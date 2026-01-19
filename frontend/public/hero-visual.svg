@@ -1,0 +1,27 @@
+<svg width="1600" height="1200" viewBox="0 0 1600 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B0B0D"/>
+      <stop offset="50%" stop-color="#1A1B1F"/>
+      <stop offset="100%" stop-color="#101114"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.3" r="0.7">
+      <stop offset="0%" stop-color="#24262B" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#15161A" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0B0B0D" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2B2D33" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0B0B0D" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1200" fill="url(#base)"/>
+  <rect width="1600" height="1200" fill="url(#glow)"/>
+  <g opacity="0.8">
+    <ellipse cx="1260" cy="280" rx="280" ry="220" fill="#1F2024"/>
+    <ellipse cx="340" cy="860" rx="320" ry="240" fill="#17181C"/>
+  </g>
+  <path d="M200 240C520 120 980 140 1320 340" stroke="url(#sheen)" stroke-width="2" opacity="0.5"/>
+  <path d="M280 520C620 420 980 420 1360 600" stroke="url(#sheen)" stroke-width="1.5" opacity="0.5"/>
+  <path d="M200 900C640 760 1040 760 1400 980" stroke="url(#sheen)" stroke-width="1.2" opacity="0.4"/>
+</svg>
