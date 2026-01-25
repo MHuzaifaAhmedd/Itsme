@@ -419,10 +419,10 @@ export default function AboutMe({ className = "" }: AboutMeProps) {
     >
       <div
         ref={containerRef}
-        className="relative flex w-full flex-col gap-12 py-24 pl-4 pr-0 md:flex-row md:items-center md:gap-16 lg:gap-20 md:pl-6 lg:pl-12 md:pr-0"
+        className="relative flex w-full flex-col gap-12 py-24 pl-4 pr-4 md:flex-row md:items-center md:gap-16 lg:gap-20 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12"
       >
         {/* Left Column - Text Content (~45%) */}
-        <div className="flex flex-1 flex-col gap-6 md:max-w-[70ch] md:flex-[0.45] md:pr-2 lg:pr-4">
+        <div className="flex flex-1 flex-col gap-6 md:max-w-[70ch] md:flex-[0.45]">
           {/* Section Label */}
           <p
             ref={labelRef}
@@ -491,10 +491,10 @@ export default function AboutMe({ className = "" }: AboutMeProps) {
         </div>
 
         {/* Right Column - Visual Anchor (~55%, full-bleed right) */}
-        <div className="relative flex flex-1 items-center justify-start w-full h-[50vh] md:sticky md:top-24 md:h-[70vh] md:flex-[0.55] lg:flex-[0.6] md:ml-8 lg:ml-16 md:w-auto">
+        <div className="relative flex flex-1 items-center justify-start w-full h-[50vh] md:sticky md:top-24 md:h-[70vh] md:flex-[0.55] lg:flex-[0.6] md:ml-16 lg:ml-32 md:w-auto">
           <div
             ref={visualRef}
-            className="relative h-full w-full overflow-hidden bg-neutral-900/80 shadow-2xl rounded-lg md:rounded-l-lg md:rounded-r-none full-bleed-right -mx-4 md:mx-0"
+            className="relative h-full w-full overflow-hidden bg-neutral-900/80 shadow-2xl rounded-lg -mx-4 md:mx-0"
             style={{
               willChange: 'transform',
             }}
