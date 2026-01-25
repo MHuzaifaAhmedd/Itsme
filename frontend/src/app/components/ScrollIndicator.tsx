@@ -178,12 +178,31 @@ export default function ScrollIndicator() {
           dot,
           {
             y: 48,
-            opacity: [0, 1, 0.8, 0],
-            scale: [0.5, 1, 1, 0.5],
-            duration: 1.2,
+            opacity: 1,
+            scale: 1,
+            duration: 0.3,
             ease: "power2.out",
           },
           delay
+        )
+        .to(
+          dot,
+          {
+            opacity: 0.8,
+            duration: 0.3,
+            ease: "power2.out",
+          },
+          delay + 0.3
+        )
+        .to(
+          dot,
+          {
+            opacity: 0,
+            scale: 0.5,
+            duration: 0.6,
+            ease: "power2.out",
+          },
+          delay + 0.6
         );
         loopTl.set(
           dot,
