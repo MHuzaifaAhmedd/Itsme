@@ -96,3 +96,18 @@ html {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Full-bleed right edge for About Me visual */
+/* Desktop: Extend to viewport right edge */
+@media (min-width: 768px) {
+  .full-bleed-right {
+    margin-right: calc((100vw - 100%) / -2);
+  }
+}
+
+/* Tablet: Slightly reduced extension for visual balance */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .full-bleed-right {
+    margin-right: calc((100vw - 100%) / -2.5);
+  }
+}

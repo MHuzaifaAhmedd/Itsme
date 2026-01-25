@@ -315,6 +315,7 @@ import Lenis from "lenis";
 import Sidebar from "./components/Sidebar";
 import AnimatedHeadline, { AnimatedHeadlineRef } from "./components/AnimatedHeadline";
 import ScrollIndicator from "./components/ScrollIndicator";
+import AboutMe from "./components/AboutMe";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -472,25 +473,31 @@ export default function Home() {
     }, root);
 
     // ===== LENIS SMOOTH SCROLL SETUP =====
-    const lenis = new Lenis({
-      lerp: 0.08, // Smoother than default for premium feel
-      smoothWheel: true,
-      wheelMultiplier: 0.8, // Slightly reduced for heavier feel
-      touchMultiplier: 1.2, // Better touch support
-      infinite: false,
-    });
+    // Disable smooth scroll on reduced motion preference
+    const lenis = prefersReducedMotion
+      ? null
+      : new Lenis({
+          lerp: 0.08, // Weighted, natural feel
+          smoothWheel: true,
+          wheelMultiplier: 1, // No inertia exaggeration
+          touchMultiplier: 1.2,
+          infinite: false,
+        });
 
     // Enhanced synchronization with GSAP ScrollTrigger
-    lenis.on("scroll", () => {
-      ScrollTrigger.update();
-    });
+    let rafFunction: ((time: number) => void) | null = null;
+    if (lenis) {
+      lenis.on("scroll", () => {
+        ScrollTrigger.update();
+      });
 
-    // Use GSAP's ticker for perfect sync
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-    
-    gsap.ticker.lagSmoothing(0);
+      // Use GSAP's ticker for perfect sync
+      rafFunction = (time: number) => {
+        lenis.raf(time * 1000);
+      };
+      gsap.ticker.add(rafFunction);
+      gsap.ticker.lagSmoothing(0);
+    }
 
     // Handle resize for stability
     let resizeTimeout: NodeJS.Timeout;
@@ -498,7 +505,9 @@ export default function Home() {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         ScrollTrigger.refresh();
-        lenis.resize();
+        if (lenis) {
+          lenis.resize();
+        }
       }, 150);
     };
 
@@ -511,8 +520,12 @@ export default function Home() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
+      if (lenis) {
+        lenis.destroy();
+        if (rafFunction) {
+          gsap.ticker.remove(rafFunction);
+        }
+      }
       ctx.revert();
       document.documentElement.style.overflow = "";
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -622,27 +635,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section
-          id="about"
-          className="relative z-10 border-t border-neutral-900 bg-neutral-950 px-6 py-24"
-        >
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
-            <div className="flex flex-col gap-4">
-              <p className="text-xs uppercase tracking-[0.5em] text-neutral-500">
-                About Me
-              </p>
-              <h2 className="text-3xl font-semibold text-neutral-100 md:text-4xl">
-                Crafting digital experiences with precision and purpose.
-              </h2>
-              <p className="max-w-2xl text-neutral-400">
-                With a focus on elegant design and performance-driven engineering,
-                I create digital products that resonate with users and deliver
-                measurable business outcomes. Every project is an opportunity to
-                push boundaries and set new standards.
-              </p>
-            </div>
-          </div>
-        </section>
+        <AboutMe />
 
         <section
           id="projects"
