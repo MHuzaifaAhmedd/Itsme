@@ -32,7 +32,7 @@ export default function ScrollIndicator() {
       gsap.set(mouseWheelRef.current, { scale: 0, rotation: -180, autoAlpha: 0 });
 
       // Create dots for animation
-      const dots = Array.from({ length: 3 }, (_, i) => {
+      const dots = Array.from({ length: 3 }, () => {
         const dot = document.createElement("div");
         dot.className = "absolute w-1 h-1 rounded-full bg-neutral-400";
         dotsContainerRef.current?.appendChild(dot);

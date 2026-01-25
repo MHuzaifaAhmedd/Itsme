@@ -316,6 +316,7 @@ import Sidebar from "./components/Sidebar";
 import AnimatedHeadline, { AnimatedHeadlineRef } from "./components/AnimatedHeadline";
 import ScrollIndicator from "./components/ScrollIndicator";
 import AboutMe from "./components/AboutMe";
+import ProjectCardsLeft from "./components/ProjectCardsLeft";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -331,6 +332,8 @@ export default function Home() {
   const ctaRef = useRef<HTMLDivElement | null>(null);
   const animatedHeadlineRef = useRef<AnimatedHeadlineRef | null>(null);
   const animatedHeadlineContainerRef = useRef<HTMLDivElement | null>(null);
+  const mainWrapperRef = useRef<HTMLDivElement | null>(null);
+  const projectsSectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -472,30 +475,40 @@ export default function Home() {
       }
     }, root);
 
-    // ===== LENIS SMOOTH SCROLL SETUP =====
-    // Disable smooth scroll on reduced motion preference
+    // ===== LENIS SMOOTH SCROLL SETUP WITH GSAP =====
+    // Optimized for mouse smoothness using GSAP ticker
     const lenis = prefersReducedMotion
       ? null
       : new Lenis({
-          lerp: 0.08, // Weighted, natural feel
-          smoothWheel: true,
-          wheelMultiplier: 1, // No inertia exaggeration
-          touchMultiplier: 1.2,
+          lerp: 0.1, // Smooth interpolation for mouse movements (0.1 = very smooth, lower = smoother)
+          duration: 1.2, // Animation duration for smooth transitions
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing for natural feel
+          smoothWheel: true, // Enable smooth mouse wheel scrolling
+          wheelMultiplier: 0.8, // Reduced multiplier for smoother, more controlled mouse scrolling
+          touchMultiplier: 1.5, // Touch device multiplier
           infinite: false,
         });
 
-    // Enhanced synchronization with GSAP ScrollTrigger
+    // Enhanced GSAP integration for perfect mouse smoothness
     let rafFunction: ((time: number) => void) | null = null;
     if (lenis) {
+      // Update ScrollTrigger on every scroll frame for smooth animations
       lenis.on("scroll", () => {
         ScrollTrigger.update();
       });
 
-      // Use GSAP's ticker for perfect sync
+      // Use GSAP's ticker for frame-perfect synchronization
+      // This ensures Lenis runs on the same frame as GSAP animations
       rafFunction = (time: number) => {
-        lenis.raf(time * 1000);
+        lenis.raf(time * 1000); // Convert GSAP time to milliseconds
       };
+      
+      // Add to GSAP ticker for synchronized updates
+      // This creates perfect sync between Lenis smooth scroll and GSAP animations
       gsap.ticker.add(rafFunction);
+      
+      // Disable lag smoothing for immediate response to mouse input
+      // This ensures mouse movements are processed immediately without delay
       gsap.ticker.lagSmoothing(0);
     }
 
@@ -534,7 +547,7 @@ export default function Home() {
 
   return (
     <div ref={rootRef} className="bg-neutral-950 text-neutral-100">
-      <Sidebar />
+      <Sidebar contentRef={mainWrapperRef} />
       <div
         ref={loaderRef}
         className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 text-neutral-200"
@@ -559,6 +572,10 @@ export default function Home() {
         </div>
       </div>
 
+      <div
+        ref={mainWrapperRef}
+        className="relative origin-center will-change-transform"
+      >
       <main className="relative">
         <section
           id="home"
@@ -638,45 +655,60 @@ export default function Home() {
         <AboutMe />
 
         <section
+          ref={projectsSectionRef}
           id="projects"
-          className="relative z-10 border-t border-neutral-900 bg-neutral-950 px-6 py-24"
+          className="relative z-10 min-h-screen md:min-h-[300vh] border-t border-neutral-900 bg-neutral-950 overflow-hidden"
         >
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
-            <div className="flex flex-col gap-4">
-              <p className="text-xs uppercase tracking-[0.5em] text-neutral-500">
+          <div className="relative flex w-full flex-col gap-12 py-24 pl-4 pr-4 md:flex-row md:items-start md:gap-16 lg:gap-20 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
+            {/* Left Column - Stacking project cards (scroll‑animated) */}
+            <div className="hidden md:block md:flex-[0.55] lg:flex-[0.6] md:sticky md:top-24 md:self-start">
+              <ProjectCardsLeft sectionRef={projectsSectionRef} />
+            </div>
+
+            {/* Right Column - Text Content (~45%) - Right aligned */}
+            <div className="flex flex-1 flex-col gap-6 md:max-w-[70ch] md:flex-[0.45] md:ml-auto">
+              {/* Section Label */}
+              <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
                 Projects
               </p>
-              <h2 className="text-3xl font-semibold text-neutral-100 md:text-4xl">
+
+              {/* Headline - Matching About section font sizes */}
+              <h2 className="text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
                 Signature projects that blend craft with measurable outcomes.
               </h2>
-              <p className="max-w-2xl text-neutral-400">
+
+              {/* Body Paragraph - Matching About section font sizes */}
+              <p className="text-left max-w-[60ch] text-base leading-relaxed text-neutral-300 md:text-lg -mt-2">
                 Each engagement is grounded in research, elevated design systems,
                 and performance-driven engineering. I partner with teams that
                 want their digital presence to feel quietly iconic.
               </p>
-            </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              {[
-                "Luxury wellness platform",
-                "Fintech onboarding redesign",
-                "Architectural studio identity",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-3xl border border-neutral-900 bg-neutral-900/40 p-6 text-neutral-300"
-                >
-                  <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
-                    Case study
-                  </p>
-                  <h3 className="mt-4 text-lg font-medium text-neutral-100">
-                    {item}
-                  </h3>
-                  <p className="mt-3 text-sm text-neutral-400">
-                    Strategy, brand systems, and immersive UI that lifts
-                    conversion and retention.
-                  </p>
-                </div>
-              ))}
+
+              {/* Projects Grid */}
+              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4">
+                {[
+                  "Luxury wellness platform",
+                  "Fintech onboarding redesign",
+                  "Architectural studio identity",
+                  "SaaS dashboard & analytics",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-3xl border border-neutral-900 bg-neutral-900/40 p-6 text-neutral-300"
+                  >
+                    <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
+                      Case study
+                    </p>
+                    <h3 className="mt-4 text-lg font-medium text-neutral-100">
+                      {item}
+                    </h3>
+                    <p className="mt-3 text-sm text-neutral-400">
+                      Strategy, brand systems, and immersive UI that lifts
+                      conversion and retention.
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -794,6 +826,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      </div>
     </div>
   );
 }

@@ -23,7 +23,7 @@ export default function BackendStatus() {
         const data = await response.json();
         setStatus(data);
         setError(null);
-      } catch (err) {
+      } catch {
         setError('Backend server is not running');
       } finally {
         setLoading(false);
