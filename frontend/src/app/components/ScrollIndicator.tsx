@@ -259,7 +259,7 @@ export default function ScrollIndicator() {
       {/* Glow effect */}
       <div
         ref={glowRef}
-        className="absolute h-16 w-px bg-gradient-to-b from-neutral-400 via-neutral-500 to-transparent"
+        className="absolute h-16 w-px bg-linear-to-b from-neutral-400 via-neutral-500 to-transparent"
         style={{ filter: "blur(4px)" }}
         aria-hidden="true"
       />
@@ -298,7 +298,7 @@ export default function ScrollIndicator() {
         {/* Inner animated line */}
         <div
           ref={lineInnerRef}
-          className="absolute top-0 h-12 w-px bg-gradient-to-b from-neutral-400 via-neutral-300 to-transparent"
+          className="absolute top-0 h-12 w-px bg-linear-to-b from-neutral-400 via-neutral-300 to-transparent"
           style={{ transform: "scaleY(0)" }}
         />
 

@@ -306,6 +306,8 @@
 //     </div>
 //   );
 // }
+
+
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -317,6 +319,7 @@ import AnimatedHeadline, { AnimatedHeadlineRef } from "./components/AnimatedHead
 import ScrollIndicator from "./components/ScrollIndicator";
 import AboutMe from "./components/AboutMe";
 import ProjectCardsLeft from "./components/ProjectCardsLeft";
+import TestimonialsSlider from "./components/TestimonialsSlider";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -589,15 +592,14 @@ export default function Home() {
           >
             <div className="absolute inset-0 overflow-hidden">
               <div 
-                className="absolute inset-0 bg-[url('/images/hero.jpg')] bg-cover bg-center"
+                className="absolute inset-0 bg-[url('/images/hero.jpg')] bg-cover bg-center bg-no-repeat"
                 style={{
                   imageRendering: "auto",
                   backfaceVisibility: "hidden",
                   transform: "translate3d(0,0,0)"
                 }}
               />
-              <div className="absolute inset-0 bg-linear-to-b from-neutral-950/40 via-neutral-950/70 to-neutral-950/95" />
-              <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.5)]" />
+              <div className="absolute inset-0 bg-linear-to-b from-transparent via-neutral-950/30 to-neutral-950/85" />
             </div>
           </div>
 
@@ -663,7 +665,7 @@ export default function Home() {
           <div className="sticky top-0 h-screen overflow-hidden">
             <div className="relative flex w-full h-full flex-col gap-12 py-24 pl-4 pr-4 md:flex-row md:items-center md:justify-between md:gap-16 lg:gap-20 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
               {/* Left Column - Stacking project cards (scroll‑animated) */}
-              <div className="hidden md:flex md:flex-[0.48] lg:flex-[0.5] md:items-center md:justify-center">
+              <div className="hidden md:flex md:flex-[0.85] lg:flex-[0.9] md:items-center md:justify-center">
                 <ProjectCardsLeft sectionRef={projectsSectionRef} />
               </div>
 
@@ -718,51 +720,23 @@ export default function Home() {
 
         <section
           id="testimonials"
-          className="relative z-10 border-t border-neutral-900 bg-neutral-950 px-6 py-24"
+          className="relative z-10 overflow-x-hidden border-t border-neutral-900 bg-neutral-950 py-24 pl-4 pr-4 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12"
         >
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
-            <div className="flex flex-col gap-4">
+          <div className="mr-auto flex w-full max-w-5xl flex-col gap-10">
+            <div className="flex flex-col gap-4 text-left">
               <p className="text-xs uppercase tracking-[0.5em] text-neutral-500">
                 Testimonials
               </p>
-              <h2 className="text-3xl font-semibold text-neutral-100 md:text-4xl">
+              <h2 className="whitespace-nowrap text-4xl font-semibold text-neutral-100 md:text-5xl lg:text-6xl leading-[1.1]">
                 What clients say about working together.
               </h2>
-              <p className="max-w-2xl text-neutral-400">
+              <p className="max-w-2xl text-base text-neutral-400 md:text-lg leading-relaxed">
                 Trusted by teams who value exceptional design and seamless execution.
               </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              {[
-                {
-                  quote: "Exceptional attention to detail and a deep understanding of user experience. The final product exceeded all expectations.",
-                  author: "Sarah Chen",
-                  role: "Product Lead, TechCorp",
-                },
-                {
-                  quote: "Working together was seamless. The design process was collaborative, and the results speak for themselves.",
-                  author: "Michael Rodriguez",
-                  role: "Founder, StartupXYZ",
-                },
-              ].map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="rounded-3xl border border-neutral-900 bg-neutral-900/40 p-8 text-neutral-300"
-                >
-                  <p className="mb-6 text-lg leading-relaxed text-neutral-200">
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-neutral-100">
-                      {testimonial.author}
-                    </span>
-                    <span className="text-sm text-neutral-500">
-                      {testimonial.role}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          </div>
+          <div className="mt-10">
+            <TestimonialsSlider />
           </div>
         </section>
 

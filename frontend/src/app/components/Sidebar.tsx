@@ -246,13 +246,13 @@ export default function Sidebar({ contentRef }: SidebarProps) {
         tabIndex={-1}
         aria-hidden="true"
         onClick={handleOverlayClick}
-        className="fixed inset-0 z-[9998] cursor-default bg-neutral-950/50 opacity-0 backdrop-blur-[20px]"
+        className="fixed inset-0 z-9998 cursor-default bg-neutral-950/50 opacity-0 backdrop-blur-[20px]"
         style={{ pointerEvents: isOpen ? "auto" : "none" }}
       />
 
       <aside
         ref={sidebarRef}
-        className={`fixed right-0 top-0 z-[9999] h-full w-full min-w-0 border-l border-neutral-800/50 bg-neutral-950/90 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] backdrop-blur-[20px] md:w-[40vw] md:min-w-[280px] md:max-w-[420px] md:rounded-l-2xl ${
+        className={`fixed right-0 top-0 z-9999 h-full w-full min-w-0 border-l border-neutral-800/50 bg-neutral-950/90 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] backdrop-blur-[20px] md:w-[40vw] md:min-w-[280px] md:max-w-[420px] md:rounded-l-2xl ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
@@ -368,7 +368,7 @@ export default function Sidebar({ contentRef }: SidebarProps) {
     <>
       <button
         onClick={handleToggle}
-        className="fixed top-6 right-6 z-[10000] flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-neutral-950/90 backdrop-blur-sm transition-colors hover:border-neutral-700 hover:bg-neutral-900/90"
+        className="fixed top-6 right-6 z-10000 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-neutral-950/90 backdrop-blur-sm transition-colors hover:border-neutral-700 hover:bg-neutral-900/90"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
         <div className="relative h-5 w-5 overflow-hidden">
