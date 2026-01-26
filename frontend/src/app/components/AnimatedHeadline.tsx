@@ -77,7 +77,7 @@ const AnimatedHeadline = forwardRef<AnimatedHeadlineRef, AnimatedHeadlineProps>(
         for (let i = 0; i <= subtitle.length; i++) {
           timeline.call(() => {
             setSubtitleText(subtitle.slice(0, i));
-          }, undefined, i * 0.08);
+          }, undefined, i * 0.05);
         }
 
         // Hide subtitle cursor at end
