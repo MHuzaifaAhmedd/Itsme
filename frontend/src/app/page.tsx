@@ -320,6 +320,7 @@ import ScrollIndicator from "./components/ScrollIndicator";
 import AboutMe from "./components/AboutMe";
 import ProjectCardsLeft from "./components/ProjectCardsLeft";
 import TestimonialsSlider from "./components/TestimonialsSlider";
+import CollaborateCTA from "./components/CollaborateCTA";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -740,68 +741,46 @@ export default function Home() {
           </div>
         </section>
 
-        <section
+        {/* Collaborate CTA Section */}
+        <CollaborateCTA className="border-t border-neutral-900" />
+
+        {/* Footer */}
+        <footer
           id="footer"
-          className="relative border-t border-neutral-900 bg-neutral-950 px-6 py-20"
+          className="relative border-t border-neutral-900 bg-neutral-950 px-6 py-12"
         >
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-            <p className="text-xs uppercase tracking-[0.5em] text-neutral-500">
-              Let&apos;s collaborate
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 text-center">
+            <p className="text-sm text-neutral-500">
+              © 2024 Portfolio Studio. All rights reserved.
             </p>
-            <h2 className="text-2xl font-semibold text-neutral-100 md:text-3xl">
-              Ready to craft your next premium release.
-            </h2>
-            <p className="max-w-2xl text-neutral-400">
-              Share a brief about your product, timeline, and goals. I partner
-              with teams that want a calm, confident digital presence.
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-4 text-sm text-neutral-500">
               <a
-                className="inline-flex h-12 items-center justify-center rounded-full border border-neutral-600 bg-neutral-50 px-7 text-sm font-medium uppercase tracking-[0.2em] text-neutral-950 transition hover:bg-white"
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition duration-200 hover:text-neutral-300"
+              >
+                GitHub
+              </a>
+              <span className="h-1 w-1 rounded-full bg-neutral-700" />
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition duration-200 hover:text-neutral-300"
+              >
+                LinkedIn
+              </a>
+              <span className="h-1 w-1 rounded-full bg-neutral-700" />
+              <a
                 href="mailto:hello@studio.com"
+                className="transition duration-200 hover:text-neutral-300"
               >
-                Start a project
+                Email
               </a>
-              <a
-                className="inline-flex h-12 items-center justify-center rounded-full border border-neutral-700 px-7 text-sm font-medium uppercase tracking-[0.2em] text-neutral-200 transition hover:border-neutral-500 hover:text-white"
-                href="#projects"
-              >
-                View projects
-              </a>
-            </div>
-            <div className="mt-12 border-t border-neutral-900 pt-8">
-              <div className="flex flex-col items-center gap-4 text-center text-sm text-neutral-500">
-                <p>© 2024 Portfolio Studio. All rights reserved.</p>
-                <div className="flex items-center gap-4">
-                  <a
-                    href="https://github.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition hover:text-neutral-300"
-                  >
-                    GitHub
-                  </a>
-                  <span className="h-1 w-1 rounded-full bg-neutral-600" />
-                  <a
-                    href="https://linkedin.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition hover:text-neutral-300"
-                  >
-                    LinkedIn
-                  </a>
-                  <span className="h-1 w-1 rounded-full bg-neutral-600" />
-                  <a
-                    href="mailto:hello@studio.com"
-                    className="transition hover:text-neutral-300"
-                  >
-                    Email
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
-        </section>
+        </footer>
       </main>
       </div>
     </div>
