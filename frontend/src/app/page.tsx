@@ -311,6 +311,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -321,6 +322,7 @@ import AboutMe from "./components/AboutMe";
 import ProjectCardsLeft from "./components/ProjectCardsLeft";
 import TestimonialsSlider from "./components/TestimonialsSlider";
 import CollaborateCTA from "./components/CollaborateCTA";
+import { createSlug } from "./utils/slug";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -345,88 +347,117 @@ export default function Home() {
       return;
     }
 
+    const skipLoader = (() => {
+      try {
+        const v = window.sessionStorage.getItem("skipHomeLoader") === "1";
+        if (v) window.sessionStorage.removeItem("skipHomeLoader");
+        return v;
+      } catch {
+        return false;
+      }
+    })();
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    document.documentElement.style.overflow = "hidden";
+    document.documentElement.style.overflow = skipLoader ? "" : "hidden";
 
     const ctx = gsap.context(() => {
-      // Initial states
-      gsap.set(heroRef.current, { autoAlpha: 0 });
-      gsap.set([eyebrowRef.current, headlineRef.current, ctaRef.current], {
-        y: 24,
-        autoAlpha: 0,
-      });
-      gsap.set(heroImageRef.current, { 
-        scale: 1.1,  // Slightly zoomed in - starting state for scroll animation
-        yPercent: 8, // Positioned lower than center - starting state for scroll animation
-        autoAlpha: 0 
-      });
+      if (skipLoader) {
+        // Skip loader when returning from Case Study.
+        gsap.set(loaderRef.current, { autoAlpha: 0, display: "none" });
+        gsap.set(heroRef.current, { autoAlpha: 1 });
+        gsap.set([eyebrowRef.current, headlineRef.current, ctaRef.current], {
+          y: 0,
+          autoAlpha: 1,
+        });
+        gsap.set(heroImageRef.current, {
+          scale: 1.1,
+          yPercent: 8,
+          autoAlpha: 1,
+        });
+      } else {
+        // Initial states
+        gsap.set(heroRef.current, { autoAlpha: 0 });
+        gsap.set([eyebrowRef.current, headlineRef.current, ctaRef.current], {
+          y: 24,
+          autoAlpha: 0,
+        });
+        gsap.set(heroImageRef.current, {
+          scale: 1.1, // Slightly zoomed in - starting state for scroll animation
+          yPercent: 8, // Positioned lower than center - starting state for scroll animation
+          autoAlpha: 0,
+        });
 
-      const progress = { value: 0 };
-      const loaderTimeline = gsap.timeline({
-        defaults: { ease: "power3.out" },
-        onComplete: () => {
-          document.documentElement.style.overflow = "";
-          ScrollTrigger.refresh();
-        },
-      });
+        const progress = { value: 0 };
+        const loaderTimeline = gsap.timeline({
+          defaults: { ease: "power3.out" },
+          onComplete: () => {
+            document.documentElement.style.overflow = "";
+            ScrollTrigger.refresh();
+          },
+        });
 
-      loaderTimeline
-        .fromTo(
-          loaderLineRef.current,
-          { scaleX: 0 },
-          { scaleX: 1, duration: prefersReducedMotion ? 0.4 : 1.6, ease: "power2.inOut" },
-        )
-        .fromTo(
-          progress,
-          { value: 0 },
-          {
-            value: 100,
-            duration: prefersReducedMotion ? 0.4 : 1.6,
-            ease: "power2.inOut",
-            onUpdate: () => {
-              if (loaderTextRef.current) {
-                loaderTextRef.current.textContent = `${Math.round(progress.value)}%`;
-              }
+        loaderTimeline
+          .fromTo(
+            loaderLineRef.current,
+            { scaleX: 0 },
+            {
+              scaleX: 1,
+              duration: prefersReducedMotion ? 0.4 : 1.6,
+              ease: "power2.inOut",
             },
-          },
-          "<",
-        )
-        .to(
-          loaderRef.current,
-          {
-            autoAlpha: 0,
-            duration: prefersReducedMotion ? 0.2 : 0.6,
-            ease: "power2.out",
-          },
-          "+=0.1",
-        )
-        .set(loaderRef.current, { display: "none" })
-        .to(heroRef.current, { autoAlpha: 1, duration: 0.01 })
-        .to(
-          heroImageRef.current,
-          {
-            autoAlpha: 1,
-            // Keep initial scroll animation state (scale: 1.1, yPercent: 8)
-            // Don't change these as they are the starting point for scroll animation
-            duration: prefersReducedMotion ? 0.3 : 1.2,
-            ease: "expo.out",
-          },
-          "<",
-        )
-        .to(
-          [eyebrowRef.current, headlineRef.current, ctaRef.current],
-          {
-            y: 0,
-            autoAlpha: 1,
-            duration: prefersReducedMotion ? 0.2 : 0.8,
-            stagger: prefersReducedMotion ? 0 : 0.08,
-            ease: "power3.out",
-          },
-          "-=0.6",
-        );
+          )
+          .fromTo(
+            progress,
+            { value: 0 },
+            {
+              value: 100,
+              duration: prefersReducedMotion ? 0.4 : 1.6,
+              ease: "power2.inOut",
+              onUpdate: () => {
+                if (loaderTextRef.current) {
+                  loaderTextRef.current.textContent = `${Math.round(progress.value)}%`;
+                }
+              },
+            },
+            "<",
+          )
+          .to(
+            loaderRef.current,
+            {
+              autoAlpha: 0,
+              duration: prefersReducedMotion ? 0.2 : 0.6,
+              ease: "power2.out",
+            },
+            "+=0.1",
+          )
+          .set(loaderRef.current, { display: "none" })
+          .to(heroRef.current, { autoAlpha: 1, duration: 0.01 })
+          .to(
+            heroImageRef.current,
+            {
+              autoAlpha: 1,
+              // Keep initial scroll animation state (scale: 1.1, yPercent: 8)
+              // Don't change these as they are the starting point for scroll animation
+              duration: prefersReducedMotion ? 0.3 : 1.2,
+              ease: "expo.out",
+            },
+            "<",
+          )
+          .to(
+            [eyebrowRef.current, headlineRef.current, ctaRef.current],
+            {
+              y: 0,
+              autoAlpha: 1,
+              duration: prefersReducedMotion ? 0.2 : 0.8,
+              stagger: prefersReducedMotion ? 0 : 0.08,
+              ease: "power3.out",
+            },
+            "-=0.6",
+          );
+      }
 
       // ===== CINEMATIC SCROLL-BASED PARALLAX ANIMATION =====
       // Background image must move visibly on scroll - not on load
@@ -514,6 +545,29 @@ export default function Home() {
       // Disable lag smoothing for immediate response to mouse input
       // This ensures mouse movements are processed immediately without delay
       gsap.ticker.lagSmoothing(0);
+    }
+
+    // If we returned from Case Study, land at the correct section immediately.
+    if (skipLoader) {
+      const scrollTarget = () => {
+        const hash = window.location.hash;
+        if (hash) {
+          const el = document.querySelector(hash) as HTMLElement | null;
+          if (el) {
+            if (lenis) {
+              // Lenis-controlled instant jump (no animation)
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (lenis as any).scrollTo(el, { immediate: true });
+            } else {
+              el.scrollIntoView({ behavior: "auto", block: "start" });
+            }
+          }
+        }
+      };
+      requestAnimationFrame(() => {
+        scrollTarget();
+        ScrollTrigger.refresh();
+      });
     }
 
     // Handle resize for stability
@@ -692,25 +746,42 @@ export default function Home() {
                 {/* Projects Grid */}
                 <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4">
                   {[
-                    "Luxury wellness platform",
-                    "Fintech onboarding redesign",
-                    "Architectural studio identity",
-                    "SaaS dashboard & analytics",
+                    {
+                      name: "Employee Management System",
+                      description: "Comprehensive system for managing employee data, attendance, and organizational workflows.",
+                    },
+                    {
+                      name: "Sharaf ul Quran",
+                      description: "Digital platform for Quranic learning and spiritual guidance.",
+                    },
+                    {
+                      name: "Whatsapp funnel (Lead Management system)",
+                      description: "Automated lead generation and management system integrated with WhatsApp messaging.",
+                    },
+                    {
+                      name: "Naba Hussam",
+                      description: "Ecommerce platform specializing in women's clothing with elegant design and seamless shopping experience.",
+                    },
                   ].map((item) => (
                     <div
-                      key={item}
-                      className="rounded-3xl border border-neutral-900 bg-neutral-900/40 p-6 text-neutral-300"
+                      key={item.name}
+                      className="rounded-3xl border border-neutral-900 bg-neutral-900/40 p-6 text-neutral-300 flex flex-col"
                     >
-                      <p className="text-sm uppercase tracking-[0.2em] text-neutral-500">
+                      <p className="text-xs uppercase tracking-[0.2em] text-neutral-500">
                         Case study
                       </p>
-                      <h3 className="mt-4 text-lg font-medium text-neutral-100">
-                        {item}
+                      <h3 className="mt-3 text-base font-medium text-neutral-100">
+                        {item.name}
                       </h3>
-                      <p className="mt-3 text-sm text-neutral-400">
-                        Strategy, brand systems, and immersive UI that lifts
-                        conversion and retention.
+                      <p className="mt-2 text-xs text-neutral-400 flex-1">
+                        {item.description}
                       </p>
+                      <Link
+                        href={`/case-study/${createSlug(item.name)}`}
+                        className="mt-4 w-fit px-4 py-2 text-xs font-medium text-neutral-100 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-neutral-600 rounded-lg transition-colors"
+                      >
+                        View
+                      </Link>
                     </div>
                   ))}
                 </div>

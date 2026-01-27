@@ -649,31 +649,33 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { createSlug } from "../utils/slug";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PROJECTS = [
+export const PROJECTS = [
   {
-    name: "Luxury wellness platform",
-    image: "/images/project1.jpg",
-    line: "Strategy, brand systems, and immersive UI that lifts conversion.",
+    name: "Employee Management System",
+    image: "/images/p2.jpg",
+    line: "Comprehensive system for managing employee data, attendance, and organizational workflows.",
   },
   {
-    name: "Fintech onboarding redesign",
-    image: "/images/proejct2.jpg",
-    line: "Streamlined flows and trust-driven design for higher completion.",
+    name: "Sharaf ul Quran",
+    image: "/images/p1.jpg",
+    line: "Digital platform for Quranic learning and spiritual guidance.",
   },
   {
-    name: "Architectural studio identity",
-    image: "/images/project3.jpg",
-    line: "Quietly iconic digital presence that reflects craft and scale.",
+    name: "Whatsapp funnel (Lead Management system)",
+    image: "/images/p3.jpg",
+    line: "Automated lead generation and management system integrated with WhatsApp messaging.",
   },
   {
-    name: "SaaS dashboard & analytics",
-    image: "/images/project4.jpg",
-    line: "Data clarity and actionable insights through elegant interfaces.",
+    name: "Naba Hussam",
+    image: "/images/p4.jpg",
+    line: "Ecommerce platform specializing in women's clothing with elegant design and seamless shopping experience.",
   },
 ];
 
@@ -783,21 +785,32 @@ export default function ProjectCardsLeft({
               zIndex: i,
             }}
           >
-            <Image
-              src={p.image}
-              alt={p.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 90vw, 45vw"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-neutral-950/90 via-neutral-950/30 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+            <div className="absolute inset-0 pointer-events-none">
+              <Image
+                src={p.image}
+                alt={p.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 90vw, 45vw"
+              />
+            </div>
+            <div className="absolute inset-0 bg-linear-to-t from-neutral-950/90 via-neutral-950/30 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7 z-10 pointer-events-auto">
               <h3 className="text-lg md:text-xl font-semibold text-white drop-shadow-lg">
                 {p.name}
               </h3>
               <p className="mt-2 text-sm md:text-base text-neutral-300 max-w-[85%]">
                 {p.line}
               </p>
+              <Link
+                href={`/case-study/${createSlug(p.name)}`}
+                className="inline-block mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 relative z-20 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                View Case Study
+              </Link>
             </div>
           </div>
         ))}
