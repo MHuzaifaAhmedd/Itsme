@@ -24,6 +24,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Force scroll to top IMMEDIATELY on page load - before React hydrates
+              // This prevents browser from restoring scroll position on reload
+              if (typeof window !== 'undefined') {
+                window.history.scrollRestoration = 'manual';
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                
+                // Also handle DOMContentLoaded to catch any late scroll restoration attempts
+                document.addEventListener('DOMContentLoaded', function() {
+                  window.scrollTo(0, 0);
+                  document.documentElement.scrollTop = 0;
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

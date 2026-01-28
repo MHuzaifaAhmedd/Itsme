@@ -82,9 +82,17 @@ body {
   }
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling & prevent layout shift when scrollbar appears/disappears */
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  /* Ensure page starts at top on load */
+  scroll-padding-top: 0;
+}
+
+/* Prevent any initial scroll jump on page load */
+html, body {
+  overflow-anchor: none;
 }
 
 /* Hide scrollbar for specific elements if needed */

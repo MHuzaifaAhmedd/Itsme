@@ -357,11 +357,52 @@ export default function Home() {
       }
     })();
 
+    // CRITICAL: Always reset scroll position to top on mount/reload
+    // This ensures the loading animation always starts from the beginning
+    // Award-winning sites always reset scroll on page load for consistent UX
+    window.history.scrollRestoration = 'manual';
+    
+    // Immediate scroll reset - before anything else
+    const forceScrollToTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      // Also set via style to override any browser behavior
+      if (document.scrollingElement) {
+        document.scrollingElement.scrollTop = 0;
+      }
+    };
+
+    // Remove hash from URL to prevent browser auto-scroll to anchors
+    // This ensures page always starts from top regardless of URL hash
+    if (window.location.hash && !skipLoader) {
+      // Only clear hash if we're showing the loader (fresh page load/reload)
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    
+    // Force scroll to top immediately
+    forceScrollToTop();
+
+    // Force again after a brief delay to override browser scroll restoration
+    // This handles cases where browser tries to restore scroll after component mount
+    setTimeout(forceScrollToTop, 0);
+    setTimeout(forceScrollToTop, 10);
+    setTimeout(forceScrollToTop, 50);
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
     document.documentElement.style.overflow = skipLoader ? "" : "hidden";
+    
+    // Lock scroll position at top during loading
+    if (!skipLoader) {
+      document.body.style.position = 'fixed';
+      document.body.style.top = '0';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+    }
 
     const ctx = gsap.context(() => {
       if (skipLoader) {
@@ -377,6 +418,12 @@ export default function Home() {
           yPercent: 8,
           autoAlpha: 1,
         });
+        // If no hash, ensure we're at the top
+        if (!window.location.hash) {
+          window.scrollTo(0, 0);
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        }
       } else {
         // Initial states
         gsap.set(heroRef.current, { autoAlpha: 0 });
@@ -394,7 +441,23 @@ export default function Home() {
         const loaderTimeline = gsap.timeline({
           defaults: { ease: "power3.out" },
           onComplete: () => {
+            // Remove fixed positioning and restore normal scroll
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.width = '';
             document.documentElement.style.overflow = "";
+            
+            // Force scroll to top after loading animation completes
+            // This ensures we're at the top before revealing content
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            if (document.scrollingElement) {
+              document.scrollingElement.scrollTop = 0;
+            }
+            
             ScrollTrigger.refresh();
           },
         });
@@ -598,8 +661,16 @@ export default function Home() {
         }
       }
       ctx.revert();
+      // Clean up body styles
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
       document.documentElement.style.overflow = "";
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      // Restore default scroll restoration behavior on cleanup
+      window.history.scrollRestoration = 'auto';
     };
   }, []);
 
