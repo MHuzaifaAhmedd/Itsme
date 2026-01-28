@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect } from "react";
 import { getCaseStudyBySlug } from "../data/caseStudies";
 import CaseStudyTemplate from "../components/CaseStudyTemplate";
+import EMSCaseStudyTemplate from "../components/EMSCaseStudyTemplate";
 
 /**
  * Dynamic Case Study Page
@@ -12,6 +13,8 @@ import CaseStudyTemplate from "../components/CaseStudyTemplate";
  * 
  * Renders complete case study with all 14 sections
  * using the centralized data structure
+ * 
+ * For EMS project, uses enhanced template with interactive diagrams
  */
 export default function CaseStudyPage() {
   const params = useParams();
@@ -39,6 +42,11 @@ export default function CaseStudyPage() {
         <div className="text-white text-lg">Loading...</div>
       </div>
     );
+  }
+
+  // Use EMS-specific template for employee-management-system
+  if (slug === 'employee-management-system') {
+    return <EMSCaseStudyTemplate data={project} />;
   }
 
   return <CaseStudyTemplate data={project} />;

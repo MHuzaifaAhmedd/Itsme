@@ -1,0 +1,1375 @@
+{
+  "version": "1.0.0",
+  "diagrams": [
+    {
+      "id": "system-architecture",
+      "title": "System Architecture Diagram",
+      "description": "High-level overview of the EMS system showing frontend applications, backend services, databases, and external integrations",
+      "nodes": [
+        {
+          "id": "employee-portal",
+          "label": "Employee Portal",
+          "type": "frontend",
+          "tech": "Next.js 16.0.7",
+          "port": "3000",
+          "group": "frontend"
+        },
+        {
+          "id": "admin-portal",
+          "label": "Admin Portal",
+          "type": "frontend",
+          "tech": "Next.js 16.0.7",
+          "port": "3001",
+          "group": "frontend"
+        },
+        {
+          "id": "superadmin-portal",
+          "label": "SuperAdmin Portal",
+          "type": "frontend",
+          "tech": "Next.js 16.0.7",
+          "port": "3002",
+          "group": "frontend"
+        },
+        {
+          "id": "mobile-app",
+          "label": "Mobile App",
+          "type": "frontend",
+          "tech": "React Native + Expo",
+          "group": "frontend"
+        },
+        {
+          "id": "express-api",
+          "label": "Express API Gateway",
+          "type": "backend",
+          "tech": "Express 4.18.2",
+          "port": "5000",
+          "group": "backend"
+        },
+        {
+          "id": "websocket-service",
+          "label": "WebSocket Server",
+          "type": "service",
+          "tech": "Socket.io 4.8.1",
+          "group": "backend"
+        },
+        {
+          "id": "performance-service",
+          "label": "Performance Service",
+          "type": "service",
+          "lines": "477 lines",
+          "group": "backend"
+        },
+        {
+          "id": "attendance-service",
+          "label": "Attendance Service",
+          "type": "service",
+          "group": "backend"
+        },
+        {
+          "id": "notification-service",
+          "label": "Notification Service",
+          "type": "service",
+          "lines": "358 lines",
+          "group": "backend"
+        },
+        {
+          "id": "zkteco-service",
+          "label": "ZKTeco Service",
+          "type": "service",
+          "group": "backend"
+        },
+        {
+          "id": "mongodb",
+          "label": "MongoDB",
+          "type": "database",
+          "tech": "Mongoose 9.0.1",
+          "collections": "25+",
+          "group": "data"
+        },
+        {
+          "id": "redis",
+          "label": "Redis Cache",
+          "type": "cache",
+          "tech": "ioredis 5.8.2",
+          "hitRate": "85%+",
+          "group": "data"
+        },
+        {
+          "id": "bull-queue",
+          "label": "Bull Job Queue",
+          "type": "queue",
+          "tech": "Bull 4.12.0",
+          "group": "data"
+        },
+        {
+          "id": "aws-s3",
+          "label": "AWS S3",
+          "type": "external",
+          "purpose": "Document Storage",
+          "group": "external"
+        },
+        {
+          "id": "fcm",
+          "label": "Firebase Cloud Messaging",
+          "type": "external",
+          "purpose": "Push Notifications",
+          "group": "external"
+        },
+        {
+          "id": "ipdata",
+          "label": "IPData API",
+          "type": "external",
+          "purpose": "IP Geolocation",
+          "group": "external"
+        },
+        {
+          "id": "zkteco-device",
+          "label": "ZKTeco Biometric Device",
+          "type": "external",
+          "purpose": "Attendance Push",
+          "group": "external"
+        }
+      ],
+      "edges": [
+        {
+          "source": "employee-portal",
+          "target": "express-api",
+          "label": "HTTP/WebSocket"
+        },
+        {
+          "source": "admin-portal",
+          "target": "express-api",
+          "label": "HTTP/WebSocket"
+        },
+        {
+          "source": "superadmin-portal",
+          "target": "express-api",
+          "label": "HTTP/WebSocket"
+        },
+        {
+          "source": "mobile-app",
+          "target": "express-api",
+          "label": "HTTP/WebSocket"
+        },
+        {
+          "source": "express-api",
+          "target": "performance-service",
+          "label": "Service Call"
+        },
+        {
+          "source": "express-api",
+          "target": "attendance-service",
+          "label": "Service Call"
+        },
+        {
+          "source": "express-api",
+          "target": "notification-service",
+          "label": "Service Call"
+        },
+        {
+          "source": "express-api",
+          "target": "zkteco-service",
+          "label": "Service Call"
+        },
+        {
+          "source": "express-api",
+          "target": "websocket-service",
+          "label": "Event Emit"
+        },
+        {
+          "source": "performance-service",
+          "target": "mongodb",
+          "label": "Aggregation Queries"
+        },
+        {
+          "source": "attendance-service",
+          "target": "mongodb",
+          "label": "CRUD Operations"
+        },
+        {
+          "source": "notification-service",
+          "target": "mongodb",
+          "label": "Store Notifications"
+        },
+        {
+          "source": "zkteco-service",
+          "target": "mongodb",
+          "label": "Store Attendance"
+        },
+        {
+          "source": "performance-service",
+          "target": "redis",
+          "label": "Cache (3min TTL)"
+        },
+        {
+          "source": "attendance-service",
+          "target": "redis",
+          "label": "Cache (1hr TTL)"
+        },
+        {
+          "source": "notification-service",
+          "target": "bull-queue",
+          "label": "Enqueue FCM Jobs"
+        },
+        {
+          "source": "bull-queue",
+          "target": "redis",
+          "label": "Job Persistence"
+        },
+        {
+          "source": "notification-service",
+          "target": "fcm",
+          "label": "Batch Send (500 tokens)"
+        },
+        {
+          "source": "websocket-service",
+          "target": "employee-portal",
+          "label": "Real-time Events"
+        },
+        {
+          "source": "websocket-service",
+          "target": "admin-portal",
+          "label": "Real-time Events"
+        },
+        {
+          "source": "websocket-service",
+          "target": "mobile-app",
+          "label": "Real-time Events"
+        },
+        {
+          "source": "attendance-service",
+          "target": "aws-s3",
+          "label": "Document Storage"
+        },
+        {
+          "source": "attendance-service",
+          "target": "ipdata",
+          "label": "IP Geolocation"
+        },
+        {
+          "source": "zkteco-device",
+          "target": "express-api",
+          "label": "Push Attendance Data"
+        }
+      ]
+    },
+    {
+      "id": "authentication-flow",
+      "title": "Authentication & Authorization Flow",
+      "description": "Complete authentication lifecycle from login to authorized request processing with multi-layer security validation",
+      "nodes": [
+        {
+          "id": "auth-user",
+          "label": "User",
+          "type": "actor",
+          "group": "client"
+        },
+        {
+          "id": "auth-frontend",
+          "label": "Frontend App",
+          "type": "frontend",
+          "group": "client"
+        },
+        {
+          "id": "auth-express",
+          "label": "Express API",
+          "type": "backend",
+          "group": "backend"
+        },
+        {
+          "id": "auth-helmet",
+          "label": "Helmet (Security Headers)",
+          "type": "middleware",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-cors",
+          "label": "CORS Validation",
+          "type": "middleware",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-ratelimit",
+          "label": "Rate Limiting",
+          "type": "middleware",
+          "limit": "1000/15min",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-csrf",
+          "label": "CSRF Token Validation",
+          "type": "middleware",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-jwt",
+          "label": "JWT Authentication",
+          "type": "middleware",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-role",
+          "label": "Role Authorization",
+          "type": "middleware",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-geofence",
+          "label": "IP Geofencing",
+          "type": "middleware",
+          "modes": "hard/soft",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-device",
+          "label": "Device Validation",
+          "type": "middleware",
+          "group": "middleware"
+        },
+        {
+          "id": "auth-handler",
+          "label": "Route Handler",
+          "type": "handler",
+          "group": "backend"
+        },
+        {
+          "id": "auth-mongodb",
+          "label": "MongoDB",
+          "type": "database",
+          "group": "data"
+        },
+        {
+          "id": "auth-redis",
+          "label": "Redis",
+          "type": "cache",
+          "group": "data"
+        },
+        {
+          "id": "auth-ipdata",
+          "label": "IPData API",
+          "type": "external",
+          "group": "external"
+        }
+      ],
+      "edges": [
+        {
+          "source": "auth-user",
+          "target": "auth-frontend",
+          "label": "Enter credentials"
+        },
+        {
+          "source": "auth-frontend",
+          "target": "auth-express",
+          "label": "POST /api/auth/login"
+        },
+        {
+          "source": "auth-express",
+          "target": "auth-helmet",
+          "label": "Request enters"
+        },
+        {
+          "source": "auth-helmet",
+          "target": "auth-cors",
+          "label": "Headers set"
+        },
+        {
+          "source": "auth-cors",
+          "target": "auth-ratelimit",
+          "label": "Origin validated"
+        },
+        {
+          "source": "auth-ratelimit",
+          "target": "auth-csrf",
+          "label": "Rate check (Redis)"
+        },
+        {
+          "source": "auth-csrf",
+          "target": "auth-jwt",
+          "label": "CSRF token valid"
+        },
+        {
+          "source": "auth-jwt",
+          "target": "auth-mongodb",
+          "label": "Verify JWT & fetch User"
+        },
+        {
+          "source": "auth-mongodb",
+          "target": "auth-jwt",
+          "label": "User data"
+        },
+        {
+          "source": "auth-jwt",
+          "target": "auth-role",
+          "label": "JWT valid, attach req.user"
+        },
+        {
+          "source": "auth-role",
+          "target": "auth-geofence",
+          "label": "Role check passed"
+        },
+        {
+          "source": "auth-geofence",
+          "target": "auth-redis",
+          "label": "Get SystemSettings (cache)"
+        },
+        {
+          "source": "auth-redis",
+          "target": "auth-geofence",
+          "label": "Office IP CIDRs"
+        },
+        {
+          "source": "auth-geofence",
+          "target": "auth-ipdata",
+          "label": "IP geolocation (audit)"
+        },
+        {
+          "source": "auth-ipdata",
+          "target": "auth-geofence",
+          "label": "Location data"
+        },
+        {
+          "source": "auth-geofence",
+          "target": "auth-device",
+          "label": "IP validated"
+        },
+        {
+          "source": "auth-device",
+          "target": "auth-mongodb",
+          "label": "Check trusted devices"
+        },
+        {
+          "source": "auth-mongodb",
+          "target": "auth-device",
+          "label": "Device status"
+        },
+        {
+          "source": "auth-device",
+          "target": "auth-handler",
+          "label": "All checks passed"
+        },
+        {
+          "source": "auth-handler",
+          "target": "auth-mongodb",
+          "label": "Business logic queries"
+        },
+        {
+          "source": "auth-mongodb",
+          "target": "auth-handler",
+          "label": "Response data"
+        },
+        {
+          "source": "auth-handler",
+          "target": "auth-frontend",
+          "label": "JSON response + httpOnly cookie"
+        },
+        {
+          "source": "auth-frontend",
+          "target": "auth-user",
+          "label": "Display result"
+        }
+      ]
+    },
+    {
+      "id": "attendance-lifecycle",
+      "title": "Attendance Check-In/Out Lifecycle",
+      "description": "Complete flow of employee attendance tracking from check-in button click to real-time dashboard update, including geofencing validation and late calculation",
+      "nodes": [
+        {
+          "id": "att-employee",
+          "label": "Employee",
+          "type": "actor",
+          "group": "client"
+        },
+        {
+          "id": "att-ui",
+          "label": "Check-In Button",
+          "type": "ui",
+          "group": "client"
+        },
+        {
+          "id": "att-validation",
+          "label": "Client Validation",
+          "type": "logic",
+          "checks": "Already checked in?",
+          "group": "client"
+        },
+        {
+          "id": "att-api-call",
+          "label": "API Request",
+          "type": "api",
+          "endpoint": "POST /api/attendance/checkin",
+          "group": "client"
+        },
+        {
+          "id": "att-middleware",
+          "label": "Middleware Chain",
+          "type": "middleware",
+          "layers": "JWT + CSRF + Geofence + Device",
+          "group": "backend"
+        },
+        {
+          "id": "att-route",
+          "label": "Route Handler",
+          "type": "handler",
+          "group": "backend"
+        },
+        {
+          "id": "att-service",
+          "label": "Attendance Service",
+          "type": "service",
+          "group": "backend"
+        },
+        {
+          "id": "att-settings",
+          "label": "Get System Settings",
+          "type": "service",
+          "data": "Work hours, grace period",
+          "group": "backend"
+        },
+        {
+          "id": "att-create",
+          "label": "Create Attendance Record",
+          "type": "logic",
+          "fields": "checkInTime, status: in_progress",
+          "group": "backend"
+        },
+        {
+          "id": "att-mongodb",
+          "label": "MongoDB",
+          "type": "database",
+          "collection": "Attendance",
+          "group": "data"
+        },
+        {
+          "id": "att-cache-invalidate",
+          "label": "Invalidate Cache",
+          "type": "cache",
+          "action": "DEL attendance:summary:{userId}",
+          "group": "data"
+        },
+        {
+          "id": "att-redis",
+          "label": "Redis Cache",
+          "type": "cache",
+          "group": "data"
+        },
+        {
+          "id": "att-websocket",
+          "label": "WebSocket Service",
+          "type": "service",
+          "event": "attendance:update",
+          "group": "backend"
+        },
+        {
+          "id": "att-notification",
+          "label": "Notification Service",
+          "type": "service",
+          "group": "backend"
+        },
+        {
+          "id": "att-fcm-queue",
+          "label": "FCM Job Queue",
+          "type": "queue",
+          "tech": "Bull",
+          "group": "data"
+        },
+        {
+          "id": "att-response",
+          "label": "JSON Response",
+          "type": "response",
+          "data": "{ success, attendance }",
+          "group": "backend"
+        },
+        {
+          "id": "att-ui-update",
+          "label": "UI Update",
+          "type": "ui",
+          "action": "Show check-in confirmation",
+          "group": "client"
+        },
+        {
+          "id": "att-admin-dashboard",
+          "label": "Admin Dashboard",
+          "type": "frontend",
+          "update": "Real-time",
+          "group": "client"
+        },
+        {
+          "id": "att-fcm",
+          "label": "Firebase Cloud Messaging",
+          "type": "external",
+          "group": "external"
+        },
+        {
+          "id": "att-admin-mobile",
+          "label": "Admin Mobile Device",
+          "type": "device",
+          "group": "client"
+        }
+      ],
+      "edges": [
+        {
+          "source": "att-employee",
+          "target": "att-ui",
+          "label": "Click Check-In"
+        },
+        {
+          "source": "att-ui",
+          "target": "att-validation",
+          "label": "Validate state"
+        },
+        {
+          "source": "att-validation",
+          "target": "att-api-call",
+          "label": "Not checked in"
+        },
+        {
+          "source": "att-api-call",
+          "target": "att-middleware",
+          "label": "HTTP POST + JWT cookie + Device ID"
+        },
+        {
+          "source": "att-middleware",
+          "target": "att-route",
+          "label": "All checks passed"
+        },
+        {
+          "source": "att-route",
+          "target": "att-service",
+          "label": "Call checkIn(userId, date)"
+        },
+        {
+          "source": "att-service",
+          "target": "att-settings",
+          "label": "Fetch settings"
+        },
+        {
+          "source": "att-settings",
+          "target": "att-redis",
+          "label": "Cache check"
+        },
+        {
+          "source": "att-redis",
+          "target": "att-settings",
+          "label": "Return settings"
+        },
+        {
+          "source": "att-settings",
+          "target": "att-create",
+          "label": "Settings loaded"
+        },
+        {
+          "source": "att-create",
+          "target": "att-mongodb",
+          "label": "Attendance.create()"
+        },
+        {
+          "source": "att-mongodb",
+          "target": "att-cache-invalidate",
+          "label": "Post-save hook"
+        },
+        {
+          "source": "att-cache-invalidate",
+          "target": "att-redis",
+          "label": "DEL cache key"
+        },
+        {
+          "source": "att-mongodb",
+          "target": "att-websocket",
+          "label": "Emit event"
+        },
+        {
+          "source": "att-websocket",
+          "target": "att-admin-dashboard",
+          "label": "Socket.io emit to admin:onboarding room"
+        },
+        {
+          "source": "att-mongodb",
+          "target": "att-notification",
+          "label": "Create notification"
+        },
+        {
+          "source": "att-notification",
+          "target": "att-fcm-queue",
+          "label": "Enqueue FCM job"
+        },
+        {
+          "source": "att-fcm-queue",
+          "target": "att-fcm",
+          "label": "Background worker sends (batch 500)"
+        },
+        {
+          "source": "att-fcm",
+          "target": "att-admin-mobile",
+          "label": "Push notification"
+        },
+        {
+          "source": "att-mongodb",
+          "target": "att-response",
+          "label": "Return attendance record"
+        },
+        {
+          "source": "att-response",
+          "target": "att-ui-update",
+          "label": "JSON response (80-170ms)"
+        },
+        {
+          "source": "att-ui-update",
+          "target": "att-employee",
+          "label": "Show confirmation + disable button"
+        }
+      ]
+    },
+    {
+      "id": "task-lifecycle",
+      "title": "Task Assignment & Verification Lifecycle",
+      "description": "Complete workflow from admin creating a task through employee completion and proof submission to final admin verification",
+      "nodes": [
+        {
+          "id": "task-admin",
+          "label": "Admin",
+          "type": "actor",
+          "group": "admin"
+        },
+        {
+          "id": "task-create-form",
+          "label": "Create Task Form",
+          "type": "ui",
+          "fields": "Title, deadline, priority, assignees",
+          "group": "admin"
+        },
+        {
+          "id": "task-api-create",
+          "label": "POST /api/tasks",
+          "type": "api",
+          "group": "admin"
+        },
+        {
+          "id": "task-service",
+          "label": "Task Service",
+          "type": "service",
+          "group": "backend"
+        },
+        {
+          "id": "task-assignment-logic",
+          "label": "Assignment Logic",
+          "type": "logic",
+          "types": "individual/department/global",
+          "group": "backend"
+        },
+        {
+          "id": "task-create-record",
+          "label": "Create Task Record",
+          "type": "logic",
+          "structure": "completedBy array per assignee",
+          "group": "backend"
+        },
+        {
+          "id": "task-mongodb",
+          "label": "MongoDB",
+          "type": "database",
+          "collection": "Task",
+          "group": "data"
+        },
+        {
+          "id": "task-notify-employees",
+          "label": "Notify Assignees",
+          "type": "service",
+          "channels": "WebSocket + FCM",
+          "group": "backend"
+        },
+        {
+          "id": "task-employee",
+          "label": "Employee",
+          "type": "actor",
+          "group": "employee"
+        },
+        {
+          "id": "task-employee-ui",
+          "label": "Task List UI",
+          "type": "ui",
+          "group": "employee"
+        },
+        {
+          "id": "task-start",
+          "label": "Start Task",
+          "type": "action",
+          "status": "active",
+          "group": "employee"
+        },
+        {
+          "id": "task-work",
+          "label": "Work on Task",
+          "type": "action",
+          "group": "employee"
+        },
+        {
+          "id": "task-upload-proof",
+          "label": "Upload Proof Files",
+          "type": "action",
+          "destination": "S3",
+          "group": "employee"
+        },
+        {
+          "id": "task-s3",
+          "label": "AWS S3",
+          "type": "external",
+          "storage": "Task attachments",
+          "group": "external"
+        },
+        {
+          "id": "task-mark-complete",
+          "label": "Mark Complete",
+          "type": "api",
+          "endpoint": "POST /api/tasks/:id/complete",
+          "group": "employee"
+        },
+        {
+          "id": "task-update-completion",
+          "label": "Update completedBy Entry",
+          "type": "logic",
+          "fields": "status: completed, proofFiles, completedAt",
+          "group": "backend"
+        },
+        {
+          "id": "task-notify-admin",
+          "label": "Notify Admin",
+          "type": "service",
+          "message": "Task completed, awaiting verification",
+          "group": "backend"
+        },
+        {
+          "id": "task-admin-review",
+          "label": "Admin Reviews Proof",
+          "type": "ui",
+          "group": "admin"
+        },
+        {
+          "id": "task-verify",
+          "label": "Approve/Reject",
+          "type": "api",
+          "endpoint": "PATCH /api/tasks/:id/verify/:employeeId",
+          "group": "admin"
+        },
+        {
+          "id": "task-update-verification",
+          "label": "Update Verification Status",
+          "type": "logic",
+          "values": "verified | rejected",
+          "group": "backend"
+        },
+        {
+          "id": "task-performance-impact",
+          "label": "Performance Calculation",
+          "type": "service",
+          "metrics": "C (completion) & T (timeliness)",
+          "group": "backend"
+        }
+      ],
+      "edges": [
+        {
+          "source": "task-admin",
+          "target": "task-create-form",
+          "label": "Fill form"
+        },
+        {
+          "source": "task-create-form",
+          "target": "task-api-create",
+          "label": "Submit"
+        },
+        {
+          "source": "task-api-create",
+          "target": "task-service",
+          "label": "Authenticated request"
+        },
+        {
+          "source": "task-service",
+          "target": "task-assignment-logic",
+          "label": "Determine assignees"
+        },
+        {
+          "source": "task-assignment-logic",
+          "target": "task-create-record",
+          "label": "Assignee list"
+        },
+        {
+          "source": "task-create-record",
+          "target": "task-mongodb",
+          "label": "Task.create()"
+        },
+        {
+          "source": "task-mongodb",
+          "target": "task-notify-employees",
+          "label": "Post-save hook"
+        },
+        {
+          "source": "task-notify-employees",
+          "target": "task-employee-ui",
+          "label": "WebSocket event + FCM push"
+        },
+        {
+          "source": "task-employee",
+          "target": "task-employee-ui",
+          "label": "View tasks"
+        },
+        {
+          "source": "task-employee-ui",
+          "target": "task-start",
+          "label": "Click Start"
+        },
+        {
+          "source": "task-start",
+          "target": "task-mongodb",
+          "label": "Update status to active"
+        },
+        {
+          "source": "task-start",
+          "target": "task-work",
+          "label": "Begin work"
+        },
+        {
+          "source": "task-work",
+          "target": "task-upload-proof",
+          "label": "Task completed"
+        },
+        {
+          "source": "task-upload-proof",
+          "target": "task-s3",
+          "label": "Presigned URL upload"
+        },
+        {
+          "source": "task-s3",
+          "target": "task-mark-complete",
+          "label": "Files uploaded"
+        },
+        {
+          "source": "task-mark-complete",
+          "target": "task-update-completion",
+          "label": "Submit completion"
+        },
+        {
+          "source": "task-update-completion",
+          "target": "task-mongodb",
+          "label": "Update completedBy array"
+        },
+        {
+          "source": "task-mongodb",
+          "target": "task-notify-admin",
+          "label": "Post-save hook"
+        },
+        {
+          "source": "task-notify-admin",
+          "target": "task-admin-review",
+          "label": "WebSocket + FCM"
+        },
+        {
+          "source": "task-admin",
+          "target": "task-admin-review",
+          "label": "Check pending verifications"
+        },
+        {
+          "source": "task-admin-review",
+          "target": "task-verify",
+          "label": "Download proof & decide"
+        },
+        {
+          "source": "task-verify",
+          "target": "task-update-verification",
+          "label": "Verification decision"
+        },
+        {
+          "source": "task-update-verification",
+          "target": "task-mongodb",
+          "label": "Update verificationStatus"
+        },
+        {
+          "source": "task-mongodb",
+          "target": "task-performance-impact",
+          "label": "Invalidate performance cache"
+        },
+        {
+          "source": "task-performance-impact",
+          "target": "task-employee",
+          "label": "Performance score updated (notification)"
+        }
+      ]
+    },
+    {
+      "id": "performance-calculation",
+      "title": "Performance Calculation Flow (Four-Metric System)",
+      "description": "Detailed flow of how employee performance scores are calculated using Attendance (A), Punctuality (P), Completion (C), and Timeliness (T) metrics with configurable weights",
+      "nodes": [
+        {
+          "id": "perf-trigger",
+          "label": "Trigger Event",
+          "type": "trigger",
+          "events": "Admin dashboard load OR cache miss",
+          "group": "trigger"
+        },
+        {
+          "id": "perf-api",
+          "label": "GET /api/dashboard/leaderboard",
+          "type": "api",
+          "group": "request"
+        },
+        {
+          "id": "perf-cache-check",
+          "label": "Check Redis Cache",
+          "type": "cache",
+          "key": "leaderboard:all",
+          "ttl": "3 minutes",
+          "group": "cache"
+        },
+        {
+          "id": "perf-cache-hit",
+          "label": "Cache Hit",
+          "type": "decision",
+          "result": "Return cached leaderboard",
+          "group": "cache"
+        },
+        {
+          "id": "perf-cache-miss",
+          "label": "Cache Miss",
+          "type": "decision",
+          "result": "Calculate fresh",
+          "group": "cache"
+        },
+        {
+          "id": "perf-fetch-employees",
+          "label": "Fetch Active Employees",
+          "type": "query",
+          "filter": "employmentInfo.isActive: true",
+          "group": "data"
+        },
+        {
+          "id": "perf-mongodb",
+          "label": "MongoDB",
+          "type": "database",
+          "group": "data"
+        },
+        {
+          "id": "perf-loop-start",
+          "label": "For Each Employee",
+          "type": "loop",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-fetch-attendance",
+          "label": "Aggregate Attendance Data",
+          "type": "query",
+          "pipeline": "Group by status, sum late_minutes",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-fetch-tasks",
+          "label": "Aggregate Task Data",
+          "type": "query",
+          "pipeline": "Count assigned, completed, on-time",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-calc-a",
+          "label": "Calculate A (Attendance)",
+          "type": "formula",
+          "formula": "(presentDays / scheduledDays) * 100",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-calc-p",
+          "label": "Calculate P (Punctuality)",
+          "type": "formula",
+          "formula": "max(0, 100 - (totalLateMinutes / scheduledDays))",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-calc-c",
+          "label": "Calculate C (Completion)",
+          "type": "formula",
+          "formula": "(completedTasks / assignedTasks) * 100",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-calc-t",
+          "label": "Calculate T (Timeliness)",
+          "type": "formula",
+          "formula": "(onTimeTasks / completedTasks) * 100",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-strict-zero",
+          "label": "Apply strict_zero Policy",
+          "type": "logic",
+          "rule": "Missing metrics = 0% (not excluded)",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-get-weights",
+          "label": "Get System Weights",
+          "type": "config",
+          "defaults": "A:30%, P:20%, C:30%, T:20%",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-redis",
+          "label": "Redis Cache",
+          "type": "cache",
+          "group": "data"
+        },
+        {
+          "id": "perf-calc-final",
+          "label": "Calculate Final Score",
+          "type": "formula",
+          "formula": "(A*weightA + P*weightP + C*weightC + T*weightT) / 100",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-clamp",
+          "label": "Clamp Score",
+          "type": "logic",
+          "range": "0-100%",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-assign-band",
+          "label": "Assign Performance Band",
+          "type": "logic",
+          "bands": "Outstanding(≥95), Excellent(≥85), Good(≥70), Needs Improvement(≥50), Unsatisfactory(<50)",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-loop-end",
+          "label": "Next Employee",
+          "type": "loop",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-sort",
+          "label": "Sort by Score Descending",
+          "type": "logic",
+          "group": "calculation"
+        },
+        {
+          "id": "perf-store-cache",
+          "label": "Store in Redis Cache",
+          "type": "cache",
+          "ttl": "3 minutes",
+          "group": "cache"
+        },
+        {
+          "id": "perf-response",
+          "label": "Return Leaderboard",
+          "type": "response",
+          "data": "Array of { employee, score, band, breakdown }",
+          "group": "response"
+        },
+        {
+          "id": "perf-frontend",
+          "label": "Admin Dashboard",
+          "type": "frontend",
+          "display": "Leaderboard chart with Recharts",
+          "group": "response"
+        }
+      ],
+      "edges": [
+        {
+          "source": "perf-trigger",
+          "target": "perf-api",
+          "label": "Request"
+        },
+        {
+          "source": "perf-api",
+          "target": "perf-cache-check",
+          "label": "Check cache"
+        },
+        {
+          "source": "perf-cache-check",
+          "target": "perf-redis",
+          "label": "GET leaderboard:all"
+        },
+        {
+          "source": "perf-redis",
+          "target": "perf-cache-hit",
+          "label": "Cache exists"
+        },
+        {
+          "source": "perf-cache-hit",
+          "target": "perf-response",
+          "label": "Return cached (50ms)"
+        },
+        {
+          "source": "perf-redis",
+          "target": "perf-cache-miss",
+          "label": "Cache empty"
+        },
+        {
+          "source": "perf-cache-miss",
+          "target": "perf-fetch-employees",
+          "label": "Calculate fresh"
+        },
+        {
+          "source": "perf-fetch-employees",
+          "target": "perf-mongodb",
+          "label": "Query Employee collection"
+        },
+        {
+          "source": "perf-mongodb",
+          "target": "perf-loop-start",
+          "label": "Employee list"
+        },
+        {
+          "source": "perf-loop-start",
+          "target": "perf-fetch-attendance",
+          "label": "Employee ID"
+        },
+        {
+          "source": "perf-fetch-attendance",
+          "target": "perf-mongodb",
+          "label": "Aggregation pipeline"
+        },
+        {
+          "source": "perf-mongodb",
+          "target": "perf-fetch-tasks",
+          "label": "Attendance stats"
+        },
+        {
+          "source": "perf-fetch-tasks",
+          "target": "perf-mongodb",
+          "label": "Aggregation pipeline"
+        },
+        {
+          "source": "perf-mongodb",
+          "target": "perf-calc-a",
+          "label": "Task stats"
+        },
+        {
+          "source": "perf-calc-a",
+          "target": "perf-calc-p",
+          "label": "A calculated"
+        },
+        {
+          "source": "perf-calc-p",
+          "target": "perf-calc-c",
+          "label": "P calculated"
+        },
+        {
+          "source": "perf-calc-c",
+          "target": "perf-calc-t",
+          "label": "C calculated"
+        },
+        {
+          "source": "perf-calc-t",
+          "target": "perf-strict-zero",
+          "label": "T calculated"
+        },
+        {
+          "source": "perf-strict-zero",
+          "target": "perf-get-weights",
+          "label": "Metrics ready"
+        },
+        {
+          "source": "perf-get-weights",
+          "target": "perf-redis",
+          "label": "GET settings:system"
+        },
+        {
+          "source": "perf-redis",
+          "target": "perf-calc-final",
+          "label": "Weights loaded"
+        },
+        {
+          "source": "perf-calc-final",
+          "target": "perf-clamp",
+          "label": "Weighted sum"
+        },
+        {
+          "source": "perf-clamp",
+          "target": "perf-assign-band",
+          "label": "Score 0-100%"
+        },
+        {
+          "source": "perf-assign-band",
+          "target": "perf-loop-end",
+          "label": "Band assigned"
+        },
+        {
+          "source": "perf-loop-end",
+          "target": "perf-loop-start",
+          "label": "More employees"
+        },
+        {
+          "source": "perf-loop-end",
+          "target": "perf-sort",
+          "label": "All employees processed"
+        },
+        {
+          "source": "perf-sort",
+          "target": "perf-store-cache",
+          "label": "Sorted leaderboard"
+        },
+        {
+          "source": "perf-store-cache",
+          "target": "perf-redis",
+          "label": "SET leaderboard:all (TTL 3min)"
+        },
+        {
+          "source": "perf-redis",
+          "target": "perf-response",
+          "label": "Cached"
+        },
+        {
+          "source": "perf-response",
+          "target": "perf-frontend",
+          "label": "JSON response (200-500ms)"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "createdFrom": "PROJECT_ANALYSIS.md + caseStudyData.json",
+    "purpose": "Interactive diagram data for EMS case study in portfolio",
+    "renderEngines": [
+      "React Flow",
+      "D3.js",
+      "Cytoscape.js"
+    ],
+    "nodeTypes": {
+      "frontend": "Client-side applications (Next.js, React Native)",
+      "backend": "Server-side components (Express, services)",
+      "service": "Business logic services",
+      "middleware": "Express middleware layers",
+      "database": "MongoDB primary storage",
+      "cache": "Redis caching layer",
+      "queue": "Background job queue",
+      "external": "Third-party integrations",
+      "actor": "Human users",
+      "ui": "User interface components",
+      "logic": "Business logic operations",
+      "api": "API endpoints",
+      "handler": "Route handlers",
+      "trigger": "Event triggers",
+      "decision": "Decision points",
+      "query": "Database queries",
+      "formula": "Calculation formulas",
+      "config": "Configuration sources",
+      "response": "API responses",
+      "loop": "Iteration constructs",
+      "action": "User actions",
+      "device": "Physical devices"
+    },
+    "groupColors": {
+      "frontend": "#60A5FA",
+      "backend": "#34D399",
+      "data": "#F59E0B",
+      "external": "#A78BFA",
+      "client": "#60A5FA",
+      "middleware": "#FBBF24",
+      "admin": "#F87171",
+      "employee": "#60A5FA",
+      "trigger": "#EC4899",
+      "request": "#8B5CF6",
+      "cache": "#F59E0B",
+      "calculation": "#10B981",
+      "response": "#3B82F6"
+    }
+  }
+}

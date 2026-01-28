@@ -119,3 +119,45 @@ html, body {
     margin-right: calc((100vw - 100%) / -2.5);
   }
 }
+
+/* React Flow Custom Styles */
+.react-flow__node {
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__node:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__controls {
+  button {
+    background-color: #262626 !important;
+    border-color: #404040 !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease;
+  }
+
+  button:hover {
+    background-color: #404040 !important;
+    transform: scale(1.05);
+  }
+}
+
+.react-flow__minimap {
+  background-color: #171717 !important;
+  border: 1px solid #404040 !important;
+}
+
+.react-flow__background {
+  background-color: #0a0a0a !important;
+}

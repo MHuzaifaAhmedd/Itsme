@@ -35,11 +35,11 @@ export default function CoreFeatures({ data }: CoreFeaturesProps) {
         </ScrollReveal>
 
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 items-stretch">
           {data.features.map((feature, i) => (
-            <ScrollReveal key={i} delay={i * 0.1}>
+            <ScrollReveal key={i} delay={i * 0.1} className="h-full">
               <div
-                className="group relative p-6 md:p-8 border border-neutral-800 rounded-xl bg-neutral-900/30 transition-all duration-300 hover:border-neutral-700 hover:bg-neutral-900/50 hover:scale-[1.02] cursor-pointer"
+                className="group relative h-full p-6 md:p-8 border border-neutral-800 rounded-xl bg-neutral-900/30 transition-all duration-300 hover:border-neutral-700 hover:bg-neutral-900/50 hover:scale-[1.02] cursor-pointer flex flex-col"
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(null)}
               >
@@ -66,7 +66,7 @@ export default function CoreFeatures({ data }: CoreFeaturesProps) {
                 </div>
 
                 {/* Why It Matters */}
-                <div className="mb-4">
+                <div className="mb-4 flex-1">
                   <h4 className="text-sm uppercase tracking-wider text-neutral-500 mb-2">
                     Why it matters
                   </h4>

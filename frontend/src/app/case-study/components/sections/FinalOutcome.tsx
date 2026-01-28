@@ -29,41 +29,41 @@ export default function FinalOutcome({ data }: FinalOutcomeProps) {
           </div>
         </ScrollReveal>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-3 gap-6 mb-12 items-stretch">
           {/* What Was Achieved */}
-          <ScrollReveal delay={0.1}>
-            <div className="p-6 md:p-8 border-2 border-green-500/30 rounded-xl bg-green-500/5">
+          <ScrollReveal delay={0.1} className="h-full">
+            <div className="h-full p-6 md:p-8 border-2 border-green-500/30 rounded-xl bg-green-500/5 flex flex-col">
               <div className="text-3xl mb-4">✓</div>
               <h3 className="text-xl font-semibold text-white mb-3">
                 What We Achieved
               </h3>
-              <p className="text-neutral-300 leading-relaxed">
+              <p className="text-neutral-300 leading-relaxed flex-1">
                 {data.achieved}
               </p>
             </div>
           </ScrollReveal>
 
           {/* Who It Helped */}
-          <ScrollReveal delay={0.2}>
-            <div className="p-6 md:p-8 border-2 border-blue-500/30 rounded-xl bg-blue-500/5">
+          <ScrollReveal delay={0.2} className="h-full">
+            <div className="h-full p-6 md:p-8 border-2 border-blue-500/30 rounded-xl bg-blue-500/5 flex flex-col">
               <div className="text-3xl mb-4">👥</div>
               <h3 className="text-xl font-semibold text-white mb-3">
                 Who It Helped
               </h3>
-              <p className="text-neutral-300 leading-relaxed">
+              <p className="text-neutral-300 leading-relaxed flex-1">
                 {data.whoHelped}
               </p>
             </div>
           </ScrollReveal>
 
           {/* Why It Matters */}
-          <ScrollReveal delay={0.3}>
-            <div className="p-6 md:p-8 border-2 border-purple-500/30 rounded-xl bg-purple-500/5">
+          <ScrollReveal delay={0.3} className="h-full">
+            <div className="h-full p-6 md:p-8 border-2 border-purple-500/30 rounded-xl bg-purple-500/5 flex flex-col">
               <div className="text-3xl mb-4">⭐</div>
               <h3 className="text-xl font-semibold text-white mb-3">
                 Why It Matters
               </h3>
-              <p className="text-neutral-300 leading-relaxed">
+              <p className="text-neutral-300 leading-relaxed flex-1">
                 {data.whyMatters}
               </p>
             </div>

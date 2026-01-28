@@ -21,13 +21,7 @@ interface CaseStudyIntroProps {
 export default function CaseStudyIntro({ projectName, onComplete }: CaseStudyIntroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [letters, setLetters] = useState<string[]>([]);
-
-  useEffect(() => {
-    // Split project name into individual characters (preserve spaces)
-    const chars = projectName.split("");
-    setLetters(chars);
-  }, [projectName]);
+  const [letters] = useState<string[]>(() => projectName.split(""));
 
   useEffect(() => {
     if (letters.length === 0) return;

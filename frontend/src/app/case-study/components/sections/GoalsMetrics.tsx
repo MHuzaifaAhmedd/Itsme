@@ -29,16 +29,16 @@ export default function GoalsMetrics({ data }: GoalsMetricsProps) {
           </div>
         </ScrollReveal>
 
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-stretch">
           {/* Objectives */}
-          <ScrollReveal delay={0.1}>
-            <div className="p-6 md:p-8 border border-neutral-800 rounded-xl bg-neutral-900/30">
+          <ScrollReveal delay={0.1} className="h-full">
+            <div className="h-full p-6 md:p-8 border border-neutral-800 rounded-xl bg-neutral-900/30 flex flex-col">
               <h3 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-blue-500" />
                 Objectives
               </h3>
-              <ul className="space-y-4">
-                {data.objectives.map((objective, i) => (
+              <ul className="space-y-4 flex-1">
+                {data.objectives.slice(0, 8).map((objective, i) => (
                   <li key={i} className="flex gap-3 text-neutral-300">
                     <span className="text-blue-400 font-semibold mt-1">
                       {String(i + 1).padStart(2, "0")}
@@ -51,14 +51,14 @@ export default function GoalsMetrics({ data }: GoalsMetricsProps) {
           </ScrollReveal>
 
           {/* Success Metrics */}
-          <ScrollReveal delay={0.2}>
-            <div className="p-6 md:p-8 border border-neutral-800 rounded-xl bg-neutral-900/30">
+          <ScrollReveal delay={0.2} className="h-full">
+            <div className="h-full p-6 md:p-8 border border-neutral-800 rounded-xl bg-neutral-900/30 flex flex-col">
               <h3 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
                 Success Metrics
               </h3>
-              <ul className="space-y-4">
-                {data.successMetrics.map((metric, i) => (
+              <ul className="space-y-4 flex-1">
+                {data.successMetrics.slice(0, 8).map((metric, i) => (
                   <li key={i} className="flex gap-3 text-neutral-300">
                     <span className="text-green-400 font-semibold mt-1">
                       {String(i + 1).padStart(2, "0")}

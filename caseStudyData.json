@@ -1,0 +1,408 @@
+{
+  "projectMeta": {
+    "name": "Employee Management System (EMS)",
+    "domain": "Human Resources Management / Enterprise HR Software / Workforce Management",
+    "purpose": "A comprehensive enterprise-grade HR platform designed to streamline employee management, attendance tracking, leave management, task assignment, performance evaluation, document management, and organizational administration through three distinct web portals plus a mobile application",
+    "year": "2024-2026",
+    "role": "Full-Stack Developer / System Architect",
+    "techStack": [
+      "Next.js 16.0.7",
+      "React 19.2.1",
+      "React Native 0.81.5",
+      "Expo 54.0.31",
+      "TypeScript 5.9.2",
+      "Tailwind CSS 4",
+      "NativeWind 4.2.1",
+      "Redux Toolkit 2.8.2",
+      "TanStack React Query 5.85.3",
+      "Zustand 5.0.7",
+      "Node.js",
+      "Express 4.18.2",
+      "MongoDB (Mongoose 9.0.1)",
+      "Redis (ioredis 5.8.2)",
+      "Socket.io 4.8.1",
+      "AWS S3 (SDK v3)",
+      "Firebase Cloud Messaging",
+      "Docker",
+      "Bull 4.12.0",
+      "PDFKit 0.17.2",
+      "ExcelJS 4.4.0"
+    ]
+  },
+
+  "problemStatement": {
+    "context": "Organizations were facing significant challenges in managing their workforce efficiently. Traditional HR processes relied heavily on manual paperwork, spreadsheets, and disconnected systems, creating operational inefficiencies and security vulnerabilities.",
+    "userPainPoints": [
+      "Manual attendance tracking was error-prone and lacked real-time visibility",
+      "Leave management through emails and paper forms made balance tracking difficult",
+      "Performance evaluation was subjective without data-driven metrics",
+      "Employee documents scattered across physical files and multiple systems",
+      "Task coordination relied on ad-hoc communication leading to missed deadlines",
+      "No centralized audit logging or security policy enforcement",
+      "Lack of real-time communication platform for HR updates"
+    ],
+    "existingSolutionsLimitations": [
+      "Generic HR software lacked customization for specific organizational needs",
+      "Monolithic legacy solutions were difficult to scale or modify",
+      "High licensing costs for enterprise solutions",
+      "Limited integration capabilities with biometric devices",
+      "Poor user experience with outdated interfaces",
+      "Lack of mobile support for on-the-go access",
+      "Insufficient security features for sensitive employee data"
+    ]
+  },
+
+  "goalsAndMetrics": {
+    "goals": [
+      "Automate core HR processes including attendance, leaves, and approvals",
+      "Provide role-based access through separate portals (Employee, Admin, SuperAdmin)",
+      "Implement data-driven performance evaluation with configurable metrics",
+      "Enable real-time communication via WebSockets and push notifications",
+      "Ensure security through IP geofencing, device management, and audit logging",
+      "Support biometric device integration for attendance tracking",
+      "Achieve GDPR compliance with privacy consent and data retention policies",
+      "Deliver mobile accessibility for employees"
+    ],
+    "successMetrics": [
+      "95% improvement in API response times (2-3s to 50-200ms)",
+      "85%+ cache hit rate for frequently accessed data",
+      "60% reduction in database queries through optimization",
+      "30-40% storage cost reduction via automated data retention",
+      "95%+ anomaly detection accuracy in activity tracking",
+      "Support for 4 user roles with granular permissions",
+      "Real-time updates delivered within milliseconds via WebSocket"
+    ]
+  },
+
+  "userFlow": [
+    {
+      "step": "1. Authentication",
+      "description": "User accesses portal → enters credentials → system validates JWT → checks IP geofencing (employees) → validates trusted device → grants access with role-based permissions"
+    },
+    {
+      "step": "2. Employee Check-In",
+      "description": "Employee clicks check-in → frontend validates office network → sends request with device ID → backend validates geofencing and device → creates attendance record → calculates late minutes → returns confirmation"
+    },
+    {
+      "step": "3. Leave Request",
+      "description": "Employee submits leave request → system validates balance availability → checks for date conflicts → creates pending request → notifies admin via WebSocket and FCM → admin reviews and approves/rejects → employee notified of decision"
+    },
+    {
+      "step": "4. Task Assignment",
+      "description": "Admin creates task → sets priority, deadline, assignment type → assigns to individual/department/global → system notifies assignees → employees update status → upload proof files → admin verifies completion"
+    },
+    {
+      "step": "5. Performance Calculation",
+      "description": "System collects attendance data → calculates punctuality from late minutes → aggregates task completion rates → computes timeliness scores → applies configurable weights → generates final score and band"
+    },
+    {
+      "step": "6. Document Management",
+      "description": "Employee uploads document → system stores in S3 → creates pending approval record → admin reviews document → approves or rejects with reason → employee notified of status"
+    },
+    {
+      "step": "7. Admin Dashboard",
+      "description": "Admin logs in → dashboard loads department statistics → displays pending approvals count → shows attendance summary → presents performance leaderboard → enables drill-down into individual records"
+    }
+  ],
+
+  "systemArchitecture": {
+    "frontend": [
+      "Employee Portal - Next.js 16.0.7 App Router (Port 3000)",
+      "Admin Portal - Next.js 16.0.7 App Router (Port 3001)",
+      "SuperAdmin Portal - Next.js 16.0.7 App Router (Port 3002)",
+      "Mobile App - Expo 54.0.31 with React Native 0.81.5",
+      "State Management - Redux Toolkit + TanStack React Query + Zustand",
+      "Styling - Tailwind CSS 4 (web) / NativeWind 4.2.1 (mobile)",
+      "Real-Time - Socket.io Client 4.8.1",
+      "Charts - Recharts 3.1.2, ECharts 6.0.0, React Native Gifted Charts"
+    ],
+    "backend": [
+      "Express 4.18.2 REST API Server (Port 5000)",
+      "TypeScript 5.1.6 for type safety",
+      "Mongoose 9.0.1 ODM for MongoDB operations",
+      "Socket.io 4.8.1 WebSocket server for real-time events",
+      "Bull 4.12.0 job queue for background processing",
+      "node-cron 4.2.1 for scheduled tasks",
+      "JWT (jsonwebtoken 9.0.2) for authentication",
+      "bcryptjs 3.0.3 for password hashing"
+    ],
+    "services": [
+      "performanceService - Four-metric performance calculation",
+      "attendanceService - Attendance tracking and analytics",
+      "notificationService - Push notifications via FCM",
+      "websocketService - Real-time event distribution",
+      "zktecoService - Biometric device integration",
+      "anomalyDetection - ML-based activity anomaly detection",
+      "dataRetention - Automated GDPR-compliant cleanup",
+      "autoCheckoutScheduler - Scheduled attendance closing"
+    ],
+    "databases": [
+      "MongoDB 9.0.1 - Primary document database with 25+ collections",
+      "Redis - In-memory cache and Bull job queue backend"
+    ],
+    "externalIntegrations": [
+      "AWS S3 - Document and file storage with presigned URLs",
+      "Firebase Cloud Messaging - Web and mobile push notifications",
+      "IPData API - IP geolocation for geofencing audit",
+      "ZKTeco Biometric Devices - iClock/ADMS push API integration"
+    ]
+  },
+
+  "dataFlow": [
+    {
+      "from": "Client (Web/Mobile)",
+      "to": "Express API Gateway",
+      "data": "HTTP requests with JWT cookie and CSRF token",
+      "trigger": "User action (button click, form submit)"
+    },
+    {
+      "from": "Express Middleware",
+      "to": "Route Handler",
+      "data": "Authenticated and authorized request",
+      "trigger": "Successful validation of JWT, CSRF, geofencing, device"
+    },
+    {
+      "from": "Service Layer",
+      "to": "MongoDB",
+      "data": "CRUD operations via Mongoose",
+      "trigger": "Business logic execution"
+    },
+    {
+      "from": "Service Layer",
+      "to": "Redis Cache",
+      "data": "Cached query results and session data",
+      "trigger": "Frequent data access or cache miss"
+    },
+    {
+      "from": "Backend",
+      "to": "WebSocket Server",
+      "data": "Real-time events (notifications, status changes)",
+      "trigger": "Database mutation or system event"
+    },
+    {
+      "from": "Backend",
+      "to": "Firebase Cloud Messaging",
+      "data": "Push notification payload",
+      "trigger": "Notification creation"
+    },
+    {
+      "from": "Backend",
+      "to": "AWS S3",
+      "data": "Document uploads and downloads",
+      "trigger": "File storage operation"
+    },
+    {
+      "from": "ZKTeco Device",
+      "to": "Backend /iclock endpoint",
+      "data": "Biometric punch data (PIN, time, type)",
+      "trigger": "Employee biometric scan"
+    }
+  ],
+
+  "coreFeatures": [
+    {
+      "name": "Multi-Role Authentication System",
+      "whatItDoes": "JWT-based authentication with httpOnly cookies, CSRF protection, IP geofencing (hard/soft modes), device management, and role-based authorization for 4 user roles (SuperAdmin, Admin, SemiAdmin, Employee)",
+      "implementationLocation": "Backend/src/middleware/auth.ts, Backend/src/middleware/geofencing.ts, Backend/src/routes/auth.ts",
+      "implementationSummary": "JWT tokens stored in httpOnly cookies with 30-day expiry for employees and 1-year for admins. Geofencing validates employee IPs against CIDR ranges. Device validation ensures trusted device for sensitive actions."
+    },
+    {
+      "name": "Attendance Management with Biometric Integration",
+      "whatItDoes": "IP-geofenced attendance tracking with check-in/out, breaks, late calculation, auto-checkout, and ZKTeco biometric device integration via push API",
+      "implementationLocation": "Backend/src/models/Attendance.ts, Backend/src/services/attendanceService.ts, Backend/src/routes/zkteco.ts, Backend/src/services/zktecoService.ts",
+      "implementationSummary": "Attendance records track timestamps, breaks, late minutes. Grace period configurable in system settings. ZKTeco devices push attendance data which is parsed and mapped to employees by PIN."
+    },
+    {
+      "name": "Four-Metric Performance Evaluation",
+      "whatItDoes": "Calculates employee performance using Attendance (A), Punctuality (P), Task Completion (C), and Timeliness (T) metrics with configurable weights and generates leaderboards",
+      "implementationLocation": "Backend/src/services/performanceService.ts, Backend/src/types/performance.ts",
+      "implementationSummary": "Performance calculation aggregates attendance data and task completions. Missing metrics treated as 0% to prevent manipulation. Scores clamped to 0-100% with bands: Outstanding (≥95%), Excellent (≥85%), Good (≥70%), Needs Improvement (≥50%), Unsatisfactory (<50%)."
+    },
+    {
+      "name": "Leave Management System",
+      "whatItDoes": "Leave request submission with full/half-day options, approval workflow, balance tracking, conflict detection, and integration with attendance records",
+      "implementationLocation": "Backend/src/models/LeaveRequest.ts, Backend/src/services/leave.service.ts, Backend/src/services/leaveConflictService.ts",
+      "implementationSummary": "Supports sick, casual, annual, and unpaid leave types. Leave balances tracked per employee with annual reset scheduler. Approved leaves marked in attendance records."
+    },
+    {
+      "name": "Task Assignment and Verification",
+      "whatItDoes": "Task creation with individual/department/global assignment, priority levels, deadlines, attachments, proof file uploads, and admin verification workflow",
+      "implementationLocation": "Backend/src/models/Task.ts, Backend/src/services/task.service.ts, Backend/src/routes/admin/tasks.routes.ts",
+      "implementationSummary": "Tasks support multiple assignment types. Completion records per employee with verification status. Task templates enable quick creation of recurring tasks."
+    },
+    {
+      "name": "Real-Time Notification System",
+      "whatItDoes": "WebSocket events via Socket.io for instant updates plus Firebase Cloud Messaging for push notifications to web and mobile devices",
+      "implementationLocation": "Backend/src/services/websocketService.ts, Backend/src/services/notificationService.ts, Backend/src/models/Notification.ts",
+      "implementationSummary": "WebSocket service maintains room-based connections for role-specific events. FCM notifications sent in batches up to 500 tokens. Failed notifications logged for retry. Invalid tokens automatically deactivated."
+    },
+    {
+      "name": "Document Management with S3 Storage",
+      "whatItDoes": "Secure document storage in AWS S3 with presigned URLs, approval workflows for contracts/certifications/IDs, and document change request system",
+      "implementationLocation": "Backend/src/services/document.service.ts, Backend/src/utils/s3.ts, Backend/src/models/DocumentChangeRequest.ts",
+      "implementationSummary": "Documents uploaded to S3 with presigned URLs. Each document type has pending/approved/rejected status. Change requests allow employees to request document updates with admin approval."
+    },
+    {
+      "name": "Activity Tracking with Anomaly Detection",
+      "whatItDoes": "Employee session tracking with active/idle time measurement, hourly activity breakdown, and ML-based anomaly detection using Z-score analysis",
+      "implementationLocation": "Backend/src/services/anomalyDetection.ts, Backend/src/models/EmployeeSession.ts, Backend/src/models/HourlyActivity.ts",
+      "implementationSummary": "Sessions track total active and idle time. Anomaly detection identifies 6 types of anomalies including excessive active/idle time and time manipulation. 95%+ detection confidence for serious anomalies."
+    },
+    {
+      "name": "Data Retention and GDPR Compliance",
+      "whatItDoes": "Automated data retention cleanup, privacy consent management with versioning, and GDPR Right to Erasure implementation",
+      "implementationLocation": "Backend/src/services/dataRetention.ts, Backend/src/models/PrivacyConsent.ts, Backend/src/routes/employee/privacy.ts",
+      "implementationSummary": "Automated cleanup runs daily at 2 AM. Sessions retained 90 days, legal records 7 years. Privacy consent tracked per type with consent date and IP address."
+    },
+    {
+      "name": "Reporting and Analytics",
+      "whatItDoes": "Comprehensive dashboards with real-time statistics, attendance heatmaps, performance leaderboards, and PDF/Excel export functionality",
+      "implementationLocation": "Backend/src/services/reportsService.ts, Backend/src/services/dashboardService.ts, Backend/src/utils/pdfGenerator.ts, Backend/src/utils/excelGenerator.ts",
+      "implementationSummary": "Dashboard aggregates statistics per department. PDFKit generates PDF reports. ExcelJS creates Excel exports. Attendance charts service provides heatmap and trend data."
+    }
+  ],
+
+  "technicalChallenges": [
+    {
+      "challenge": "Performance Optimization for Activity Tracking",
+      "whyItWasHard": "Activity tracking system was generating 2-3 second API response times due to complex MongoDB aggregations on large datasets and lack of caching",
+      "solution": "Implemented Redis caching with 85%+ hit rate, optimized MongoDB aggregation pipelines, added compound indexes for frequent queries, implemented pagination and data limiting. Result: 95% improvement (2-3s to 50-200ms), 60% reduction in database queries."
+    },
+    {
+      "challenge": "IP Geofencing Accuracy Behind Proxies",
+      "whyItWasHard": "IP detection was inaccurate behind reverse proxies, CDNs, and load balancers, causing false geofence violations for legitimate office users",
+      "solution": "Configured Express trust proxy setting, implemented custom IP detection utility checking multiple headers (X-Forwarded-For, X-Real-IP), used ip-cidr library for CIDR validation, added geofence audit logging with IP geolocation via IPData API."
+    },
+    {
+      "challenge": "ZKTeco Biometric Integration",
+      "whyItWasHard": "ZKTeco devices send data in specific formats via push API, requiring proper payload parsing, employee-device PIN mapping, and deduplication to prevent duplicate attendance records",
+      "solution": "Created dedicated /iclock route handler before CSRF middleware, implemented payload parsing for iClock/ADMS formats, built employee-device PIN mapping with sparse unique index, added deduplication log management via ZKTecoLog model."
+    },
+    {
+      "challenge": "Fair Performance Calculation",
+      "whyItWasHard": "Performance scores needed to be transparent, fair, and prevent manipulation (e.g., deleting tasks to improve scores)",
+      "solution": "Implemented strict_zero policy where missing metrics are treated as 0% instead of being excluded. Used original weights without rescaling. Scores clamped to 0-100% range. Performance bands provide clear categorization."
+    },
+    {
+      "challenge": "Real-Time Notification Scalability",
+      "whyItWasHard": "WebSocket connections needed to scale with growing user base while ensuring role-filtered notifications reach the correct recipients",
+      "solution": "Implemented Socket.io with room-based architecture (admin:onboarding, employee:{id}, user:{id}). JWT authentication for WebSocket connections. Firebase Cloud Messaging for mobile push with batch sending up to 500 tokens per request."
+    },
+    {
+      "challenge": "GDPR Data Retention Compliance",
+      "whyItWasHard": "Need to comply with GDPR data retention policies while maintaining system functionality and audit trails",
+      "solution": "Implemented automated daily cleanup running at 2 AM with configurable retention periods (90 days for sessions, 7 years for legal records). Privacy consent management with versioning. GDPR Right to Erasure endpoint. Result: 30-40% storage cost reduction."
+    }
+  ],
+
+  "performanceAndSecurity": {
+    "performanceOptimizations": [
+      "Redis caching with 85%+ cache hit rate and automatic invalidation on mutations",
+      "MongoDB compound indexes on all frequently queried fields",
+      "Aggregation pipelines instead of multiple sequential queries",
+      "Batch processing for FCM notifications (up to 500 per request)",
+      "Selective field projection using Mongoose .select()",
+      "Pagination with offset/limit for large datasets",
+      "Cache-aside pattern with explicit cache management",
+      "Connection pooling via Mongoose"
+    ],
+    "securityConsiderations": [
+      "JWT tokens in httpOnly cookies to prevent XSS",
+      "CSRF token validation for state-changing requests",
+      "Password hashing with bcryptjs (salt rounds: 10)",
+      "Rate limiting: 1000 req/15min general, 100 req/15min for auth",
+      "IP geofencing with CIDR validation (hard/soft modes)",
+      "Trusted device registration and validation",
+      "Request signing for sensitive operations",
+      "Security headers via Helmet middleware",
+      "Input sanitization middleware removing dangerous characters",
+      "Comprehensive audit logging (GeofenceAudit, LoginAudit, AccessLog)"
+    ],
+    "errorHandling": [
+      "Express error handling middleware with secure error responses",
+      "Try-catch blocks with detailed error logging",
+      "Graceful fallback for external service failures (FCM, Redis)",
+      "Failed notification storage for retry capability",
+      "Mongoose validation errors with descriptive messages",
+      "JWT verification errors with specific error codes",
+      "Geofencing errors allow access with logging (fail-open for availability)"
+    ]
+  },
+
+  "visualAndUXDecisions": {
+    "uiPatternsObserved": [
+      "Three separate web portals with role-appropriate interfaces",
+      "Mobile app with React Native for iOS/Android",
+      "Skeleton loaders for improved perceived performance",
+      "Dashboard cards with key metrics and quick actions",
+      "Attendance heatmaps for visual pattern recognition",
+      "Performance leaderboards with ranking and breakdown",
+      "Modal dialogs for forms and confirmations",
+      "Toast notifications for action feedback",
+      "Dark/light theme support via ThemeContext"
+    ],
+    "interactionLogic": [
+      "Form validation with React Hook Form + Zod schemas",
+      "Optimistic updates via TanStack React Query",
+      "Real-time updates via WebSocket without page refresh",
+      "Pull-to-refresh on mobile for data refresh",
+      "Debounced search inputs to reduce API calls",
+      "Infinite scroll pagination for large lists",
+      "Confirmation dialogs for destructive actions",
+      "Loading states during async operations"
+    ]
+  },
+
+  "outcomeAndImpact": {
+    "actualResults": [
+      "95% improvement in API response times (2-3s to 50-200ms)",
+      "85%+ cache hit rate reducing database load",
+      "60% reduction in database queries through optimization",
+      "30-40% storage cost reduction via automated data retention",
+      "95%+ anomaly detection accuracy in activity tracking",
+      "Real-time updates delivered via WebSocket within milliseconds",
+      "Support for 4 distinct user roles with granular permissions",
+      "Biometric device integration with ZKTeco via push API",
+      "GDPR-compliant data retention and privacy consent system"
+    ],
+    "limitations": [
+      "Single organization deployment (no multi-tenant architecture)",
+      "No two-factor authentication implementation",
+      "No SSO/SAML integration",
+      "English language only (no i18n)",
+      "Single Redis instance (no cluster configuration)",
+      "WebSocket server not configured for multi-instance scaling",
+      "No explicit password complexity rules enforcement",
+      "No automated backup/restore functionality visible"
+    ]
+  },
+
+  "learnings": [
+    "Micro-services architecture enables independent deployment but increases complexity in inter-service communication",
+    "Database indexing is critical for MongoDB aggregation performance at scale",
+    "Caching strategy (client-side, server-side, in-memory) significantly impacts user experience",
+    "WebSocket room-based architecture effectively handles role-based event distribution",
+    "IP geofencing requires careful configuration behind proxies and CDNs",
+    "Missing metrics should be treated as 0% rather than excluded to prevent score manipulation",
+    "Automated data retention policies balance compliance with operational needs",
+    "Device validation adds security layer but requires careful UX consideration",
+    "Firebase Cloud Messaging batch limits (500) require chunking for large audiences"
+  ],
+
+  "futureImprovements": [
+    "Implement two-factor authentication (2FA) for enhanced security",
+    "Add SSO/SAML integration for enterprise customers",
+    "Multi-tenant architecture for SaaS deployment",
+    "Localization/i18n support for multiple languages",
+    "Redis cluster configuration for high availability",
+    "Redis adapter for Socket.io multi-instance scaling",
+    "Password complexity enforcement and history tracking",
+    "Automated backup and disaster recovery system",
+    "Email notification system integration",
+    "Mobile offline-first architecture with sync queue",
+    "Advanced analytics with machine learning predictions",
+    "Integration with payroll systems",
+    "Video calling for remote meetings",
+    "Document OCR for automatic data extraction"
+  ]
+}

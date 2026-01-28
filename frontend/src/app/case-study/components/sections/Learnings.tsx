@@ -53,19 +53,19 @@ export default function Learnings({ data }: LearningsProps) {
           </div>
         </ScrollReveal>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 items-stretch">
           {categories.map((category, i) => (
-            <ScrollReveal key={i} delay={i * 0.1}>
+            <ScrollReveal key={i} delay={i * 0.1} className="h-full">
               <div
-                className={`p-6 md:p-8 border-2 rounded-xl ${category.bgColor} ${category.borderColor}`}
+                className={`h-full p-6 md:p-8 border-2 rounded-xl ${category.bgColor} ${category.borderColor} flex flex-col`}
               >
                 <h3 className={`text-xl font-semibold ${category.color} mb-6`}>
                   {category.title}
                 </h3>
-                <ul className="space-y-4">
-                  {category.items.map((item, j) => (
+                <ul className="space-y-4 flex-1">
+                  {category.items.slice(0, 8).map((item, j) => (
                     <li key={j} className="flex gap-3 text-neutral-300 text-sm leading-relaxed">
-                      <span className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-neutral-500" />
+                      <span className="shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-neutral-500" />
                       <span>{item}</span>
                     </li>
                   ))}
