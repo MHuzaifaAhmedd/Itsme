@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { getCaseStudyBySlug } from "../data/caseStudies";
 import CaseStudyTemplate from "../components/CaseStudyTemplate";
 
@@ -19,6 +19,11 @@ export default function CaseStudyPage() {
   const slug = params.slug as string;
 
   const project = getCaseStudyBySlug(slug);
+
+  // Scroll to top immediately on page load (before paint)
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
 
   useEffect(() => {
     if (!project) {
