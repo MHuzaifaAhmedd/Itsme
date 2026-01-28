@@ -112,7 +112,11 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
     particleArrayRef.current = [];
 
     const text = "MAKE IT REAL";
-    const fontSize = Math.min(canvas.width / 5, 220);
+    // Responsive font size: smaller on mobile, original on desktop
+    const isMobile = window.innerWidth < 640; // sm breakpoint
+    const fontSize = isMobile 
+      ? Math.min(canvas.width / 8, 120) // Smaller on mobile
+      : Math.min(canvas.width / 5, 220); // Original desktop size
     ctx.fillStyle = 'white';
     ctx.font = `900 ${fontSize}px Arial, system-ui, sans-serif`;
     ctx.textAlign = 'center';
@@ -155,7 +159,11 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
       canvas.height = rect.height;
       
       const text = "MAKE IT REAL";
-      const fontSize = Math.min(canvas.width / 5, 220);
+      // Responsive font size: smaller on mobile, original on desktop
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      const fontSize = isMobile 
+        ? Math.min(canvas.width / 8, 120) // Smaller on mobile
+        : Math.min(canvas.width / 5, 220); // Original desktop size
       ctx.fillStyle = 'rgba(26, 91, 199, 0.15)';
       ctx.font = `900 ${fontSize}px Arial, system-ui, sans-serif`;
       ctx.textAlign = 'center';
@@ -359,18 +367,18 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-32 md:py-40 lg:py-48">
+      <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-4 py-20 sm:px-6 sm:py-24 md:py-40 lg:py-48">
         {/* Animated divider line */}
         <div
           ref={dividerRef}
-          className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-24 bg-linear-to-r from-transparent via-neutral-600 to-transparent"
+          className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-16 sm:w-20 md:w-24 bg-linear-to-r from-transparent via-neutral-600 to-transparent"
           aria-hidden="true"
         />
 
         {/* Headline */}
         <h2
           ref={headlineRef}
-          className="text-center text-4xl font-semibold leading-tight tracking-tight text-neutral-100 md:text-5xl lg:text-6xl"
+          className="text-center text-3xl font-semibold leading-tight tracking-tight text-neutral-100 sm:text-4xl md:text-5xl lg:text-6xl"
         >
           Let&apos;s collaborate
         </h2>
@@ -378,7 +386,7 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
         {/* Supporting headline */}
         <p
           ref={supportingRef}
-          className="mt-4 text-center text-lg font-normal tracking-wide text-neutral-300 md:text-xl lg:text-2xl"
+          className="mt-3 text-center text-base font-normal tracking-wide text-neutral-300 sm:mt-4 sm:text-lg md:text-xl lg:text-2xl"
         >
           Ready to craft your next premium release.
         </p>
@@ -386,7 +394,7 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
         {/* Description paragraph */}
         <p
           ref={descriptionRef}
-          className="mt-6 max-w-2xl text-center text-base leading-relaxed text-neutral-400 md:text-lg"
+          className="mt-4 max-w-2xl text-center text-sm leading-relaxed text-neutral-400 sm:mt-6 sm:text-base md:text-lg"
         >
           I believe in clarity, quality, and thoughtful execution. Whether you&apos;re 
           launching a new product or refining an existing experience, I bring focused 
@@ -396,12 +404,12 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
         {/* CTA Buttons */}
         <div
           ref={buttonsRef}
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          className="mt-8 flex w-full flex-col items-stretch gap-3 sm:mt-10 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4"
         >
           {/* Primary Button - Solid */}
           <a
             href="mailto:hello@studio.com"
-            className="group relative inline-flex h-13 items-center justify-center overflow-hidden rounded-full bg-neutral-50 px-8 text-sm font-medium uppercase tracking-[0.2em] text-neutral-950 transition-all duration-250 ease-out hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)]"
+            className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-neutral-50 px-6 text-xs font-medium uppercase tracking-[0.2em] text-neutral-950 transition-all duration-250 ease-out hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)] sm:h-13 sm:px-8 sm:text-sm"
           >
             <span className="relative z-10">Start a project</span>
             <div 
@@ -413,7 +421,7 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
           {/* Secondary Button - Outline */}
           <a
             href="#projects"
-            className="group relative inline-flex h-13 items-center justify-center overflow-hidden rounded-full border border-neutral-700 px-8 text-sm font-medium uppercase tracking-[0.2em] text-neutral-200 transition-all duration-250 ease-out hover:scale-[1.03] hover:border-neutral-500 hover:text-white hover:shadow-[0_8px_30px_rgba(255,255,255,0.06)]"
+            className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full border border-neutral-700 px-6 text-xs font-medium uppercase tracking-[0.2em] text-neutral-200 transition-all duration-250 ease-out hover:scale-[1.03] hover:border-neutral-500 hover:text-white hover:shadow-[0_8px_30px_rgba(255,255,255,0.06)] sm:h-13 sm:px-8 sm:text-sm"
           >
             <span className="relative z-10">View work</span>
           </a>
