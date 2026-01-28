@@ -83,6 +83,19 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
   const mouseRef = useRef({ x: -1000, y: -1000, radius: 120 });
   const animationFrameRef = useRef<number>(0);
 
+  // Reset particles to random positions for the "scatter" effect
+  const resetParticlesToRandom = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    particleArrayRef.current.forEach(p => {
+      p.x = Math.random() * canvas.width;
+      p.y = Math.random() * canvas.height;
+      p.vx = 0;
+      p.vy = 0;
+    });
+  }, []);
+
   const initParticles = useCallback(() => {
     const canvas = canvasRef.current;
     const section = sectionRef.current;
@@ -180,6 +193,19 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
       initParticles();
     };
 
+    // ScrollTrigger to reset particles when section enters viewport
+    // This makes the "pop-in" animation happen every time you scroll to the section
+    const scrollTrigger = ScrollTrigger.create({
+      trigger: section,
+      start: "top 80%",
+      onEnter: () => {
+        resetParticlesToRandom();
+      },
+      onEnterBack: () => {
+        resetParticlesToRandom();
+      },
+    });
+
     section.addEventListener('mousemove', handleMouseMove);
     section.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('resize', handleResize);
@@ -191,8 +217,9 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
       section.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameRef.current);
+      scrollTrigger.kill();
     };
-  }, [initParticles]);
+  }, [initParticles, resetParticlesToRandom]);
 
   // Content animation effect
   useEffect(() => {
@@ -204,96 +231,109 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
     ).matches;
 
     const ctx = gsap.context(() => {
-      // Set initial states for elements
-      gsap.set([headlineRef.current, supportingRef.current, descriptionRef.current, buttonsRef.current], {
-        opacity: 0,
-        y: 20,
-      });
-
-      gsap.set(dividerRef.current, {
-        scaleX: 0,
-        transformOrigin: "left center",
-      });
-
-      // Master timeline triggered on scroll
-      const masterTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top 75%",
-          once: true,
-        },
-      });
-
-      if (!prefersReducedMotion) {
-        // Animated divider line (left to right)
-        masterTimeline.to(dividerRef.current, {
-          scaleX: 1,
-          duration: 0.8,
-          ease: "power2.out",
+      // Function to reset elements to initial state
+      const resetElements = () => {
+        gsap.set([headlineRef.current, supportingRef.current, descriptionRef.current, buttonsRef.current], {
+          opacity: 0,
+          y: 20,
         });
 
-        // Headline fade-up
-        masterTimeline.to(
-          headlineRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power2.out",
-          },
-          "-=0.3"
-        );
+        gsap.set(dividerRef.current, {
+          scaleX: 0,
+          transformOrigin: "left center",
+        });
+      };
 
-        // Supporting headline with slight delay
-        masterTimeline.to(
-          supportingRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power2.out",
-          },
-          "-=0.45"
-        );
+      // Function to play the animation
+      const playAnimation = () => {
+        // Reset first
+        resetElements();
 
-        // Description paragraph
-        masterTimeline.to(
-          descriptionRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power2.out",
-          },
-          "-=0.45"
-        );
+        // Create and play the timeline
+        const masterTimeline = gsap.timeline();
 
-        // CTA buttons (last)
-        masterTimeline.to(
-          buttonsRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
+        if (!prefersReducedMotion) {
+          // Animated divider line (left to right)
+          masterTimeline.to(dividerRef.current, {
+            scaleX: 1,
+            duration: 0.8,
             ease: "power2.out",
-          },
-          "-=0.4"
-        );
-      } else {
-        // Reduced motion: simple fade in
-        masterTimeline.to(
-          [headlineRef.current, supportingRef.current, descriptionRef.current, buttonsRef.current],
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            stagger: 0.05,
-            ease: "power2.out",
-          }
-        );
+          });
 
-        gsap.set(dividerRef.current, { scaleX: 1 });
-      }
+          // Headline fade-up
+          masterTimeline.to(
+            headlineRef.current,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+            },
+            "-=0.3"
+          );
+
+          // Supporting headline with slight delay
+          masterTimeline.to(
+            supportingRef.current,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+            },
+            "-=0.45"
+          );
+
+          // Description paragraph
+          masterTimeline.to(
+            descriptionRef.current,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+            },
+            "-=0.45"
+          );
+
+          // CTA buttons (last)
+          masterTimeline.to(
+            buttonsRef.current,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+            },
+            "-=0.4"
+          );
+        } else {
+          // Reduced motion: simple fade in
+          masterTimeline.to(
+            [headlineRef.current, supportingRef.current, descriptionRef.current, buttonsRef.current],
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.3,
+              stagger: 0.05,
+              ease: "power2.out",
+            }
+          );
+
+          gsap.set(dividerRef.current, { scaleX: 1 });
+        }
+      };
+
+      // Set initial state
+      resetElements();
+
+      // ScrollTrigger that fires every time section enters viewport
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 75%",
+        onEnter: playAnimation,
+        onEnterBack: playAnimation,
+      });
     }, section);
 
     return () => {
