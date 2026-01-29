@@ -319,7 +319,7 @@ import Sidebar from "./components/Sidebar";
 import AnimatedHeadline, { AnimatedHeadlineRef } from "./components/AnimatedHeadline";
 import ScrollIndicator from "./components/ScrollIndicator";
 import AboutMe from "./components/AboutMe";
-import ProjectCardsLeft from "./components/ProjectCardsLeft";
+import ProjectCardsLeft, { MobileProjectCards } from "./components/ProjectCardsLeft";
 import TestimonialsSlider from "./components/TestimonialsSlider";
 import CollaborateCTA from "./components/CollaborateCTA";
 import { createSlug } from "./utils/slug";
@@ -380,14 +380,18 @@ export default function Home() {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
     
-    // Force scroll to top immediately
-    forceScrollToTop();
+    // Only force scroll to top if NOT returning from case study
+    // When returning from case study, we want to scroll to #projects section
+    if (!skipLoader) {
+      // Force scroll to top immediately
+      forceScrollToTop();
 
-    // Force again after a brief delay to override browser scroll restoration
-    // This handles cases where browser tries to restore scroll after component mount
-    setTimeout(forceScrollToTop, 0);
-    setTimeout(forceScrollToTop, 10);
-    setTimeout(forceScrollToTop, 50);
+      // Force again after a brief delay to override browser scroll restoration
+      // This handles cases where browser tries to restore scroll after component mount
+      setTimeout(forceScrollToTop, 0);
+      setTimeout(forceScrollToTop, 10);
+      setTimeout(forceScrollToTop, 50);
+    }
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -627,10 +631,12 @@ export default function Home() {
           }
         }
       };
-      requestAnimationFrame(() => {
+      // Use a small delay to ensure Lenis is fully initialized
+      // and the DOM is ready for accurate scroll positioning
+      setTimeout(() => {
         scrollTarget();
         ScrollTrigger.refresh();
-      });
+      }, 50);
     }
 
     // Handle resize for stability
@@ -782,12 +788,37 @@ export default function Home() {
 
         <AboutMe />
 
-        {/* Projects Section */}
-        <section
-          ref={projectsSectionRef}
-          id="projects"
-          className="relative z-10 min-h-[300vh] border-t border-neutral-900 bg-neutral-950"
-        >
+        {/* Projects Section Wrapper */}
+        <div id="projects">
+          {/* Projects Section - Mobile */}
+          <section
+            className="relative z-10 border-t border-neutral-900 bg-neutral-950 md:hidden"
+          >
+            <div className="px-4 py-16">
+              {/* Section Header */}
+              <div className="flex flex-col gap-4 mb-8">
+                <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60">
+                  Projects
+                </p>
+                <h2 className="text-3xl font-semibold leading-[1.1] text-neutral-100">
+                  Signature projects that blend craft with measurable outcomes.
+                </h2>
+                <p className="text-base leading-relaxed text-neutral-300">
+                  Each engagement is grounded in research, elevated design systems,
+                  and performance-driven engineering.
+                </p>
+              </div>
+
+              {/* Mobile Project Cards Carousel */}
+              <MobileProjectCards sectionRef={projectsSectionRef} />
+            </div>
+          </section>
+
+          {/* Projects Section - Desktop (unchanged) */}
+          <section
+            ref={projectsSectionRef}
+            className="relative z-10 min-h-[300vh] border-t border-neutral-900 bg-neutral-950 hidden md:block"
+          >
           <div className="sticky top-0 h-screen overflow-hidden">
             <div className="relative flex w-full h-full flex-col gap-12 py-24 pl-4 pr-4 md:flex-row md:items-center md:justify-between md:gap-16 lg:gap-20 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
               {/* Left Column - Stacking project cards (scroll‑animated) */}
@@ -860,6 +891,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        </div>
 
         <section
           id="testimonials"

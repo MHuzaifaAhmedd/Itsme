@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import gsap from "gsap";
-
-gsap.config({ nullTargetWarn: false });
 
 const TESTIMONIALS = [
   {
@@ -32,162 +29,154 @@ const TESTIMONIALS = [
   },
 ];
 
-const CARD_WIDTH = 400;
-const BASE_DURATION = 45;
-const SCROLL_SPEED_MULTIPLIER = 1.35;
+// Responsive card widths and gaps
+const MOBILE_CARD_WIDTH = 260;
+const MOBILE_GAP = 12;
+const TABLET_CARD_WIDTH = 300;
+const TABLET_GAP = 16;
+const DESKTOP_CARD_WIDTH = 400;
+const DESKTOP_GAP = 24;
 
 export default function TestimonialsSlider() {
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
-  const lastScrollYRef = useRef(0);
-  const scrollAccumRef = useRef(0);
-  const timeScaleTweenRef = useRef<gsap.core.Tween | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  const setTimeScale = useCallback(
-    (value: number) => {
-      const tl = timelineRef.current;
-      if (!tl) return;
-      timeScaleTweenRef.current?.kill();
-      timeScaleTweenRef.current = gsap.to(tl, {
-        timeScale: value,
-        duration: 0.4,
-        ease: "power2.inOut",
-      });
-    },
-    [],
-  );
+  // Calculate total width of one set of cards for each breakpoint
+  const mobileSetWidth = TESTIMONIALS.length * (MOBILE_CARD_WIDTH + MOBILE_GAP);
+  const tabletSetWidth = TESTIMONIALS.length * (TABLET_CARD_WIDTH + TABLET_GAP);
+  const desktopSetWidth = TESTIMONIALS.length * (DESKTOP_CARD_WIDTH + DESKTOP_GAP);
 
   useEffect(() => {
-    const track = trackRef.current;
     const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!track || reduced) return;
-
-    const ctx = gsap.context(() => {
-      gsap.set(track, { force3D: true, willChange: "transform" });
-
-      const tl = gsap.timeline({
-        repeat: -1,
-        ease: "none",
-      });
-
-      tl.to(track, {
-        xPercent: -50,
-        duration: BASE_DURATION,
-        ease: "none",
-        overwrite: true,
-      });
-
-      timelineRef.current = tl;
-    }, track);
-
-    return () => {
-      ctx.revert();
-      timelineRef.current = null;
-      timeScaleTweenRef.current?.kill();
-    };
+    if (reduced && trackRef.current) {
+      trackRef.current.style.animationPlayState = "paused";
+    }
   }, []);
 
-  useEffect(() => {
-    const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+  const handleCardEnter = useCallback((index: number) => {
+    setIsPaused(true);
+    setHoveredIndex(index);
+  }, []);
 
-    const onTick = () => {
-      const tl = timelineRef.current;
-      if (!tl) return;
+  const handleCardLeave = useCallback(() => {
+    setIsPaused(false);
+    setHoveredIndex(null);
+  }, []);
 
-      if (isHovered) {
-        setTimeScale(0);
-        return;
-      }
-
-      const y = typeof window !== "undefined" ? window.scrollY ?? document.documentElement.scrollTop : 0;
-      const delta = Math.abs(y - lastScrollYRef.current);
-      lastScrollYRef.current = y;
-
-      if (delta > 0.5) {
-        scrollAccumRef.current = 8;
-      } else if (scrollAccumRef.current > 0) {
-        scrollAccumRef.current -= 1;
-      }
-
-      const targetScale = scrollAccumRef.current > 0 ? SCROLL_SPEED_MULTIPLIER : 1;
-      if (Math.abs(tl.timeScale() - targetScale) > 0.01) {
-        setTimeScale(targetScale);
-      }
-    };
-
-    gsap.ticker.add(onTick);
-    return () => {
-      gsap.ticker.remove(onTick);
-    };
-  }, [isHovered, setTimeScale]);
-
-  useEffect(() => {
-    if (!isHovered) return;
-    const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-    setTimeScale(0);
-  }, [isHovered, setTimeScale]);
-
-  const handleCardEnter = useCallback(
-    (el: HTMLDivElement) => {
-      setIsHovered(true);
-      gsap.set(el, { transformOrigin: "center center" });
-      gsap.to(el, {
-        scale: 1.03,
-        boxShadow: "0 25px 50px -12px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)",
-        duration: 0.3,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    },
-    [],
-  );
-
-  const handleCardLeave = useCallback(
-    (el: HTMLDivElement) => {
-      setIsHovered(false);
-      gsap.to(el, {
-        scale: 1,
-        boxShadow: "none",
-        duration: 0.35,
-        ease: "power2.out",
-        overwrite: true,
-      });
-    },
-    [],
-  );
-
-  const duplicated = [...TESTIMONIALS, ...TESTIMONIALS];
+  // Triple the testimonials for seamless infinite loop
+  const tripled = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
 
   return (
     <div className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden">
+      {/* CSS Keyframes for smooth infinite scroll - responsive */}
+      <style jsx>{`
+        /* Mobile (default) */
+        @keyframes scroll-left-mobile {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-${mobileSetWidth}px);
+          }
+        }
+        
+        /* Tablet */
+        @keyframes scroll-left-tablet {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-${tabletSetWidth}px);
+          }
+        }
+        
+        /* Desktop */
+        @keyframes scroll-left-desktop {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-${desktopSetWidth}px);
+          }
+        }
+        
+        .testimonial-track {
+          animation: scroll-left-mobile 30s linear infinite;
+          will-change: transform;
+          gap: ${MOBILE_GAP}px;
+        }
+        
+        @media (min-width: 640px) {
+          .testimonial-track {
+            animation: scroll-left-tablet 35s linear infinite;
+            gap: ${TABLET_GAP}px;
+          }
+        }
+        
+        @media (min-width: 768px) {
+          .testimonial-track {
+            animation: scroll-left-desktop 40s linear infinite;
+            gap: ${DESKTOP_GAP}px;
+          }
+        }
+        
+        .testimonial-track:hover,
+        .testimonial-track.paused {
+          animation-play-state: paused;
+        }
+        
+        /* Card responsive styles */
+        .testimonial-card {
+          min-width: ${MOBILE_CARD_WIDTH}px;
+          width: ${MOBILE_CARD_WIDTH}px;
+          padding: 1rem 1rem;
+        }
+        
+        @media (min-width: 640px) {
+          .testimonial-card {
+            min-width: ${TABLET_CARD_WIDTH}px;
+            width: ${TABLET_CARD_WIDTH}px;
+            padding: 1.25rem;
+          }
+        }
+        
+        @media (min-width: 768px) {
+          .testimonial-card {
+            min-width: ${DESKTOP_CARD_WIDTH}px;
+            width: ${DESKTOP_CARD_WIDTH}px;
+            padding: 2rem;
+          }
+        }
+      `}</style>
+      
       <div
         ref={trackRef}
-        className="flex flex-nowrap items-stretch gap-6 py-2"
+        className={`testimonial-track flex flex-nowrap items-stretch py-2 ${isPaused ? 'paused' : ''}`}
         style={{
           width: "max-content",
-          willChange: "transform",
         }}
       >
-        {duplicated.map((t, i) => (
+        {tripled.map((t, i) => (
           <div
             key={i}
-            className="shrink-0 rounded-3xl border border-neutral-900 bg-neutral-900/40 p-8 text-neutral-300 backdrop-blur-sm transition-shadow"
+            className="testimonial-card shrink-0 rounded-xl sm:rounded-2xl md:rounded-3xl border border-neutral-800/60 bg-neutral-900/50 text-neutral-300"
             style={{
-              minWidth: CARD_WIDTH,
-              width: CARD_WIDTH,
+              transform: hoveredIndex === i ? 'scale(1.03)' : 'scale(1)',
+              boxShadow: hoveredIndex === i 
+                ? '0 25px 50px -12px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)' 
+                : 'none',
+              transition: 'transform 0.3s ease-out, box-shadow 0.3s ease-out',
             }}
-            onMouseEnter={(e) => handleCardEnter(e.currentTarget)}
-            onMouseLeave={(e) => handleCardLeave(e.currentTarget)}
+            onMouseEnter={() => handleCardEnter(i)}
+            onMouseLeave={handleCardLeave}
           >
-            <p className="mb-6 text-lg leading-relaxed text-neutral-200">
+            <p className="mb-3 sm:mb-4 md:mb-6 text-[13px] sm:text-sm md:text-lg leading-normal sm:leading-relaxed text-neutral-300 md:text-neutral-200">
               &ldquo;{t.quote}&rdquo;
             </p>
-            <div className="flex flex-col">
-              <span className="font-medium text-neutral-100">{t.author}</span>
-              <span className="text-sm text-neutral-500">{t.role}</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs sm:text-sm md:text-base font-medium text-neutral-100">{t.author}</span>
+              <span className="text-[11px] sm:text-xs md:text-sm text-neutral-500">{t.role}</span>
             </div>
           </div>
         ))}

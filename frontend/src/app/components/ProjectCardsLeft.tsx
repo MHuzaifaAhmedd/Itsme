@@ -647,7 +647,7 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
@@ -681,6 +681,7 @@ export const PROJECTS = [
 
 const STACK_OFFSET_REM = 2.5; // Space between stacked cards
 
+// Desktop version - pinned stacking animation
 export default function ProjectCardsLeft({
   sectionRef,
 }: {
@@ -815,6 +816,219 @@ export default function ProjectCardsLeft({
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// Mobile version - horizontal swipe carousel with staggered reveal
+export function MobileProjectCards({
+  sectionRef,
+}: {
+  sectionRef: React.RefObject<HTMLElement | null>;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const hintRef = useRef<HTMLParagraphElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Reveal animation on mount
+  useEffect(() => {
+    const container = containerRef.current;
+    const cards = cardRefs.current.filter(Boolean);
+    if (!container || cards.length === 0) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    // Set initial state - cards start invisible and slightly below
+    gsap.set(cards, {
+      y: 40,
+      opacity: 0,
+    });
+
+    const ctx = gsap.context(() => {
+      // Staggered reveal animation when section enters viewport
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: container,
+          start: "top 85%",
+          once: true,
+        },
+      });
+
+      // Animate cards with staggered timing
+      cards.forEach((card, i) => {
+        tl.to(
+          card,
+          {
+            y: 0,
+            opacity: 1,
+            duration: prefersReducedMotion ? 0.3 : 0.5,
+            ease: "power3.out",
+          },
+          prefersReducedMotion ? i * 0.05 : i * 0.1
+        );
+      });
+
+      // Fade out the swipe hint after a delay
+      if (hintRef.current) {
+        tl.to(
+          hintRef.current,
+          {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          },
+          "+=2.5"
+        );
+      }
+    }, container);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Track active card using native scroll with debounce
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const handleScroll = () => {
+      // Clear existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Debounce the index update to avoid flickering
+      scrollTimeoutRef.current = setTimeout(() => {
+        const cards = cardRefs.current.filter(Boolean);
+        if (cards.length === 0) return;
+
+        // Find the card closest to the center of the viewport
+        const carouselRect = carousel.getBoundingClientRect();
+        const carouselCenter = carouselRect.left + carouselRect.width / 2;
+
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+
+        cards.forEach((card, i) => {
+          if (!card) return;
+          const cardRect = card.getBoundingClientRect();
+          const cardCenter = cardRect.left + cardRect.width / 2;
+          const distance = Math.abs(cardCenter - carouselCenter);
+
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = i;
+          }
+        });
+
+        setActiveIndex(closestIndex);
+      }, 50);
+    };
+
+    carousel.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      carousel.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Scroll to specific card when pagination dot is clicked
+  const scrollToCard = (index: number) => {
+    const card = cardRefs.current[index];
+    if (!card || !carouselRef.current) return;
+
+    // Use native scrollIntoView for smooth, hardware-accelerated scrolling
+    card.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+    setActiveIndex(index);
+  };
+
+  return (
+    <div ref={containerRef} className="w-full">
+      {/* Carousel Container - Pure native scroll */}
+      <div
+        ref={carouselRef}
+        className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          scrollBehavior: "smooth",
+        }}
+      >
+        {/* Left padding spacer for first card centering */}
+        <div className="shrink-0 w-[7.5vw]" aria-hidden="true" />
+        
+        {PROJECTS.map((p, i) => (
+          <div
+            key={p.name}
+            ref={(el) => {
+              cardRefs.current[i] = el;
+            }}
+            className="shrink-0 w-[85vw] h-[55vh] min-h-[380px] max-h-[500px] rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900/90 shadow-2xl snap-center"
+          >
+            <div className="relative w-full h-full">
+              <Image
+                src={p.image}
+                alt={p.name}
+                fill
+                className="object-cover"
+                sizes="85vw"
+                priority={i === 0}
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-neutral-950/95 via-neutral-950/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+                <h3 className="text-lg font-semibold text-white drop-shadow-lg leading-tight">
+                  {p.name}
+                </h3>
+                <p className="mt-2 text-sm text-neutral-300 line-clamp-2">
+                  {p.line}
+                </p>
+                <Link
+                  href={`/case-study/${createSlug(p.name)}`}
+                  className="inline-block mt-4 px-5 py-2.5 bg-white/10 hover:bg-white/20 active:bg-white/25 backdrop-blur-sm border border-white/20 rounded-xl text-white text-sm font-medium transition-all duration-200 active:scale-95"
+                >
+                  View Case Study
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        {/* Right padding spacer for last card centering */}
+        <div className="shrink-0 w-[7.5vw]" aria-hidden="true" />
+      </div>
+
+      {/* Pagination Dots */}
+      <div className="flex justify-center gap-2 mt-4">
+        {PROJECTS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToCard(i)}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              activeIndex === i
+                ? "bg-white w-6"
+                : "bg-neutral-600 hover:bg-neutral-500 w-2"
+            }`}
+            aria-label={`Go to project ${i + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Swipe hint - shows briefly on first load */}
+      <p
+        ref={hintRef}
+        className="text-center text-xs text-neutral-500 mt-3 animate-pulse"
+      >
+        Swipe to explore projects
+      </p>
     </div>
   );
 }
