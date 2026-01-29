@@ -103,7 +103,7 @@ export default function CaseStudyIntro({ projectName, onComplete }: CaseStudyInt
       {/* Animated title */}
       <h1
         ref={titleRef}
-        className="relative z-10 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white text-center px-6 max-w-[90vw]"
+        className="relative z-10 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white text-center px-6 max-w-[90vw]"
         style={{ perspective: "1000px" }}
       >
         {letters.map((char, index) => (

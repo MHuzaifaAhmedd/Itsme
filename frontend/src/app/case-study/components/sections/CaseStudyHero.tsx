@@ -81,26 +81,27 @@ export default function CaseStudyHero({ data }: CaseStudyHeroProps) {
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/70 via-neutral-950/50 to-neutral-950" />
+        <div className="absolute inset-0 bg-linear-to-b from-neutral-950/70 via-neutral-950/50 to-neutral-950" />
       </div>
 
       {/* Content */}
       <div
         ref={contentRef}
-        className="relative z-10 max-w-4xl mx-auto text-center"
+        className="relative z-10 mx-auto w-full max-w-5xl"
       >
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
         {/* Project Name */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-white mb-5">
           {data.projectName}
         </h1>
 
         {/* Impact Line */}
-        <p className="text-xl md:text-2xl lg:text-3xl text-neutral-300 mb-8 max-w-3xl mx-auto">
+        <p className="text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed text-neutral-300 mb-8 max-w-2xl">
           {data.impactLine}
         </p>
 
         {/* Meta Info */}
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mb-10 text-sm md:text-base text-neutral-400">
+        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6 mb-10 text-sm md:text-base text-neutral-400">
           <div className="flex items-center gap-2">
             <span className="text-neutral-500">Role:</span>
             <span className="text-neutral-200">{data.role}</span>
@@ -113,7 +114,7 @@ export default function CaseStudyHero({ data }: CaseStudyHeroProps) {
         </div>
 
         {/* Tech Stack */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
+        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-12">
           {data.techStack.map((tech, i) => (
             <span
               key={i}
@@ -125,7 +126,7 @@ export default function CaseStudyHero({ data }: CaseStudyHeroProps) {
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
           {data.ctas.live && (
             <a
               href={data.ctas.live}
@@ -156,6 +157,7 @@ export default function CaseStudyHero({ data }: CaseStudyHeroProps) {
               GitHub
             </a>
           )}
+        </div>
         </div>
       </div>
     </section>
