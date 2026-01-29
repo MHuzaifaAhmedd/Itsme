@@ -821,11 +821,7 @@ export default function ProjectCardsLeft({
 }
 
 // Mobile version - horizontal swipe carousel with staggered reveal
-export function MobileProjectCards({
-  sectionRef,
-}: {
-  sectionRef: React.RefObject<HTMLElement | null>;
-}) {
+export function MobileProjectCards() {
   const containerRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);

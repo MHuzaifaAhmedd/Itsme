@@ -1,0 +1,1402 @@
+{
+  "diagrams": [
+    {
+      "id": "system-architecture",
+      "title": "System Architecture Overview",
+      "description": "Complete system topology showing applications, services, databases, and external integrations",
+      "nodes": [
+        {
+          "id": "customer-frontend",
+          "label": "Customer Frontend\n(React SPA)",
+          "type": "frontend",
+          "technology": "React 18 + Vite + Tailwind",
+          "port": "7001:3000"
+        },
+        {
+          "id": "admin-frontend",
+          "label": "Admin Dashboard\n(React SPA)",
+          "type": "frontend",
+          "technology": "React 18 + Vite + Tailwind",
+          "port": "7002:3000"
+        },
+        {
+          "id": "nginx",
+          "label": "Nginx Reverse Proxy",
+          "type": "service",
+          "technology": "Nginx + SSL",
+          "port": "443"
+        },
+        {
+          "id": "express-backend",
+          "label": "Express API Server",
+          "type": "backend",
+          "technology": "Express.js + Node.js",
+          "port": "7000:4000",
+          "binding": "localhost only"
+        },
+        {
+          "id": "auth-middleware",
+          "label": "Auth Middleware",
+          "type": "service",
+          "technology": "JWT Validation"
+        },
+        {
+          "id": "multer-middleware",
+          "label": "File Upload Handler",
+          "type": "service",
+          "technology": "Multer (Memory Storage)"
+        },
+        {
+          "id": "mongodb",
+          "label": "MongoDB Atlas",
+          "type": "db",
+          "technology": "MongoDB 8.x",
+          "collections": ["users", "products", "orders", "settings"]
+        },
+        {
+          "id": "s3",
+          "label": "AWS S3",
+          "type": "db",
+          "technology": "Object Storage",
+          "region": "eu-north-1",
+          "contents": ["Product Images", "Size Charts", "Payment Proofs"]
+        },
+        {
+          "id": "ga4",
+          "label": "Google Analytics 4",
+          "type": "external",
+          "technology": "Analytics"
+        },
+        {
+          "id": "whatsapp",
+          "label": "WhatsApp",
+          "type": "external",
+          "technology": "Click-to-Chat"
+        },
+        {
+          "id": "stripe",
+          "label": "Stripe",
+          "type": "external",
+          "technology": "Payment Gateway (Inactive)",
+          "status": "disabled"
+        },
+        {
+          "id": "razorpay",
+          "label": "Razorpay",
+          "type": "external",
+          "technology": "Payment Gateway (Inactive)",
+          "status": "disabled"
+        }
+      ],
+      "edges": [
+        {
+          "source": "customer-frontend",
+          "target": "nginx",
+          "label": "HTTPS (nabahussam.com)"
+        },
+        {
+          "source": "admin-frontend",
+          "target": "nginx",
+          "label": "HTTPS (admin.nabahussam.com)"
+        },
+        {
+          "source": "nginx",
+          "target": "customer-frontend",
+          "label": "Serve Static Files"
+        },
+        {
+          "source": "nginx",
+          "target": "admin-frontend",
+          "label": "Serve Static Files"
+        },
+        {
+          "source": "nginx",
+          "target": "express-backend",
+          "label": "Proxy /api/* → localhost:7000"
+        },
+        {
+          "source": "customer-frontend",
+          "target": "express-backend",
+          "label": "HTTP + JWT"
+        },
+        {
+          "source": "admin-frontend",
+          "target": "express-backend",
+          "label": "HTTP + Admin JWT"
+        },
+        {
+          "source": "express-backend",
+          "target": "auth-middleware",
+          "label": "Protected Routes"
+        },
+        {
+          "source": "express-backend",
+          "target": "multer-middleware",
+          "label": "Image Upload Routes"
+        },
+        {
+          "source": "auth-middleware",
+          "target": "express-backend",
+          "label": "userId Attached"
+        },
+        {
+          "source": "multer-middleware",
+          "target": "express-backend",
+          "label": "File Buffers"
+        },
+        {
+          "source": "express-backend",
+          "target": "mongodb",
+          "label": "Mongoose Queries"
+        },
+        {
+          "source": "mongodb",
+          "target": "express-backend",
+          "label": "JSON Documents"
+        },
+        {
+          "source": "express-backend",
+          "target": "s3",
+          "label": "PutObjectCommand"
+        },
+        {
+          "source": "s3",
+          "target": "customer-frontend",
+          "label": "Direct Image URLs"
+        },
+        {
+          "source": "s3",
+          "target": "admin-frontend",
+          "label": "Direct Image URLs"
+        },
+        {
+          "source": "customer-frontend",
+          "target": "ga4",
+          "label": "DataLayer Events"
+        },
+        {
+          "source": "customer-frontend",
+          "target": "whatsapp",
+          "label": "Click-to-Chat Link"
+        },
+        {
+          "source": "express-backend",
+          "target": "stripe",
+          "label": "API (Integrated, Unused)"
+        },
+        {
+          "source": "express-backend",
+          "target": "razorpay",
+          "label": "API (Integrated, Unused)"
+        }
+      ]
+    },
+    {
+      "id": "authentication-flow",
+      "title": "Authentication & Authorization Flow",
+      "description": "Complete auth lifecycle for customers, admins, and guest order linking",
+      "nodes": [
+        {
+          "id": "user-action-login",
+          "label": "User Login",
+          "type": "frontend",
+          "action": "POST /api/user/login"
+        },
+        {
+          "id": "user-action-register",
+          "label": "User Registration",
+          "type": "frontend",
+          "action": "POST /api/user/register"
+        },
+        {
+          "id": "admin-action-login",
+          "label": "Admin Login",
+          "type": "frontend",
+          "action": "POST /api/user/admin"
+        },
+        {
+          "id": "guest-checkout",
+          "label": "Guest Checkout",
+          "type": "frontend",
+          "action": "POST /api/order/place-guest"
+        },
+        {
+          "id": "validate-credentials",
+          "label": "Validate Credentials",
+          "type": "backend",
+          "logic": "bcrypt.compare(password, hashedPassword)"
+        },
+        {
+          "id": "check-db-admin",
+          "label": "Check DB Admin",
+          "type": "backend",
+          "logic": "User.findOne({email, isAdmin: true})"
+        },
+        {
+          "id": "check-env-admin",
+          "label": "Check Env Admin",
+          "type": "backend",
+          "logic": "email === ADMIN_EMAIL && password === ADMIN_PASSWORD"
+        },
+        {
+          "id": "hash-password",
+          "label": "Hash Password",
+          "type": "backend",
+          "logic": "bcrypt.hash(password, 10)"
+        },
+        {
+          "id": "create-user",
+          "label": "Create User Document",
+          "type": "backend",
+          "logic": "user.save()"
+        },
+        {
+          "id": "link-guest-orders",
+          "label": "Link Guest Orders",
+          "type": "backend",
+          "logic": "Order.updateMany({guestEmail, isGuestOrder})"
+        },
+        {
+          "id": "generate-jwt",
+          "label": "Generate JWT",
+          "type": "backend",
+          "logic": "jwt.sign({id: user._id}, JWT_SECRET)"
+        },
+        {
+          "id": "generate-admin-jwt",
+          "label": "Generate Admin JWT",
+          "type": "backend",
+          "logic": "jwt.sign({id, isAdmin: true}, JWT_SECRET)"
+        },
+        {
+          "id": "store-token-client",
+          "label": "Store Token",
+          "type": "frontend",
+          "storage": "localStorage.setItem('token', token)"
+        },
+        {
+          "id": "create-guest-order",
+          "label": "Create Guest Order",
+          "type": "backend",
+          "logic": "order.save() with {guestEmail, isGuestOrder: true}"
+        },
+        {
+          "id": "auth-middleware",
+          "label": "Auth Middleware",
+          "type": "service",
+          "logic": "jwt.verify(token) → userId"
+        },
+        {
+          "id": "admin-auth-middleware",
+          "label": "Admin Auth Middleware",
+          "type": "service",
+          "logic": "jwt.verify(token) → check isAdmin"
+        },
+        {
+          "id": "protected-endpoint",
+          "label": "Protected Endpoint",
+          "type": "backend",
+          "access": "Requires valid JWT"
+        },
+        {
+          "id": "admin-endpoint",
+          "label": "Admin Endpoint",
+          "type": "backend",
+          "access": "Requires admin JWT"
+        }
+      ],
+      "edges": [
+        {
+          "source": "user-action-login",
+          "target": "validate-credentials",
+          "label": "email, password"
+        },
+        {
+          "source": "validate-credentials",
+          "target": "generate-jwt",
+          "label": "Valid ✓"
+        },
+        {
+          "source": "validate-credentials",
+          "target": "user-action-login",
+          "label": "Invalid ✗ → Error"
+        },
+        {
+          "source": "generate-jwt",
+          "target": "store-token-client",
+          "label": "Return token"
+        },
+        {
+          "source": "user-action-register",
+          "target": "hash-password",
+          "label": "name, email, password"
+        },
+        {
+          "source": "hash-password",
+          "target": "create-user",
+          "label": "hashedPassword"
+        },
+        {
+          "source": "create-user",
+          "target": "link-guest-orders",
+          "label": "userId, email"
+        },
+        {
+          "source": "link-guest-orders",
+          "target": "generate-jwt",
+          "label": "Orders linked"
+        },
+        {
+          "source": "admin-action-login",
+          "target": "check-db-admin",
+          "label": "email, password"
+        },
+        {
+          "source": "check-db-admin",
+          "target": "generate-admin-jwt",
+          "label": "Found ✓"
+        },
+        {
+          "source": "check-db-admin",
+          "target": "check-env-admin",
+          "label": "Not Found → Fallback"
+        },
+        {
+          "source": "check-env-admin",
+          "target": "generate-admin-jwt",
+          "label": "Match ✓"
+        },
+        {
+          "source": "check-env-admin",
+          "target": "admin-action-login",
+          "label": "No Match ✗ → Error"
+        },
+        {
+          "source": "generate-admin-jwt",
+          "target": "store-token-client",
+          "label": "Return admin token"
+        },
+        {
+          "source": "guest-checkout",
+          "target": "create-guest-order",
+          "label": "guestEmail, items, address"
+        },
+        {
+          "source": "store-token-client",
+          "target": "auth-middleware",
+          "label": "Subsequent requests with token"
+        },
+        {
+          "source": "auth-middleware",
+          "target": "protected-endpoint",
+          "label": "Valid token → userId attached"
+        },
+        {
+          "source": "store-token-client",
+          "target": "admin-auth-middleware",
+          "label": "Admin requests with token"
+        },
+        {
+          "source": "admin-auth-middleware",
+          "target": "admin-endpoint",
+          "label": "Valid admin token"
+        }
+      ]
+    },
+    {
+      "id": "order-placement-lifecycle",
+      "title": "Order Placement Lifecycle",
+      "description": "End-to-end order flow from cart to confirmation with payment routing",
+      "nodes": [
+        {
+          "id": "cart-review",
+          "label": "Cart Review",
+          "type": "frontend",
+          "component": "Cart.jsx"
+        },
+        {
+          "id": "proceed-checkout",
+          "label": "Proceed to Checkout",
+          "type": "frontend",
+          "component": "PlaceOrder.jsx"
+        },
+        {
+          "id": "check-mto-items",
+          "label": "Check for MTO Items",
+          "type": "frontend",
+          "logic": "items.some(i => i.isMakeToOrder)"
+        },
+        {
+          "id": "payment-method-selection",
+          "label": "Select Payment Method",
+          "type": "frontend",
+          "options": ["COD", "Bank Transfer"]
+        },
+        {
+          "id": "validate-payment-method",
+          "label": "Validate Payment",
+          "type": "frontend",
+          "logic": "MTO → Force Bank Transfer"
+        },
+        {
+          "id": "show-bank-details",
+          "label": "Show Bank Details",
+          "type": "frontend",
+          "conditional": "If Bank Transfer selected"
+        },
+        {
+          "id": "submit-order",
+          "label": "Submit Order",
+          "type": "frontend",
+          "action": "POST /api/order/place or /api/order/place-guest"
+        },
+        {
+          "id": "validate-items",
+          "label": "Validate Items",
+          "type": "backend",
+          "checks": ["Product exists", "Size valid", "Quantity > 0"]
+        },
+        {
+          "id": "fetch-settings",
+          "label": "Fetch Settings",
+          "type": "backend",
+          "query": "Setting.findOne()"
+        },
+        {
+          "id": "calculate-totals",
+          "label": "Calculate Totals",
+          "type": "backend",
+          "formula": "subtotal + addOns + shippingFee"
+        },
+        {
+          "id": "create-order-doc",
+          "label": "Create Order Document",
+          "type": "backend",
+          "model": "Order"
+        },
+        {
+          "id": "add-cod-details",
+          "label": "Add COD Details",
+          "type": "backend",
+          "conditional": "If paymentMethod === COD",
+          "fields": ["deliveryService", "trackingId", "attempts"]
+        },
+        {
+          "id": "add-mto-fields",
+          "label": "Add MTO Fields",
+          "type": "backend",
+          "conditional": "If MTO items",
+          "fields": ["deposit", "balance", "modificationDeadline"]
+        },
+        {
+          "id": "save-order",
+          "label": "Save Order",
+          "type": "backend",
+          "operation": "order.save()"
+        },
+        {
+          "id": "clear-cart",
+          "label": "Clear User Cart",
+          "type": "backend",
+          "operation": "User.findByIdAndUpdate({cartData: {}})"
+        },
+        {
+          "id": "return-order-id",
+          "label": "Return Order ID",
+          "type": "backend",
+          "response": "{success: true, orderId}"
+        },
+        {
+          "id": "clear-local-cart",
+          "label": "Clear Local Cart",
+          "type": "frontend",
+          "storage": "localStorage.removeItem('cartData')"
+        },
+        {
+          "id": "fire-purchase-event",
+          "label": "Fire Purchase Event",
+          "type": "frontend",
+          "analytics": "dataLayer.push({event: 'purchase'})"
+        },
+        {
+          "id": "redirect-confirmation",
+          "label": "Redirect to Thank You",
+          "type": "frontend",
+          "route": "/thank-you?orderId=..."
+        }
+      ],
+      "edges": [
+        {
+          "source": "cart-review",
+          "target": "proceed-checkout",
+          "label": "Click Checkout"
+        },
+        {
+          "source": "proceed-checkout",
+          "target": "check-mto-items",
+          "label": "Load cart items"
+        },
+        {
+          "source": "check-mto-items",
+          "target": "payment-method-selection",
+          "label": "Continue"
+        },
+        {
+          "source": "payment-method-selection",
+          "target": "validate-payment-method",
+          "label": "Method selected"
+        },
+        {
+          "source": "validate-payment-method",
+          "target": "payment-method-selection",
+          "label": "Invalid (MTO + COD) → Error"
+        },
+        {
+          "source": "validate-payment-method",
+          "target": "show-bank-details",
+          "label": "Bank Transfer selected"
+        },
+        {
+          "source": "validate-payment-method",
+          "target": "submit-order",
+          "label": "Valid"
+        },
+        {
+          "source": "show-bank-details",
+          "target": "submit-order",
+          "label": "Details displayed"
+        },
+        {
+          "source": "submit-order",
+          "target": "validate-items",
+          "label": "Order payload"
+        },
+        {
+          "source": "validate-items",
+          "target": "fetch-settings",
+          "label": "Items valid ✓"
+        },
+        {
+          "source": "validate-items",
+          "target": "return-order-id",
+          "label": "Invalid ✗ → Error response"
+        },
+        {
+          "source": "fetch-settings",
+          "target": "calculate-totals",
+          "label": "Shipping charges"
+        },
+        {
+          "source": "calculate-totals",
+          "target": "create-order-doc",
+          "label": "Final amount"
+        },
+        {
+          "source": "create-order-doc",
+          "target": "add-cod-details",
+          "label": "If COD"
+        },
+        {
+          "source": "create-order-doc",
+          "target": "add-mto-fields",
+          "label": "If MTO items"
+        },
+        {
+          "source": "add-cod-details",
+          "target": "save-order",
+          "label": "COD fields added"
+        },
+        {
+          "source": "add-mto-fields",
+          "target": "save-order",
+          "label": "MTO fields added"
+        },
+        {
+          "source": "create-order-doc",
+          "target": "save-order",
+          "label": "Standard order"
+        },
+        {
+          "source": "save-order",
+          "target": "clear-cart",
+          "label": "Order saved"
+        },
+        {
+          "source": "clear-cart",
+          "target": "return-order-id",
+          "label": "Cart cleared"
+        },
+        {
+          "source": "return-order-id",
+          "target": "clear-local-cart",
+          "label": "Success response"
+        },
+        {
+          "source": "clear-local-cart",
+          "target": "fire-purchase-event",
+          "label": "Local state cleared"
+        },
+        {
+          "source": "fire-purchase-event",
+          "target": "redirect-confirmation",
+          "label": "Analytics sent"
+        }
+      ]
+    },
+    {
+      "id": "product-data-flow",
+      "title": "Product Data Flow",
+      "description": "Product lifecycle from creation to display including image storage",
+      "nodes": [
+        {
+          "id": "admin-add-product",
+          "label": "Admin Add Product Form",
+          "type": "frontend",
+          "component": "Add.jsx"
+        },
+        {
+          "id": "validate-aspect-ratio",
+          "label": "Validate Aspect Ratio",
+          "type": "frontend",
+          "logic": "Image width/height ≈ 2:3"
+        },
+        {
+          "id": "upload-product",
+          "label": "Upload Product",
+          "type": "frontend",
+          "action": "POST /api/product/add (multipart)"
+        },
+        {
+          "id": "multer-capture",
+          "label": "Multer Capture Files",
+          "type": "service",
+          "storage": "Memory (buffers)"
+        },
+        {
+          "id": "upload-to-s3",
+          "label": "Upload to S3",
+          "type": "backend",
+          "operation": "PutObjectCommand × images"
+        },
+        {
+          "id": "s3-storage",
+          "label": "S3 Bucket Storage",
+          "type": "db",
+          "region": "eu-north-1"
+        },
+        {
+          "id": "generate-public-urls",
+          "label": "Generate Public URLs",
+          "type": "backend",
+          "pattern": "https://{bucket}.s3.{region}.amazonaws.com/{key}"
+        },
+        {
+          "id": "create-product-doc",
+          "label": "Create Product Document",
+          "type": "backend",
+          "model": "Product",
+          "fields": ["name", "price", "images (URLs)", "category", "sizes"]
+        },
+        {
+          "id": "save-to-mongodb",
+          "label": "Save to MongoDB",
+          "type": "backend",
+          "operation": "product.save()"
+        },
+        {
+          "id": "mongodb-products",
+          "label": "Products Collection",
+          "type": "db",
+          "database": "MongoDB Atlas"
+        },
+        {
+          "id": "customer-browse",
+          "label": "Customer Browse",
+          "type": "frontend",
+          "component": "Collection.jsx"
+        },
+        {
+          "id": "fetch-product-list",
+          "label": "Fetch Product List",
+          "type": "frontend",
+          "action": "GET /api/product/list"
+        },
+        {
+          "id": "query-all-products",
+          "label": "Query All Products",
+          "type": "backend",
+          "query": "Product.find({})"
+        },
+        {
+          "id": "cache-in-context",
+          "label": "Cache in Context",
+          "type": "frontend",
+          "storage": "ShopContext.products"
+        },
+        {
+          "id": "render-product-grid",
+          "label": "Render Product Grid",
+          "type": "frontend",
+          "component": "ProductItem.jsx"
+        },
+        {
+          "id": "load-images-s3",
+          "label": "Load Images from S3",
+          "type": "frontend",
+          "element": "<img src={product.image[0]} />"
+        },
+        {
+          "id": "customer-search",
+          "label": "Customer Search",
+          "type": "frontend",
+          "component": "HeaderSearch.jsx"
+        },
+        {
+          "id": "debounce-search",
+          "label": "Debounce (300ms)",
+          "type": "frontend",
+          "logic": "Wait 300ms after typing"
+        },
+        {
+          "id": "search-api",
+          "label": "Search API",
+          "type": "frontend",
+          "action": "GET /api/product/search?q=..."
+        },
+        {
+          "id": "regex-query",
+          "label": "Regex Query",
+          "type": "backend",
+          "query": "Product.find({$or: [{name: regex}, {category: regex}]})"
+        },
+        {
+          "id": "return-search-results",
+          "label": "Return Results",
+          "type": "backend",
+          "limit": "20 products"
+        }
+      ],
+      "edges": [
+        {
+          "source": "admin-add-product",
+          "target": "validate-aspect-ratio",
+          "label": "Image files selected"
+        },
+        {
+          "source": "validate-aspect-ratio",
+          "target": "admin-add-product",
+          "label": "Invalid ratio → Error toast"
+        },
+        {
+          "source": "validate-aspect-ratio",
+          "target": "upload-product",
+          "label": "Valid ✓"
+        },
+        {
+          "source": "upload-product",
+          "target": "multer-capture",
+          "label": "FormData with files"
+        },
+        {
+          "source": "multer-capture",
+          "target": "upload-to-s3",
+          "label": "req.files (buffers)"
+        },
+        {
+          "source": "upload-to-s3",
+          "target": "s3-storage",
+          "label": "PutObjectCommand"
+        },
+        {
+          "source": "s3-storage",
+          "target": "generate-public-urls",
+          "label": "Upload success"
+        },
+        {
+          "source": "generate-public-urls",
+          "target": "create-product-doc",
+          "label": "Image URLs array"
+        },
+        {
+          "source": "create-product-doc",
+          "target": "save-to-mongodb",
+          "label": "Product document"
+        },
+        {
+          "source": "save-to-mongodb",
+          "target": "mongodb-products",
+          "label": "Insert document"
+        },
+        {
+          "source": "customer-browse",
+          "target": "fetch-product-list",
+          "label": "Page load / Navigate to collection"
+        },
+        {
+          "source": "fetch-product-list",
+          "target": "query-all-products",
+          "label": "API request"
+        },
+        {
+          "source": "query-all-products",
+          "target": "mongodb-products",
+          "label": "Product.find({})"
+        },
+        {
+          "source": "mongodb-products",
+          "target": "query-all-products",
+          "label": "All product documents"
+        },
+        {
+          "source": "query-all-products",
+          "target": "cache-in-context",
+          "label": "Products array"
+        },
+        {
+          "source": "cache-in-context",
+          "target": "render-product-grid",
+          "label": "products from Context"
+        },
+        {
+          "source": "render-product-grid",
+          "target": "load-images-s3",
+          "label": "Render <img> tags"
+        },
+        {
+          "source": "load-images-s3",
+          "target": "s3-storage",
+          "label": "Direct HTTP GET"
+        },
+        {
+          "source": "customer-search",
+          "target": "debounce-search",
+          "label": "Typing in search box"
+        },
+        {
+          "source": "debounce-search",
+          "target": "search-api",
+          "label": "300ms after last keystroke"
+        },
+        {
+          "source": "search-api",
+          "target": "regex-query",
+          "label": "Search query"
+        },
+        {
+          "source": "regex-query",
+          "target": "mongodb-products",
+          "label": "Regex match query"
+        },
+        {
+          "source": "mongodb-products",
+          "target": "return-search-results",
+          "label": "Matching products"
+        },
+        {
+          "source": "return-search-results",
+          "target": "customer-search",
+          "label": "Display results"
+        }
+      ]
+    },
+    {
+      "id": "cart-state-management",
+      "title": "Shopping Cart State Management",
+      "description": "Cart synchronization between client, server, and storage",
+      "nodes": [
+        {
+          "id": "guest-add-to-cart",
+          "label": "Guest Add to Cart",
+          "type": "frontend",
+          "userState": "No token"
+        },
+        {
+          "id": "update-local-state",
+          "label": "Update Cart State",
+          "type": "frontend",
+          "structure": "{itemId: {size: qty}}"
+        },
+        {
+          "id": "save-to-localstorage",
+          "label": "Save to LocalStorage",
+          "type": "frontend",
+          "operation": "localStorage.setItem('cartData')"
+        },
+        {
+          "id": "auth-add-to-cart",
+          "label": "Authenticated Add to Cart",
+          "type": "frontend",
+          "userState": "Has token"
+        },
+        {
+          "id": "update-context-state",
+          "label": "Update Context State",
+          "type": "frontend",
+          "context": "ShopContext.cartData"
+        },
+        {
+          "id": "sync-to-backend",
+          "label": "Sync to Backend",
+          "type": "frontend",
+          "action": "POST /api/cart/add"
+        },
+        {
+          "id": "update-user-cart",
+          "label": "Update User Cart Field",
+          "type": "backend",
+          "operation": "user.cartData[itemId][size] = qty"
+        },
+        {
+          "id": "save-user-doc",
+          "label": "Save User Document",
+          "type": "backend",
+          "operation": "user.save()"
+        },
+        {
+          "id": "mongodb-users",
+          "label": "Users Collection",
+          "type": "db",
+          "database": "MongoDB Atlas",
+          "field": "cartData (nested object)"
+        },
+        {
+          "id": "user-login",
+          "label": "User Login",
+          "type": "frontend",
+          "trigger": "After authentication"
+        },
+        {
+          "id": "fetch-db-cart",
+          "label": "Fetch DB Cart",
+          "type": "frontend",
+          "action": "POST /api/cart/get"
+        },
+        {
+          "id": "read-local-cart",
+          "label": "Read LocalStorage Cart",
+          "type": "frontend",
+          "operation": "localStorage.getItem('cartData')"
+        },
+        {
+          "id": "merge-carts",
+          "label": "Merge Cart Data",
+          "type": "frontend",
+          "logic": "dbCart + localCart (additive)"
+        },
+        {
+          "id": "sync-merged-cart",
+          "label": "Sync Merged Cart",
+          "type": "frontend",
+          "action": "POST /api/cart/update"
+        },
+        {
+          "id": "clear-localstorage",
+          "label": "Clear LocalStorage",
+          "type": "frontend",
+          "operation": "localStorage.removeItem('cartData')"
+        },
+        {
+          "id": "calculate-cart-total",
+          "label": "Calculate Cart Total",
+          "type": "frontend",
+          "function": "getCartAmount()",
+          "formula": "Σ(price + addOns) × qty"
+        },
+        {
+          "id": "cart-drawer-display",
+          "label": "Cart Drawer Display",
+          "type": "frontend",
+          "component": "CartDrawer.jsx"
+        }
+      ],
+      "edges": [
+        {
+          "source": "guest-add-to-cart",
+          "target": "update-local-state",
+          "label": "itemId, size, qty"
+        },
+        {
+          "source": "update-local-state",
+          "target": "save-to-localstorage",
+          "label": "Updated cart object"
+        },
+        {
+          "source": "save-to-localstorage",
+          "target": "calculate-cart-total",
+          "label": "Cart persisted"
+        },
+        {
+          "source": "auth-add-to-cart",
+          "target": "update-context-state",
+          "label": "itemId, size, qty"
+        },
+        {
+          "source": "update-context-state",
+          "target": "sync-to-backend",
+          "label": "State updated"
+        },
+        {
+          "source": "sync-to-backend",
+          "target": "update-user-cart",
+          "label": "userId, itemId, size, qty"
+        },
+        {
+          "source": "update-user-cart",
+          "target": "save-user-doc",
+          "label": "Cart field modified"
+        },
+        {
+          "source": "save-user-doc",
+          "target": "mongodb-users",
+          "label": "Update document"
+        },
+        {
+          "source": "mongodb-users",
+          "target": "update-context-state",
+          "label": "Save confirmed"
+        },
+        {
+          "source": "update-context-state",
+          "target": "calculate-cart-total",
+          "label": "State synced"
+        },
+        {
+          "source": "user-login",
+          "target": "fetch-db-cart",
+          "label": "Token received"
+        },
+        {
+          "source": "fetch-db-cart",
+          "target": "mongodb-users",
+          "label": "GET user.cartData"
+        },
+        {
+          "source": "mongodb-users",
+          "target": "read-local-cart",
+          "label": "DB cart retrieved"
+        },
+        {
+          "source": "read-local-cart",
+          "target": "merge-carts",
+          "label": "Local cart + DB cart"
+        },
+        {
+          "source": "merge-carts",
+          "target": "sync-merged-cart",
+          "label": "Merged cart object"
+        },
+        {
+          "source": "sync-merged-cart",
+          "target": "update-user-cart",
+          "label": "Save merged cart"
+        },
+        {
+          "source": "sync-merged-cart",
+          "target": "clear-localstorage",
+          "label": "Backend updated"
+        },
+        {
+          "source": "clear-localstorage",
+          "target": "calculate-cart-total",
+          "label": "Local cart removed"
+        },
+        {
+          "source": "calculate-cart-total",
+          "target": "cart-drawer-display",
+          "label": "Total calculated"
+        }
+      ]
+    },
+    {
+      "id": "mto-workflow",
+      "title": "Made-to-Order (MTO) Workflow",
+      "description": "Custom product lifecycle with deposit payments and modification tracking",
+      "nodes": [
+        {
+          "id": "mto-product-view",
+          "label": "View MTO Product",
+          "type": "frontend",
+          "flag": "isMakeToOrder: true"
+        },
+        {
+          "id": "select-design-category",
+          "label": "Select Design Category",
+          "type": "frontend",
+          "options": "mtoAttributes.designCategories"
+        },
+        {
+          "id": "choose-custom-size",
+          "label": "Choose Custom Size",
+          "type": "frontend",
+          "options": "mtoAttributes.customSizeOptions"
+        },
+        {
+          "id": "view-size-chart-mto",
+          "label": "View MTO Size Chart",
+          "type": "frontend",
+          "source": "settings.sizeCharts.mto (S3 URL)"
+        },
+        {
+          "id": "add-mto-to-cart",
+          "label": "Add MTO to Cart",
+          "type": "frontend",
+          "storage": "Cart with MTO flag"
+        },
+        {
+          "id": "proceed-mto-checkout",
+          "label": "Proceed to Checkout",
+          "type": "frontend",
+          "component": "PlaceOrder.jsx"
+        },
+        {
+          "id": "detect-mto-items",
+          "label": "Detect MTO Items",
+          "type": "frontend",
+          "logic": "cartItems.some(i => i.isMakeToOrder)"
+        },
+        {
+          "id": "force-bank-transfer",
+          "label": "Force Bank Transfer",
+          "type": "frontend",
+          "constraint": "COD disabled for MTO"
+        },
+        {
+          "id": "display-bank-details",
+          "label": "Display Bank Details",
+          "type": "frontend",
+          "source": "settings.bankDetails"
+        },
+        {
+          "id": "upload-payment-proof",
+          "label": "Upload Payment Proof",
+          "type": "frontend",
+          "optional": true
+        },
+        {
+          "id": "submit-mto-order",
+          "label": "Submit Order",
+          "type": "frontend",
+          "action": "POST /api/order/place"
+        },
+        {
+          "id": "validate-mto-payment",
+          "label": "Validate Payment Method",
+          "type": "backend",
+          "check": "MTO items → Must be Bank Transfer"
+        },
+        {
+          "id": "calculate-deposit",
+          "label": "Calculate Deposit",
+          "type": "backend",
+          "formula": "total × depositPercentage"
+        },
+        {
+          "id": "calculate-balance",
+          "label": "Calculate Balance",
+          "type": "backend",
+          "formula": "total - deposit"
+        },
+        {
+          "id": "set-modification-deadline",
+          "label": "Set Modification Deadline",
+          "type": "backend",
+          "formula": "orderDate + modificationDeadlineDays"
+        },
+        {
+          "id": "set-balance-due-date",
+          "label": "Set Balance Due Date",
+          "type": "backend",
+          "formula": "orderDate + productionTimeDays"
+        },
+        {
+          "id": "create-mto-order",
+          "label": "Create Order with MTO Fields",
+          "type": "backend",
+          "fields": ["deposit", "balance", "modificationDeadline", "balanceDueDate"]
+        },
+        {
+          "id": "save-mto-order",
+          "label": "Save Order",
+          "type": "backend",
+          "status": "Order Placed (Pending Deposit Verification)"
+        },
+        {
+          "id": "admin-verify-deposit",
+          "label": "Admin Verify Deposit",
+          "type": "backend",
+          "action": "Update order status"
+        },
+        {
+          "id": "modification-window-open",
+          "label": "Modification Window",
+          "type": "backend",
+          "duration": "modificationDeadlineDays",
+          "state": "Customer can request changes"
+        },
+        {
+          "id": "modification-window-closed",
+          "label": "Design Locked",
+          "type": "backend",
+          "trigger": "After modification deadline",
+          "state": "No further changes allowed"
+        },
+        {
+          "id": "production-start",
+          "label": "Production Start",
+          "type": "backend",
+          "status": "In Production"
+        },
+        {
+          "id": "balance-payment-reminder",
+          "label": "Balance Payment Due",
+          "type": "backend",
+          "timing": "Before balanceDueDate"
+        },
+        {
+          "id": "admin-verify-balance",
+          "label": "Admin Verify Balance",
+          "type": "backend",
+          "action": "Update payment status"
+        },
+        {
+          "id": "ready-for-delivery",
+          "label": "Ready for Delivery",
+          "type": "backend",
+          "status": "Completed, Ready to Ship"
+        }
+      ],
+      "edges": [
+        {
+          "source": "mto-product-view",
+          "target": "select-design-category",
+          "label": "Product page load"
+        },
+        {
+          "source": "select-design-category",
+          "target": "choose-custom-size",
+          "label": "Design selected"
+        },
+        {
+          "source": "choose-custom-size",
+          "target": "view-size-chart-mto",
+          "label": "Need size guidance"
+        },
+        {
+          "source": "view-size-chart-mto",
+          "target": "add-mto-to-cart",
+          "label": "Size determined"
+        },
+        {
+          "source": "choose-custom-size",
+          "target": "add-mto-to-cart",
+          "label": "Size selected"
+        },
+        {
+          "source": "add-mto-to-cart",
+          "target": "proceed-mto-checkout",
+          "label": "Click checkout"
+        },
+        {
+          "source": "proceed-mto-checkout",
+          "target": "detect-mto-items",
+          "label": "Cart analysis"
+        },
+        {
+          "source": "detect-mto-items",
+          "target": "force-bank-transfer",
+          "label": "MTO items found"
+        },
+        {
+          "source": "force-bank-transfer",
+          "target": "display-bank-details",
+          "label": "Bank Transfer selected"
+        },
+        {
+          "source": "display-bank-details",
+          "target": "upload-payment-proof",
+          "label": "Optional upload"
+        },
+        {
+          "source": "display-bank-details",
+          "target": "submit-mto-order",
+          "label": "Submit order"
+        },
+        {
+          "source": "upload-payment-proof",
+          "target": "submit-mto-order",
+          "label": "Proof uploaded"
+        },
+        {
+          "source": "submit-mto-order",
+          "target": "validate-mto-payment",
+          "label": "Order payload"
+        },
+        {
+          "source": "validate-mto-payment",
+          "target": "calculate-deposit",
+          "label": "Valid ✓"
+        },
+        {
+          "source": "calculate-deposit",
+          "target": "calculate-balance",
+          "label": "Deposit amount"
+        },
+        {
+          "source": "calculate-balance",
+          "target": "set-modification-deadline",
+          "label": "Balance amount"
+        },
+        {
+          "source": "set-modification-deadline",
+          "target": "set-balance-due-date",
+          "label": "Deadline date"
+        },
+        {
+          "source": "set-balance-due-date",
+          "target": "create-mto-order",
+          "label": "Due date"
+        },
+        {
+          "source": "create-mto-order",
+          "target": "save-mto-order",
+          "label": "Order document"
+        },
+        {
+          "source": "save-mto-order",
+          "target": "admin-verify-deposit",
+          "label": "Order created"
+        },
+        {
+          "source": "admin-verify-deposit",
+          "target": "modification-window-open",
+          "label": "Deposit verified"
+        },
+        {
+          "source": "modification-window-open",
+          "target": "modification-window-closed",
+          "label": "Deadline reached"
+        },
+        {
+          "source": "modification-window-closed",
+          "target": "production-start",
+          "label": "Design finalized"
+        },
+        {
+          "source": "production-start",
+          "target": "balance-payment-reminder",
+          "label": "Production in progress"
+        },
+        {
+          "source": "balance-payment-reminder",
+          "target": "admin-verify-balance",
+          "label": "Balance paid"
+        },
+        {
+          "source": "admin-verify-balance",
+          "target": "ready-for-delivery",
+          "label": "Payment confirmed"
+        }
+      ]
+    }
+  ]
+}

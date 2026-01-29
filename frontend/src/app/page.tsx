@@ -811,7 +811,7 @@ export default function Home() {
               </div>
 
               {/* Mobile Project Cards Carousel */}
-              <MobileProjectCards sectionRef={projectsSectionRef} />
+              <MobileProjectCards />
             </div>
           </section>
 

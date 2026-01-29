@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect } from "react";
 import { getCaseStudyBySlug } from "../data/caseStudies";
 import CaseStudyTemplate from "../components/CaseStudyTemplate";
 import EMSCaseStudyTemplate from "../components/EMSCaseStudyTemplate";
+import ClothieCaseStudyTemplate from "../components/ClothieCaseStudyTemplate";
 
 /**
  * Dynamic Case Study Page
@@ -14,7 +15,9 @@ import EMSCaseStudyTemplate from "../components/EMSCaseStudyTemplate";
  * Renders complete case study with all 14 sections
  * using the centralized data structure
  * 
- * For EMS project, uses enhanced template with interactive diagrams
+ * Custom templates for projects with interactive diagrams:
+ * - EMS: Employee Management System
+ * - Naba Hussam: Clothie E-commerce Platform
  */
 export default function CaseStudyPage() {
   const params = useParams();
@@ -47,6 +50,11 @@ export default function CaseStudyPage() {
   // Use EMS-specific template for employee-management-system
   if (slug === 'employee-management-system') {
     return <EMSCaseStudyTemplate data={project} />;
+  }
+
+  // Use Clothie-specific template for naba-hussam (Clothie E-commerce)
+  if (slug === 'naba-hussam') {
+    return <ClothieCaseStudyTemplate data={project} />;
   }
 
   return <CaseStudyTemplate data={project} />;
