@@ -6,6 +6,7 @@ import { getCaseStudyBySlug } from "../data/caseStudies";
 import CaseStudyTemplate from "../components/CaseStudyTemplate";
 import EMSCaseStudyTemplate from "../components/EMSCaseStudyTemplate";
 import ClothieCaseStudyTemplate from "../components/ClothieCaseStudyTemplate";
+import WhatsAppFunnelCaseStudyTemplate from "../components/WhatsAppFunnelCaseStudyTemplate";
 
 /**
  * Dynamic Case Study Page
@@ -18,6 +19,7 @@ import ClothieCaseStudyTemplate from "../components/ClothieCaseStudyTemplate";
  * Custom templates for projects with interactive diagrams:
  * - EMS: Employee Management System
  * - Naba Hussam: Clothie E-commerce Platform
+ * - WhatsApp Funnel: Lead Management System
  */
 export default function CaseStudyPage() {
   const params = useParams();
@@ -55,6 +57,11 @@ export default function CaseStudyPage() {
   // Use Clothie-specific template for naba-hussam (Clothie E-commerce)
   if (slug === 'naba-hussam') {
     return <ClothieCaseStudyTemplate data={project} />;
+  }
+
+  // Use WhatsApp Funnel-specific template for whatsapp-funnel-lead-management-system
+  if (slug === 'whatsapp-funnel-lead-management-system') {
+    return <WhatsAppFunnelCaseStudyTemplate data={project} />;
   }
 
   return <CaseStudyTemplate data={project} />;

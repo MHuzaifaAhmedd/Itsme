@@ -1,0 +1,174 @@
+{
+  "projectMeta": {
+    "name": "WhatsApp Funnel",
+    "domain": "WhatsApp Business automation and multi-channel lead management",
+    "purpose": "Enable businesses to manage WhatsApp and other lead conversations, assign leads to team members via round-robin or biased round-robin, run visual flows for automated messaging, and handle follow-ups and dashboards; admin panel for platform-wide business and permission management",
+    "year": "",
+    "role": "",
+    "techStack": [
+      "Next.js 15 (React 19)",
+      "Redux Toolkit",
+      "Tailwind CSS",
+      "React Flow",
+      "Socket.IO (client)",
+      "Firebase (FCM)",
+      "Express 4",
+      "TypeScript",
+      "MongoDB (native driver + Mongoose)",
+      "JWT, Passport (Google OAuth)",
+      "Helmet, CORS, express-rate-limit, express-validator",
+      "WhatsApp Cloud API / Facebook Graph API",
+      "AWS S3",
+      "Nodemailer (SMTP)",
+      "Firebase Admin"
+    ]
+  },
+
+  "problemStatement": {
+    "context": "Businesses need to handle WhatsApp and multi-channel leads (Facebook Lead Ads, walk-in, webhook, manual), assign conversations to team members fairly, automate replies with visual flows, and track follow-ups and performance.",
+    "userPainPoints": [],
+    "existingSolutionsLimitations": []
+  },
+
+  "goalsAndMetrics": {
+    "goals": [],
+    "successMetrics": []
+  },
+
+  "userFlow": [
+    { "step": "Landing", "description": "User visits Next.js app; AuthenticatedRedirect sends logged-in users to dashboard" },
+    { "step": "Auth", "description": "Sign in (email/password or Google OAuth); token stored in cookie" },
+    { "step": "Dashboard", "description": "Protected layout fetches /auth/me; permissions/roles loaded; sidebar reflects menu permissions" },
+    { "step": "Conversations", "description": "List conversations with filters; select conversation; load messages; send message or template" },
+    { "step": "Leads", "description": "View all-leads or channel-specific leads; create manual lead; bulk import CSV; reassign; delete" },
+    { "step": "Flows", "description": "Create/edit flow (nodes, edges); assign phone numbers; conflict check; flow runs on inbound webhook" },
+    { "step": "Follow-ups", "description": "Create follow-up (conversationId, note, scheduledFor); list/filter; complete or delete; reminder job sends notifications" },
+    { "step": "Team", "description": "Invite members; set walkin/webhook frequencies; accept invite (team member)" },
+    { "step": "Real-time", "description": "Socket.IO connects with auth token; join conversation room; receive new_message, message_status_update" }
+  ],
+
+  "systemArchitecture": {
+    "frontend": [
+      "Next.js 15 app (user-app/frontend): App Router, (admin), (full-width-pages), layout with ReduxProvider, ThemeProvider, SidebarProvider, AlertProvider, SocketProvider, FCMProvider",
+      "Pages: dashboard, leads (all, facebook, manual, walkin, webhook, whatsapp), flow (add, manage, setting, [manage-flow]), follow-ups, team-performance, profile, business-settings, roles-permissions, teams-settings",
+      "Auth pages: signin, signup, forgot-password, reset-password/[token]",
+      "State: Redux store with slices (permissions, roles, locations, flows, user, team, conversations, templates, socket, tokenStatus, dashboard, walkin, followUp, etc.) and requestDeduplication middleware",
+      "API: fetch with NEXT_PUBLIC_API_URL, credentials include; cookie-based auth"
+    ],
+    "backend": [
+      "Express server (user-app/backend/server.ts): routes under /api (locations, phone-numbers, auth, teams, permissions, roles, flow, conversations, messages, media, users, token-status, dashboard, fcm, oauth, data-deletion, facebook-stats, walkin, webhook-leads, followups)",
+      "Webhook: GET/POST /webhook/facebook (verify and handle)",
+      "Middleware: Helmet, CORS, cookie-parser, body 55MB, CSRF attach, request size, sanitize body/query, rate limiter (skip webhooks), passport",
+      "Auth: protect (JWT from cookie or Bearer, resolve user from Users or TeamMembers), requireAdmin for admin routes",
+      "Controllers call getCollection(collectionName) or Mongoose models; business logic in services (conversationAssignmentService, flowMessageService, leadImportService, etc.)"
+    ],
+    "services": [
+      "conversationAssignmentService (round-robin, biased)",
+      "flowMessageService",
+      "leadImportService, timelineImportJobService, timelineImportService",
+      "followUpReminderService",
+      "tokenRefreshService",
+      "socketService (Socket.IO server)",
+      "fcmService",
+      "facebookGraphService, leadWebhookService, webhookNotificationService",
+      "walkinConversationService, walkinDistributionService",
+      "webhookLeadChannelService",
+      "dataDeletionService",
+      "MessageImportService, ChatHistoryParser, CallImportService"
+    ],
+    "databases": [
+      "MongoDB (whaDB): Users, TeamMembers, Conversations, Messages, Flows, FollowUps, PhoneNumbers, OAuthTokens, FacebookPages, FacebookLeads, WalkinLeads, WalkinChannels, WalkinAssignmentQueues, WalkinUnavailabilityLogs, WebhookLeads, WebhookLeadChannels, RoundRobinTracking, and other state collections"
+    ],
+    "externalIntegrations": [
+      "WhatsApp Cloud API (Graph API) for messaging, phone numbers, media",
+      "Facebook Graph API: OAuth, Pages, WABA, Lead Ads webhook",
+      "Facebook webhook: GET verify, POST handle at /webhook/facebook",
+      "SMTP (Nodemailer) for password reset, invitations, follow-up reminders",
+      "Firebase Cloud Messaging (FCM) for push notifications",
+      "AWS S3 for media and call recording storage"
+    ]
+  },
+
+  "dataFlow": [
+    { "from": "Client", "to": "API", "data": "Cookie (token) or Bearer", "trigger": "Every request (credentials: include)" },
+    { "from": "API", "to": "MongoDB", "data": "Conversations, Messages, Flows, FollowUps, Users, TeamMembers, etc.", "trigger": "Controller CRUD via getCollection or Mongoose" },
+    { "from": "Facebook", "to": "Webhook", "data": "Hub payload (messages, leadgen)", "trigger": "POST /webhook/facebook" },
+    { "from": "Webhook handler", "to": "ConversationAssignmentService / FlowMessageService", "data": "Inbound message, lead", "trigger": "After parsing webhook" },
+    { "from": "Backend", "to": "WhatsApp Cloud API", "data": "Send message, media, template", "trigger": "User send message or flow reply" },
+    { "from": "Backend", "to": "Socket.IO", "data": "new_message, message_status_update", "trigger": "After save message or status" },
+    { "from": "Backend", "to": "FCM", "data": "Push notification payload", "trigger": "New message or lead assignment" },
+    { "from": "Frontend", "to": "Socket", "data": "join_room (conversationId, phoneNumberId)", "trigger": "User opens conversation" }
+  ],
+
+  "coreFeatures": [
+    { "name": "Authentication", "whatItDoes": "Email/password and Google OAuth; JWT in cookie; protect and requireAdmin middlewares", "implementationLocation": "auth.routes.ts, controllers/auth.ts, middlewares/auth.ts", "implementationSummary": "Register, login, logout, getMe; forgot/reset/change password; Google strategy creates/links user; token verified and user attached to req" },
+    { "name": "Conversations and messages", "whatItDoes": "List conversations with filters; get messages; send text/media/button/list/location/template/captureField/contact/textDirective; mark read/active; status; flow-enabled; tags; comments; Facebook lead data; assign phone; chat history parse/import; reassign lead", "implementationLocation": "conversation.routes.ts, controllers/conversation.ts, utils/conversationService, sending-message/whatsapp/*", "implementationSummary": "getConversations builds query with role-based filters (team lead sees team conversations, member sees assigned); sendMessage delegates to WhatsApp send utils; import uses LeadImportService, MessageImportService, TimelineImportService" },
+    { "name": "Leads (all sources)", "whatItDoes": "Unified getAllLeads; createManualLead; bulk CSV import (job + failures); timeline import; delete; reassign", "implementationLocation": "conversation.routes.ts, controllers/conversation.ts, LeadImportService, TimelineImportJobService", "implementationSummary": "all-leads aggregates conversations by source; import creates job document and worker processes queue; timeline import populates metadata.comments from spreadsheet" },
+    { "name": "Flow builder", "whatItDoes": "Save flow (nodes, edges, name); get by name/id; list with pagination and filters; delete; conflict check; assign/remove phone numbers", "implementationLocation": "flow.routes.ts, controllers/flow.ts", "implementationSummary": "Flows stored in Flows collection with userId, businessId; conflict check prevents same number on multiple flows; flowReenableJob runs periodically to re-enable flows" },
+    { "name": "Follow-ups", "whatItDoes": "Create, list (with role-based visibility), get by conversation, update, complete, delete", "implementationLocation": "followUp.routes.ts, controllers/followUp.ts, followUpReminderService, followUpReminderJob", "implementationSummary": "Team leads see own + team members' follow-ups; members see own; business owners see all. Reminder job runs every 5 min and sends email/in-app reminders" },
+    { "name": "Real-time and push", "whatItDoes": "Socket.IO for new messages and status updates; FCM for push notifications", "implementationLocation": "socketService.ts, SocketProvider (frontend), fcm.routes.ts, fcmService, FCMProvider", "implementationSummary": "Socket auth via token; join room by conversationId; backend emits after saving message. FCM register/unregister; backend sends on new message or assignment" },
+    { "name": "Team and roles", "whatItDoes": "Invite, accept, resend, update, delete members; walkin/webhook frequency; role-based conversation and follow-up visibility", "implementationLocation": "team.routes.ts, controllers/team.ts, roleUtils (isTeamLead, isRegularTeamMember, shouldSeeAllConversations)", "implementationSummary": "TeamMembers collection; round-robin and biased round-robin use team member list; roleUtils drive filter logic in conversation and followUp controllers" },
+    { "name": "Facebook OAuth and Lead Ads", "whatItDoes": "OAuth flow; fetch pages/WABA; connect/disconnect; import historical leads; refresh forms; page allowed members; CAPI settings", "implementationLocation": "oauth.routes.ts, controllers/oauth.ts, facebookGraphService, leadWebhookService", "implementationSummary": "OAuthTokens and FacebookPages stored; token refresh job runs daily; lead webhook creates FacebookLead and conversation, assigns via facebookPageAssignmentService" },
+    { "name": "Media and S3", "whatItDoes": "Upload media; get WhatsApp media URL; proxy media; S3 presigned URL for call audio", "implementationLocation": "media.routes.ts, controllers/media.ts, s3Service", "implementationSummary": "Multer upload; fileUploadRateLimiter; S3 for storage; presigner for call audio" },
+    { "name": "Data deletion", "whatItDoes": "Facebook data deletion callback; user-initiated deletion request and status", "implementationLocation": "dataDeletion.routes.ts, controllers/dataDeletion.ts, dataDeletionService", "implementationSummary": "Facebook callback returns confirmation URL and code; actual user deletion is commented out in code" }
+  ],
+
+  "technicalChallenges": [
+    { "challenge": "Dual data access (MongoDB native vs Mongoose)", "whyItWasHard": "Conversations and Messages use native driver (getCollection); Users, TeamMember, and many lead-related entities use Mongoose models", "solution": "getCollection used consistently for Conversations, Messages, Flows, FollowUps; Mongoose for schema-heavy and app-level models" },
+    { "challenge": "Role-based visibility for conversations and follow-ups", "whyItWasHard": "Team leads must see team members' data; members only own; business owners see all", "solution": "roleUtils (isTeamLead, isRegularTeamMember) used in controllers to build query filters (e.g. assignedTo in allowedUserIds)" },
+    { "challenge": "Large payloads (lead import, chat history)", "whyItWasHard": "Default body limit too small for CSV imports", "solution": "Body parser 55MB; request size middleware allows 100MB for lead import path; Socket.IO maxHttpBufferSize 100MB" }
+  ],
+
+  "performanceAndSecurity": {
+    "performanceOptimizations": [
+      "Pagination on conversations, flows, messages",
+      "Request deduplication middleware (frontend): blocks duplicate pending thunks within 100ms and reuses in-flight request within 30s for non-critical actions",
+      "Periodic cleanup: stale socket users every 5 min; Facebook rate limit entries every 24 h",
+      "Lead import and timeline import processed by job workers (2 s interval) instead of blocking request"
+    ],
+    "securityConsiderations": [
+      "JWT in HTTP-only cookie or Bearer; bcrypt for passwords",
+      "Helmet (CSP, etc.); CORS allow list (FRONTEND_URI, admin, test-frontend, reception-form)",
+      "express-validator and sanitizeBody/sanitizeQuery (validator.escape, trim)",
+      "Auth rate limit 50/15min; general 10000/15min; file upload 100/hour; webhooks excluded",
+      "Request size validation (16MB default; 100MB lead import; 10MB JSON)",
+      "CSRF token attached to responses (in-memory store); csrfProtection middleware exists but not applied globally in server"
+    ],
+    "errorHandling": [
+      "Global error handler: entity.too.large, LIMIT_FILE_SIZE → 413; ValidationError → 400; CastError/Invalid ObjectId → 400; JWT errors → 401; ECONNREFUSED/ETIMEDOUT → 503; production hides stack",
+      "notFoundHandler returns 404 JSON",
+      "Controllers use try/catch with 500 and console.error"
+    ]
+  },
+
+  "visualAndUXDecisions": {
+    "uiPatternsObserved": [
+      "Sidebar navigation with permission-based menu visibility",
+      "Dark mode (ThemeContext)",
+      "Toast notifications (react-hot-toast)",
+      "Modals for confirmations and forms (e.g. WalkinConfirmationModal, DataDeletionModal)",
+      "Charts (ApexCharts, Chart.js) for dashboard",
+      "Drag-and-drop flow builder (React Flow, react-dnd)",
+      "Infinite scroll / pagination for lists",
+      "Alert context and AlertContainer for global alerts"
+    ],
+    "interactionLogic": [
+      "AuthenticatedRedirect on landing sends logged-in users to dashboard",
+      "Socket connect on app load; join conversation room when viewing conversation",
+      "Request deduplication prevents duplicate list/message fetches on rapid clicks"
+    ]
+  },
+
+  "outcomeAndImpact": {
+    "actualResults": [],
+    "limitations": [
+      "Facebook data deletion callback does not execute user data deletion (commented out)",
+      "CSRF protection middleware not mounted on routes (only token attach)",
+      "No automated tests (npm test exits with no test specified)",
+      "CSRF and rate limit state in memory (not multi-instance safe without Redis)"
+    ]
+  },
+
+  "learnings": [],
+  "futureImprovements": []
+}

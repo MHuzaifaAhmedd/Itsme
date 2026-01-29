@@ -1,0 +1,919 @@
+{
+  "diagrams": [
+    {
+      "id": "system-architecture",
+      "title": "System Architecture",
+      "description": "Complete system topology showing frontend, backend, databases, and external integrations",
+      "nodes": [
+        {
+          "id": "frontend-user",
+          "label": "User App Frontend",
+          "type": "frontend",
+          "tech": "Next.js 15 (React 19)",
+          "features": "Redux, Socket.IO, FCM, React Flow"
+        },
+        {
+          "id": "frontend-admin",
+          "label": "Admin Panel Frontend",
+          "type": "frontend",
+          "tech": "Next.js",
+          "features": "Business Management"
+        },
+        {
+          "id": "backend-user",
+          "label": "User App Backend",
+          "type": "backend",
+          "tech": "Express 4 (TypeScript)",
+          "port": "4000",
+          "features": "20+ API routes, Socket.IO, Jobs"
+        },
+        {
+          "id": "backend-admin",
+          "label": "Admin Panel Backend",
+          "type": "backend",
+          "tech": "Express 4 (TypeScript)",
+          "port": "4001",
+          "features": "Business CRUD, Dashboard"
+        },
+        {
+          "id": "mongodb",
+          "label": "MongoDB (whaDB)",
+          "type": "db",
+          "collections": "20+ collections"
+        },
+        {
+          "id": "redis-placeholder",
+          "label": "In-Memory State",
+          "type": "cache",
+          "stores": "CSRF, Rate Limits, Socket Tracking"
+        },
+        {
+          "id": "whatsapp-api",
+          "label": "WhatsApp Cloud API",
+          "type": "external",
+          "features": "Messages, Templates, Media"
+        },
+        {
+          "id": "facebook-api",
+          "label": "Facebook Graph API",
+          "type": "external",
+          "features": "OAuth, Pages, Lead Ads"
+        },
+        {
+          "id": "firebase",
+          "label": "Firebase (FCM)",
+          "type": "external",
+          "features": "Push Notifications"
+        },
+        {
+          "id": "aws-s3",
+          "label": "AWS S3",
+          "type": "external",
+          "features": "Media, Call Recordings"
+        },
+        {
+          "id": "smtp",
+          "label": "SMTP (Nodemailer)",
+          "type": "external",
+          "features": "Emails, Reminders"
+        },
+        {
+          "id": "socket-io",
+          "label": "Socket.IO",
+          "type": "service",
+          "events": "new_message, status_update"
+        }
+      ],
+      "edges": [
+        { "source": "frontend-user", "target": "backend-user", "label": "HTTP + Cookies" },
+        { "source": "frontend-admin", "target": "backend-admin", "label": "HTTP + Cookies" },
+        { "source": "frontend-user", "target": "socket-io", "label": "WebSocket" },
+        { "source": "socket-io", "target": "backend-user", "label": "Events" },
+        { "source": "backend-user", "target": "mongodb", "label": "Native + Mongoose" },
+        { "source": "backend-admin", "target": "mongodb", "label": "Native + Mongoose" },
+        { "source": "backend-user", "target": "redis-placeholder", "label": "In-Memory" },
+        { "source": "backend-user", "target": "whatsapp-api", "label": "Messages/Media" },
+        { "source": "backend-user", "target": "facebook-api", "label": "OAuth/Webhooks" },
+        { "source": "backend-user", "target": "firebase", "label": "Push" },
+        { "source": "backend-user", "target": "aws-s3", "label": "Media Upload" },
+        { "source": "backend-user", "target": "smtp", "label": "Emails" },
+        { "source": "facebook-api", "target": "backend-user", "label": "Webhook Payloads" }
+      ]
+    },
+    {
+      "id": "authentication-flow",
+      "title": "Authentication & Authorization Flow",
+      "description": "Complete authentication lifecycle including login, OAuth, token verification, and password reset",
+      "nodes": [
+        {
+          "id": "auth-entry",
+          "label": "Auth Entry Points",
+          "type": "frontend",
+          "pages": "signin, signup, forgot-password"
+        },
+        {
+          "id": "email-login",
+          "label": "Email/Password Login",
+          "type": "service",
+          "endpoint": "POST /api/auth/login"
+        },
+        {
+          "id": "google-oauth",
+          "label": "Google OAuth",
+          "type": "service",
+          "endpoint": "GET /api/auth/google"
+        },
+        {
+          "id": "password-reset",
+          "label": "Password Reset",
+          "type": "service",
+          "endpoint": "POST /api/auth/forgot-password"
+        },
+        {
+          "id": "validate-creds",
+          "label": "Validate Credentials",
+          "type": "backend",
+          "method": "bcrypt.compare()"
+        },
+        {
+          "id": "google-consent",
+          "label": "Google Consent Screen",
+          "type": "external",
+          "scopes": "email, profile"
+        },
+        {
+          "id": "send-reset-email",
+          "label": "Send Reset Token",
+          "type": "service",
+          "via": "SMTP Nodemailer"
+        },
+        {
+          "id": "oauth-callback",
+          "label": "OAuth Callback",
+          "type": "backend",
+          "endpoint": "GET /api/auth/google/callback"
+        },
+        {
+          "id": "find-create-user",
+          "label": "Find/Create User",
+          "type": "backend",
+          "collection": "Users or TeamMembers"
+        },
+        {
+          "id": "generate-jwt",
+          "label": "Generate JWT",
+          "type": "service",
+          "payload": "id, userType, businessId"
+        },
+        {
+          "id": "set-cookie",
+          "label": "Set HTTP-only Cookie",
+          "type": "backend",
+          "options": "httpOnly, secure, sameSite"
+        },
+        {
+          "id": "protect-middleware",
+          "label": "protect Middleware",
+          "type": "backend",
+          "extracts": "token from cookie or Bearer"
+        },
+        {
+          "id": "verify-jwt",
+          "label": "Verify JWT",
+          "type": "service",
+          "checks": "signature, expiration"
+        },
+        {
+          "id": "load-user",
+          "label": "Load User Entity",
+          "type": "backend",
+          "attaches": "req.user"
+        },
+        {
+          "id": "role-check",
+          "label": "Role-Based Filtering",
+          "type": "service",
+          "utils": "isTeamLead, shouldSeeAllConversations"
+        },
+        {
+          "id": "auth-success",
+          "label": "Authenticated Request",
+          "type": "frontend",
+          "result": "Access granted"
+        }
+      ],
+      "edges": [
+        { "source": "auth-entry", "target": "email-login", "label": "email/password" },
+        { "source": "auth-entry", "target": "google-oauth", "label": "Google" },
+        { "source": "auth-entry", "target": "password-reset", "label": "forgot password" },
+        { "source": "email-login", "target": "validate-creds", "label": "" },
+        { "source": "google-oauth", "target": "google-consent", "label": "redirect" },
+        { "source": "password-reset", "target": "send-reset-email", "label": "" },
+        { "source": "google-consent", "target": "oauth-callback", "label": "code" },
+        { "source": "validate-creds", "target": "find-create-user", "label": "valid" },
+        { "source": "oauth-callback", "target": "find-create-user", "label": "exchange token" },
+        { "source": "find-create-user", "target": "generate-jwt", "label": "" },
+        { "source": "generate-jwt", "target": "set-cookie", "label": "" },
+        { "source": "set-cookie", "target": "auth-success", "label": "redirect" },
+        { "source": "protect-middleware", "target": "verify-jwt", "label": "extract token" },
+        { "source": "verify-jwt", "target": "load-user", "label": "valid" },
+        { "source": "load-user", "target": "role-check", "label": "req.user" },
+        { "source": "role-check", "target": "auth-success", "label": "filter applied" }
+      ]
+    },
+    {
+      "id": "multi-channel-lead-ingestion",
+      "title": "Multi-Channel Lead Ingestion Flow",
+      "description": "How leads from different sources flow into the unified conversation system",
+      "nodes": [
+        {
+          "id": "source-whatsapp",
+          "label": "WhatsApp Inbound",
+          "type": "external",
+          "webhook": "POST /webhook/facebook"
+        },
+        {
+          "id": "source-facebook",
+          "label": "Facebook Lead Ads",
+          "type": "external",
+          "webhook": "POST /webhook/facebook"
+        },
+        {
+          "id": "source-walkin",
+          "label": "Walk-in QR Scan",
+          "type": "external",
+          "endpoint": "POST /api/walkin/confirm"
+        },
+        {
+          "id": "source-webhook",
+          "label": "External Webhook",
+          "type": "external",
+          "auth": "Token-based channel"
+        },
+        {
+          "id": "source-manual",
+          "label": "Manual Entry",
+          "type": "frontend",
+          "endpoint": "POST /api/conversations/manual-lead"
+        },
+        {
+          "id": "webhook-handler",
+          "label": "Webhook Handler",
+          "type": "backend",
+          "verifies": "hub.verify_token or signature"
+        },
+        {
+          "id": "lead-webhook-service",
+          "label": "Lead Webhook Service",
+          "type": "service",
+          "parses": "payload by source type"
+        },
+        {
+          "id": "validate-channel",
+          "label": "Validate Channel",
+          "type": "backend",
+          "checks": "channel exists, allowed members"
+        },
+        {
+          "id": "assignment-service",
+          "label": "Assignment Service",
+          "type": "service",
+          "algorithms": "round-robin, biased"
+        },
+        {
+          "id": "round-robin-tracking",
+          "label": "RoundRobinTracking",
+          "type": "db",
+          "stores": "pointer state per channel"
+        },
+        {
+          "id": "select-member",
+          "label": "Select Team Member",
+          "type": "service",
+          "considers": "frequency, availability"
+        },
+        {
+          "id": "create-conversation",
+          "label": "Create Conversation",
+          "type": "backend",
+          "collection": "Conversations"
+        },
+        {
+          "id": "mongodb-conversations",
+          "label": "MongoDB Conversations",
+          "type": "db",
+          "indexes": "businessId, assignedTo, source"
+        },
+        {
+          "id": "notify-socket",
+          "label": "Socket.IO Emit",
+          "type": "service",
+          "event": "new_conversation"
+        },
+        {
+          "id": "notify-fcm",
+          "label": "FCM Push",
+          "type": "service",
+          "payload": "New lead assigned"
+        }
+      ],
+      "edges": [
+        { "source": "source-whatsapp", "target": "webhook-handler", "label": "" },
+        { "source": "source-facebook", "target": "webhook-handler", "label": "" },
+        { "source": "webhook-handler", "target": "lead-webhook-service", "label": "200 ack" },
+        { "source": "source-walkin", "target": "lead-webhook-service", "label": "" },
+        { "source": "source-webhook", "target": "lead-webhook-service", "label": "" },
+        { "source": "source-manual", "target": "validate-channel", "label": "" },
+        { "source": "lead-webhook-service", "target": "validate-channel", "label": "" },
+        { "source": "validate-channel", "target": "assignment-service", "label": "channel config" },
+        { "source": "assignment-service", "target": "round-robin-tracking", "label": "read/update" },
+        { "source": "assignment-service", "target": "select-member", "label": "" },
+        { "source": "select-member", "target": "create-conversation", "label": "assignedTo" },
+        { "source": "create-conversation", "target": "mongodb-conversations", "label": "insert" },
+        { "source": "create-conversation", "target": "notify-socket", "label": "" },
+        { "source": "create-conversation", "target": "notify-fcm", "label": "" }
+      ]
+    },
+    {
+      "id": "flow-execution-lifecycle",
+      "title": "Visual Flow Execution Lifecycle",
+      "description": "From flow creation in React Flow canvas to execution on inbound messages",
+      "nodes": [
+        {
+          "id": "react-flow-canvas",
+          "label": "React Flow Canvas",
+          "type": "frontend",
+          "features": "drag-and-drop, visual editing"
+        },
+        {
+          "id": "node-types",
+          "label": "Node Types",
+          "type": "frontend",
+          "types": "trigger, message, condition, delay"
+        },
+        {
+          "id": "save-flow-api",
+          "label": "POST /api/flow",
+          "type": "backend",
+          "body": "name, nodes, edges"
+        },
+        {
+          "id": "conflict-check",
+          "label": "Check Phone Conflicts",
+          "type": "service",
+          "rule": "one number → one flow"
+        },
+        {
+          "id": "flows-collection",
+          "label": "Flows Collection",
+          "type": "db",
+          "fields": "userId, businessId, nodes, edges"
+        },
+        {
+          "id": "inbound-message",
+          "label": "Inbound Message",
+          "type": "external",
+          "source": "POST /webhook/facebook"
+        },
+        {
+          "id": "flow-message-service",
+          "label": "Flow Message Service",
+          "type": "service",
+          "lookups": "active flow for phoneNumberId"
+        },
+        {
+          "id": "find-trigger",
+          "label": "Find Trigger Node",
+          "type": "service",
+          "matches": "inbound message content"
+        },
+        {
+          "id": "execute-graph",
+          "label": "Execute Flow Graph",
+          "type": "service",
+          "traverses": "edges, evaluates conditions"
+        },
+        {
+          "id": "send-wa-response",
+          "label": "Send WhatsApp Response",
+          "type": "external",
+          "api": "WhatsApp Cloud API"
+        },
+        {
+          "id": "flow-reenable-job",
+          "label": "Flow Re-enable Job",
+          "type": "service",
+          "interval": "30 min"
+        },
+        {
+          "id": "save-message",
+          "label": "Save Message",
+          "type": "db",
+          "collection": "Messages"
+        }
+      ],
+      "edges": [
+        { "source": "react-flow-canvas", "target": "node-types", "label": "compose" },
+        { "source": "node-types", "target": "save-flow-api", "label": "save" },
+        { "source": "save-flow-api", "target": "conflict-check", "label": "" },
+        { "source": "conflict-check", "target": "flows-collection", "label": "no conflict" },
+        { "source": "inbound-message", "target": "flow-message-service", "label": "" },
+        { "source": "flow-message-service", "target": "flows-collection", "label": "lookup" },
+        { "source": "flows-collection", "target": "find-trigger", "label": "flow found" },
+        { "source": "find-trigger", "target": "execute-graph", "label": "trigger matched" },
+        { "source": "execute-graph", "target": "send-wa-response", "label": "message node" },
+        { "source": "send-wa-response", "target": "save-message", "label": "" },
+        { "source": "flow-reenable-job", "target": "flows-collection", "label": "check disabled" }
+      ]
+    },
+    {
+      "id": "real-time-message-flow",
+      "title": "Real-Time Message Flow",
+      "description": "How messages flow between users, backend, and WhatsApp with Socket.IO real-time updates",
+      "nodes": [
+        {
+          "id": "user-frontend",
+          "label": "User Frontend",
+          "type": "frontend",
+          "state": "Redux conversations slice"
+        },
+        {
+          "id": "socket-provider",
+          "label": "Socket Provider",
+          "type": "frontend",
+          "events": "new_message, status_update"
+        },
+        {
+          "id": "join-room",
+          "label": "join_room",
+          "type": "service",
+          "params": "conversationId, phoneNumberId"
+        },
+        {
+          "id": "socket-server",
+          "label": "Socket.IO Server",
+          "type": "backend",
+          "auth": "JWT token verification"
+        },
+        {
+          "id": "user-tracking",
+          "label": "User Room Tracking",
+          "type": "cache",
+          "cleanup": "5 min stale removal"
+        },
+        {
+          "id": "send-message-btn",
+          "label": "Send Message",
+          "type": "frontend",
+          "endpoint": "POST /api/conversations/:id/messages"
+        },
+        {
+          "id": "message-controller",
+          "label": "Message Controller",
+          "type": "backend",
+          "types": "text, media, template, button, list"
+        },
+        {
+          "id": "whatsapp-send",
+          "label": "WhatsApp Cloud API",
+          "type": "external",
+          "action": "send message"
+        },
+        {
+          "id": "save-outbound",
+          "label": "Save Message",
+          "type": "db",
+          "collection": "Messages"
+        },
+        {
+          "id": "emit-new-message",
+          "label": "emit new_message",
+          "type": "service",
+          "to": "room members"
+        },
+        {
+          "id": "wa-status-webhook",
+          "label": "Status Webhook",
+          "type": "external",
+          "statuses": "delivered, read, failed"
+        },
+        {
+          "id": "update-status",
+          "label": "Update Status",
+          "type": "db",
+          "collection": "Messages"
+        },
+        {
+          "id": "emit-status-update",
+          "label": "emit status_update",
+          "type": "service",
+          "to": "room members"
+        },
+        {
+          "id": "inbound-webhook",
+          "label": "Inbound Webhook",
+          "type": "external",
+          "source": "POST /webhook/facebook"
+        },
+        {
+          "id": "save-inbound",
+          "label": "Save Inbound",
+          "type": "db",
+          "direction": "inbound"
+        },
+        {
+          "id": "emit-inbound",
+          "label": "emit new_message",
+          "type": "service",
+          "to": "room members"
+        },
+        {
+          "id": "fcm-notify",
+          "label": "FCM Push",
+          "type": "external",
+          "trigger": "new message"
+        }
+      ],
+      "edges": [
+        { "source": "user-frontend", "target": "socket-provider", "label": "connect" },
+        { "source": "socket-provider", "target": "join-room", "label": "view conversation" },
+        { "source": "join-room", "target": "socket-server", "label": "" },
+        { "source": "socket-server", "target": "user-tracking", "label": "track user" },
+        { "source": "send-message-btn", "target": "message-controller", "label": "" },
+        { "source": "message-controller", "target": "whatsapp-send", "label": "build payload" },
+        { "source": "whatsapp-send", "target": "save-outbound", "label": "success" },
+        { "source": "save-outbound", "target": "emit-new-message", "label": "" },
+        { "source": "emit-new-message", "target": "socket-provider", "label": "real-time" },
+        { "source": "wa-status-webhook", "target": "update-status", "label": "" },
+        { "source": "update-status", "target": "emit-status-update", "label": "" },
+        { "source": "emit-status-update", "target": "socket-provider", "label": "status change" },
+        { "source": "inbound-webhook", "target": "save-inbound", "label": "" },
+        { "source": "save-inbound", "target": "emit-inbound", "label": "" },
+        { "source": "emit-inbound", "target": "socket-provider", "label": "new inbound" },
+        { "source": "save-inbound", "target": "fcm-notify", "label": "if offline" }
+      ]
+    },
+    {
+      "id": "data-processing-flow",
+      "title": "Request Processing & Data Flow",
+      "description": "The complete request lifecycle from client through middleware to database and back",
+      "nodes": [
+        {
+          "id": "client-request",
+          "label": "Client Request",
+          "type": "frontend",
+          "includes": "Cookie (token) + JSON body"
+        },
+        {
+          "id": "mw-trust-proxy",
+          "label": "trust proxy",
+          "type": "backend",
+          "purpose": "real IP for rate limiting"
+        },
+        {
+          "id": "mw-helmet",
+          "label": "Helmet",
+          "type": "backend",
+          "headers": "CSP, X-Frame-Options"
+        },
+        {
+          "id": "mw-body-parser",
+          "label": "body-parser (55MB)",
+          "type": "backend",
+          "limit": "55MB for imports"
+        },
+        {
+          "id": "mw-cors",
+          "label": "CORS",
+          "type": "backend",
+          "origins": "FRONTEND_URI, admin"
+        },
+        {
+          "id": "mw-cookie-parser",
+          "label": "cookie-parser",
+          "type": "backend",
+          "extracts": "token from cookies"
+        },
+        {
+          "id": "mw-csrf-attach",
+          "label": "CSRF attach",
+          "type": "backend",
+          "note": "attaches token, NOT enforced"
+        },
+        {
+          "id": "mw-request-size",
+          "label": "validateRequestSize",
+          "type": "backend",
+          "limits": "16MB default, 100MB lead import"
+        },
+        {
+          "id": "mw-sanitize",
+          "label": "sanitize body/query",
+          "type": "backend",
+          "methods": "validator.escape, trim"
+        },
+        {
+          "id": "mw-rate-limit",
+          "label": "Rate Limiter",
+          "type": "backend",
+          "limits": "50/15min auth, 10000/15min general"
+        },
+        {
+          "id": "mw-passport",
+          "label": "Passport Initialize",
+          "type": "backend",
+          "strategies": "JWT, Google OAuth"
+        },
+        {
+          "id": "route-match",
+          "label": "Route Match (/api/*)",
+          "type": "backend",
+          "routes": "20+ route modules"
+        },
+        {
+          "id": "mw-protect",
+          "label": "protect Middleware",
+          "type": "backend",
+          "verifies": "JWT, loads user"
+        },
+        {
+          "id": "webhook-path",
+          "label": "Webhook Path",
+          "type": "backend",
+          "bypasses": "rate limit, auth"
+        },
+        {
+          "id": "controller",
+          "label": "Controller",
+          "type": "backend",
+          "validates": "express-validator, role checks"
+        },
+        {
+          "id": "service-layer",
+          "label": "Service Layer",
+          "type": "service",
+          "examples": "assignment, flowMessage, leadImport"
+        },
+        {
+          "id": "data-access",
+          "label": "Data Access",
+          "type": "backend",
+          "methods": "getCollection or Mongoose"
+        },
+        {
+          "id": "mongodb",
+          "label": "MongoDB (whaDB)",
+          "type": "db",
+          "collections": "20+"
+        },
+        {
+          "id": "external-apis",
+          "label": "External APIs",
+          "type": "external",
+          "apis": "WhatsApp, Facebook, FCM, S3"
+        },
+        {
+          "id": "response",
+          "label": "JSON Response",
+          "type": "backend",
+          "includes": "data or error, status code"
+        },
+        {
+          "id": "error-handler",
+          "label": "Global Error Handler",
+          "type": "backend",
+          "maps": "error type → HTTP status"
+        }
+      ],
+      "edges": [
+        { "source": "client-request", "target": "mw-trust-proxy", "label": "" },
+        { "source": "mw-trust-proxy", "target": "mw-helmet", "label": "" },
+        { "source": "mw-helmet", "target": "mw-body-parser", "label": "" },
+        { "source": "mw-body-parser", "target": "mw-cors", "label": "" },
+        { "source": "mw-cors", "target": "mw-cookie-parser", "label": "" },
+        { "source": "mw-cookie-parser", "target": "mw-csrf-attach", "label": "" },
+        { "source": "mw-csrf-attach", "target": "mw-request-size", "label": "" },
+        { "source": "mw-request-size", "target": "mw-sanitize", "label": "" },
+        { "source": "mw-sanitize", "target": "mw-rate-limit", "label": "" },
+        { "source": "mw-rate-limit", "target": "mw-passport", "label": "" },
+        { "source": "mw-passport", "target": "route-match", "label": "" },
+        { "source": "route-match", "target": "mw-protect", "label": "/api/*" },
+        { "source": "route-match", "target": "webhook-path", "label": "/webhook/*" },
+        { "source": "mw-protect", "target": "controller", "label": "req.user" },
+        { "source": "webhook-path", "target": "controller", "label": "verify token" },
+        { "source": "controller", "target": "service-layer", "label": "" },
+        { "source": "service-layer", "target": "data-access", "label": "" },
+        { "source": "service-layer", "target": "external-apis", "label": "" },
+        { "source": "data-access", "target": "mongodb", "label": "" },
+        { "source": "mongodb", "target": "response", "label": "result" },
+        { "source": "external-apis", "target": "response", "label": "result" },
+        { "source": "controller", "target": "error-handler", "label": "throw" },
+        { "source": "error-handler", "target": "response", "label": "error JSON" }
+      ]
+    },
+    {
+      "id": "follow-up-system",
+      "title": "Follow-Up Management Flow",
+      "description": "Follow-up creation, role-based visibility, and automated reminder system",
+      "nodes": [
+        {
+          "id": "create-followup",
+          "label": "Create Follow-Up",
+          "type": "frontend",
+          "form": "conversationId, note, scheduledFor"
+        },
+        {
+          "id": "post-followups",
+          "label": "POST /api/followups",
+          "type": "backend",
+          "validation": "conversationId exists"
+        },
+        {
+          "id": "followup-controller",
+          "label": "Follow-Up Controller",
+          "type": "backend",
+          "creates": "FollowUp with createdBy"
+        },
+        {
+          "id": "followups-collection",
+          "label": "FollowUps Collection",
+          "type": "db",
+          "fields": "conversationId, note, scheduledFor"
+        },
+        {
+          "id": "list-followups",
+          "label": "GET /api/followups",
+          "type": "backend",
+          "filters": "conversationId, completed, dateRange"
+        },
+        {
+          "id": "role-filter",
+          "label": "Role-Based Filtering",
+          "type": "service",
+          "rules": "owner: all, lead: own+team, member: own"
+        },
+        {
+          "id": "reminder-job",
+          "label": "Follow-Up Reminder Job",
+          "type": "service",
+          "interval": "5 min"
+        },
+        {
+          "id": "group-by-user",
+          "label": "Group by createdBy",
+          "type": "service",
+          "aggregates": "pending follow-ups per user"
+        },
+        {
+          "id": "send-email",
+          "label": "Send Email",
+          "type": "external",
+          "via": "SMTP Nodemailer"
+        },
+        {
+          "id": "send-fcm",
+          "label": "Send FCM Push",
+          "type": "external",
+          "via": "Firebase Admin"
+        },
+        {
+          "id": "complete-followup",
+          "label": "Complete Follow-Up",
+          "type": "backend",
+          "endpoint": "PATCH /api/followups/:id/complete"
+        },
+        {
+          "id": "update-completed",
+          "label": "Update completed: true",
+          "type": "db",
+          "removes": "from reminder query"
+        }
+      ],
+      "edges": [
+        { "source": "create-followup", "target": "post-followups", "label": "" },
+        { "source": "post-followups", "target": "followup-controller", "label": "" },
+        { "source": "followup-controller", "target": "followups-collection", "label": "insert" },
+        { "source": "list-followups", "target": "role-filter", "label": "" },
+        { "source": "role-filter", "target": "followups-collection", "label": "filtered query" },
+        { "source": "reminder-job", "target": "followups-collection", "label": "query pending" },
+        { "source": "followups-collection", "target": "group-by-user", "label": "pending list" },
+        { "source": "group-by-user", "target": "send-email", "label": "" },
+        { "source": "group-by-user", "target": "send-fcm", "label": "" },
+        { "source": "complete-followup", "target": "update-completed", "label": "" },
+        { "source": "update-completed", "target": "followups-collection", "label": "update" }
+      ]
+    },
+    {
+      "id": "lead-assignment-algorithms",
+      "title": "Lead Assignment Algorithms",
+      "description": "Round-robin and biased round-robin lead distribution among team members",
+      "nodes": [
+        {
+          "id": "new-lead",
+          "label": "New Lead Arrives",
+          "type": "external",
+          "sources": "WhatsApp, Facebook, Walk-in, Webhook"
+        },
+        {
+          "id": "load-config",
+          "label": "Load Channel Config",
+          "type": "backend",
+          "determines": "algorithm, allowed members"
+        },
+        {
+          "id": "round-robin-path",
+          "label": "Round-Robin",
+          "type": "service",
+          "algorithm": "equal distribution"
+        },
+        {
+          "id": "biased-path",
+          "label": "Biased Round-Robin",
+          "type": "service",
+          "algorithm": "frequency-weighted"
+        },
+        {
+          "id": "rr-pool",
+          "label": "Member Pool",
+          "type": "service",
+          "example": "[A, B, C]"
+        },
+        {
+          "id": "rr-pointer",
+          "label": "Pointer State",
+          "type": "db",
+          "collection": "RoundRobinTracking"
+        },
+        {
+          "id": "rr-select",
+          "label": "Select at Pointer",
+          "type": "service",
+          "action": "return pool[pointer], increment"
+        },
+        {
+          "id": "biased-expand",
+          "label": "Expand Pool by Frequency",
+          "type": "service",
+          "example": "[A:3, B:2, C:1] → [A,A,A,B,B,C]"
+        },
+        {
+          "id": "biased-pointer",
+          "label": "Pointer State (Biased)",
+          "type": "db",
+          "collection": "RoundRobinTracking"
+        },
+        {
+          "id": "biased-select",
+          "label": "Select from Expanded",
+          "type": "service",
+          "action": "higher frequency = more leads"
+        },
+        {
+          "id": "check-availability",
+          "label": "Check Availability",
+          "type": "service",
+          "collection": "WalkinUnavailabilityLogs"
+        },
+        {
+          "id": "assign-lead",
+          "label": "Assign Lead",
+          "type": "backend",
+          "update": "Conversation.assignedTo"
+        },
+        {
+          "id": "update-pointer",
+          "label": "Update Pointer",
+          "type": "db",
+          "persists": "state across restarts"
+        }
+      ],
+      "edges": [
+        { "source": "new-lead", "target": "load-config", "label": "" },
+        { "source": "load-config", "target": "round-robin-path", "label": "round-robin" },
+        { "source": "load-config", "target": "biased-path", "label": "biased" },
+        { "source": "round-robin-path", "target": "rr-pool", "label": "" },
+        { "source": "rr-pool", "target": "rr-pointer", "label": "load" },
+        { "source": "rr-pointer", "target": "rr-select", "label": "" },
+        { "source": "biased-path", "target": "biased-expand", "label": "" },
+        { "source": "biased-expand", "target": "biased-pointer", "label": "load" },
+        { "source": "biased-pointer", "target": "biased-select", "label": "" },
+        { "source": "rr-select", "target": "check-availability", "label": "selected" },
+        { "source": "biased-select", "target": "check-availability", "label": "selected" },
+        { "source": "check-availability", "target": "assign-lead", "label": "available" },
+        { "source": "assign-lead", "target": "update-pointer", "label": "" }
+      ]
+    }
+  ],
+  "metadata": {
+    "projectName": "WhatsApp Funnel",
+    "diagramCount": 8,
+    "nodeTypes": {
+      "frontend": "Client-side application components",
+      "backend": "Server-side Express routes and controllers",
+      "service": "Business logic and utility services",
+      "db": "MongoDB collections and data storage",
+      "cache": "In-memory state storage",
+      "external": "Third-party APIs and services"
+    }
+  }
+}
