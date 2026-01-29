@@ -150,7 +150,7 @@ const AnimatedHeadline = forwardRef<AnimatedHeadlineRef, AnimatedHeadlineProps>(
       >
         <h2
           ref={textRef}
-          className="text-3xl md:text-4xl lg:text-5xl font-normal text-neutral-100 tracking-[0.06em] leading-tight font-mono"
+          className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-neutral-100 tracking-[0.06em] leading-tight font-mono"
         >
           {displayText}
           {showCursor && (
@@ -163,7 +163,7 @@ const AnimatedHeadline = forwardRef<AnimatedHeadlineRef, AnimatedHeadlineProps>(
         {subtitle && (
           <p
             ref={subtitleRef}
-            className="mt-4 text-sm md:text-base lg:text-lg font-normal text-neutral-300 tracking-[0.06em] leading-relaxed font-mono"
+            className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base lg:text-lg font-normal text-neutral-300 tracking-[0.06em] leading-relaxed font-mono"
           >
             {subtitleText}
             {showSubtitleCursor && (

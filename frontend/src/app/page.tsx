@@ -715,7 +715,7 @@ export default function Home() {
         <section
           id="home"
           ref={heroRef}
-          className="relative flex min-h-[200vh] items-start justify-start overflow-hidden px-6 py-20"
+          className="hero-section relative min-h-[180vh] sm:min-h-[200vh] overflow-hidden px-4 sm:px-6 py-12 sm:py-20"
         >
           <div
             ref={heroImageRef}
@@ -735,32 +735,32 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Main content - positioned on left, above center */}
-          <div className="relative z-10 flex w-full max-w-6xl flex-col items-start gap-10 text-left pt-[52vh] pl-2 md:pl-4 lg:pl-0">
+          {/* Main content - positioned at bottom-left on mobile (within first viewport), above center on desktop */}
+          <div className="hero-content absolute sm:relative z-10 left-4 right-4 sm:left-0 sm:right-0 top-[75vh] xs:top-[78vh] sm:top-0 flex w-auto sm:w-full max-w-6xl flex-col items-start gap-5 xs:gap-6 sm:gap-8 md:gap-10 text-left sm:pt-[45vh] md:pt-[52vh] sm:pl-2 md:pl-4 lg:pl-0 sm:pr-0">
             <p
               ref={eyebrowRef}
-              className="text-xs uppercase tracking-[0.5em] text-neutral-400"
+              className="text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-[0.25em] xs:tracking-[0.3em] sm:tracking-[0.5em] text-neutral-400"
             >
               Product designer &amp; engineer
             </p>
             <h1
               ref={headlineRef}
-              className="text-4xl font-semibold leading-tight text-neutral-100 md:text-6xl lg:text-7xl"
+              className="hero-headline text-[1.625rem] xs:text-[1.75rem] leading-[1.15] xs:leading-[1.2] sm:text-4xl font-semibold sm:leading-tight text-neutral-100 md:text-6xl lg:text-7xl max-w-full sm:max-w-none"
             >
               Building Experiences, Not Just Interfaces.
             </h1>
             <div
               ref={ctaRef}
-              className="flex flex-wrap items-center justify-start gap-4"
+              className="flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center justify-start gap-3 sm:gap-4 w-full xs:w-auto"
             >
               <a
-                className="inline-flex h-12 items-center justify-center rounded-full border border-neutral-600 bg-neutral-50 px-7 text-sm font-medium uppercase tracking-[0.2em] text-neutral-950 transition hover:bg-white"
+                className="hero-cta-button inline-flex h-10 xs:h-11 sm:h-12 items-center justify-center rounded-full border border-neutral-600 bg-neutral-50 px-4 xs:px-5 sm:px-7 text-[11px] xs:text-xs sm:text-sm font-medium uppercase tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.2em] text-neutral-950 transition hover:bg-white active:scale-[0.98]"
                 href="#projects"
               >
                 View projects
               </a>
               <a
-                className="inline-flex h-12 items-center justify-center rounded-full border border-neutral-700 px-7 text-sm font-medium uppercase tracking-[0.2em] text-neutral-200 transition hover:border-neutral-500 hover:text-white"
+                className="hero-cta-button inline-flex h-10 xs:h-11 sm:h-12 items-center justify-center rounded-full border border-neutral-700 px-4 xs:px-5 sm:px-7 text-[11px] xs:text-xs sm:text-sm font-medium uppercase tracking-[0.12em] xs:tracking-[0.15em] sm:tracking-[0.2em] text-neutral-200 transition hover:border-neutral-500 hover:text-white active:scale-[0.98]"
                 href="#footer"
               >
                 Get in touch
@@ -769,9 +769,10 @@ export default function Home() {
           </div>
 
           {/* Animated headline on right side - appears after scrolling past hero content */}
+          {/* Mobile: full width left-aligned | Desktop: right-aligned (unchanged) */}
           <div
             ref={animatedHeadlineContainerRef}
-            className="absolute right-6 md:right-12 lg:right-20 top-[140vh] z-10"
+            className="absolute left-4 right-4 sm:left-auto sm:right-6 md:right-12 lg:right-20 top-[120vh] xs:top-[125vh] sm:top-[140vh] z-10"
           >
             <AnimatedHeadline 
               ref={animatedHeadlineRef} 
@@ -781,7 +782,7 @@ export default function Home() {
           </div>
 
           {/* Scroll indicator with unique animation */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-center pb-[10vh]">
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-center pb-[6vh] sm:pb-[10vh]">
             <ScrollIndicator />
           </div>
         </section>

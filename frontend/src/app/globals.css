@@ -13,6 +13,10 @@
   
   /* Custom breakpoints for better mobile responsiveness */
   --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -124,6 +128,54 @@ html, body {
 @media (min-width: 768px) and (max-width: 1023px) {
   .full-bleed-right {
     margin-right: calc((100vw - 100%) / -2.5);
+  }
+}
+
+/* Mobile Hero Section Responsive Fixes */
+/* Extra small devices (phones, 320px and below) */
+@media (max-width: 359px) {
+  .hero-headline {
+    font-size: 1.5rem !important;
+    line-height: 1.25 !important;
+  }
+  
+  .hero-cta-button {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 0.65rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+/* Small phones (360px - 479px) */
+@media (min-width: 360px) and (max-width: 479px) {
+  .hero-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Ensure text doesn't overflow on mobile */
+@media (max-width: 639px) {
+  .hero-content {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+}
+
+/* Landscape mobile orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-section {
+    min-height: 250vh !important;
+  }
+  
+  .hero-content {
+    padding-top: 20vh !important;
+  }
+  
+  .scroll-indicator {
+    padding-bottom: 5vh !important;
   }
 }
 

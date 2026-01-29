@@ -254,12 +254,12 @@ export default function ScrollIndicator() {
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center gap-5 text-center"
+      className="scroll-indicator relative flex flex-col items-center gap-4 sm:gap-5 text-center"
     >
       {/* Glow effect */}
       <div
         ref={glowRef}
-        className="absolute h-16 w-px bg-linear-to-b from-neutral-400 via-neutral-500 to-transparent"
+        className="absolute h-14 sm:h-16 w-px bg-linear-to-b from-neutral-400 via-neutral-500 to-transparent"
         style={{ filter: "blur(4px)" }}
         aria-hidden="true"
       />
@@ -270,18 +270,18 @@ export default function ScrollIndicator() {
         className="relative flex flex-col items-center gap-1"
         aria-hidden="true"
       >
-        <div className="h-6 w-4 rounded border border-neutral-600 bg-neutral-900/50 backdrop-blur-sm">
+        <div className="h-5 w-3.5 sm:h-6 sm:w-4 rounded border border-neutral-600 bg-neutral-900/50 backdrop-blur-sm">
           <div
             ref={wheelTopRef}
-            className="absolute left-1/2 top-1 h-0.5 w-1 -translate-x-1/2 rounded-full bg-neutral-400"
+            className="absolute left-1/2 top-0.5 sm:top-1 h-0.5 w-0.5 sm:w-1 -translate-x-1/2 rounded-full bg-neutral-400"
           />
           <div
             ref={wheelMiddleRef}
-            className="absolute left-1/2 top-1/2 h-0.5 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-300"
+            className="absolute left-1/2 top-1/2 h-0.5 w-0.5 sm:w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-300"
           />
           <div
             ref={wheelBottomRef}
-            className="absolute bottom-1 left-1/2 h-0.5 w-1 -translate-x-1/2 rounded-full bg-neutral-400"
+            className="absolute bottom-0.5 sm:bottom-1 left-1/2 h-0.5 w-0.5 sm:w-1 -translate-x-1/2 rounded-full bg-neutral-400"
           />
         </div>
       </div>
@@ -291,28 +291,28 @@ export default function ScrollIndicator() {
         {/* Outer line */}
         <div
           ref={lineRef}
-          className="h-12 w-px bg-neutral-800"
+          className="h-10 sm:h-12 w-px bg-neutral-800"
           style={{ transform: "scaleY(0)" }}
         />
 
         {/* Inner animated line */}
         <div
           ref={lineInnerRef}
-          className="absolute top-0 h-12 w-px bg-linear-to-b from-neutral-400 via-neutral-300 to-transparent"
+          className="absolute top-0 h-10 sm:h-12 w-px bg-linear-to-b from-neutral-400 via-neutral-300 to-transparent"
           style={{ transform: "scaleY(0)" }}
         />
 
         {/* Dots container for particles */}
         <div
           ref={dotsContainerRef}
-          className="absolute top-0 h-12 w-px overflow-hidden"
+          className="absolute top-0 h-10 sm:h-12 w-px overflow-hidden"
         />
       </div>
 
       {/* Text */}
       <p
         ref={textRef}
-        className="text-xs uppercase tracking-[0.3em] text-neutral-500"
+        className="text-[10px] sm:text-xs uppercase tracking-[0.25em] sm:tracking-[0.3em] text-neutral-500"
       >
         Scroll to explore
       </p>
