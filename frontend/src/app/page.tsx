@@ -342,8 +342,6 @@ export default function Home() {
   const projectsSectionRef = useRef<HTMLElement | null>(null);
   const projectsContentRef = useRef<HTMLDivElement | null>(null);
   const projectsCardsColumnRef = useRef<HTMLDivElement | null>(null);
-  const projectsTextRef = useRef<HTMLDivElement | null>(null);
-  const projectsGridRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -580,67 +578,34 @@ export default function Home() {
         });
       }
 
-      // ===== PROJECTS SECTION HORIZONTAL CENTERED LAYOUT ANIMATION =====
-      // Initially: Text (left-center) + Cards (right-center) arranged HORIZONTALLY
-      // On scroll: Both move to final right-column vertical stack position
-      if (!prefersReducedMotion && projectsSectionRef.current) {
-        const projectsText = projectsTextRef.current;
-        const projectsGrid = projectsGridRef.current;
+      // ===== PROJECTS SECTION CENTER-TO-RIGHT SCROLL ANIMATION =====
+      // Content starts centered when section pins, moves to right on scroll
+      if (!prefersReducedMotion && projectsContentRef.current && projectsSectionRef.current) {
+        const projectsContent = projectsContentRef.current;
         const projectsCards = projectsCardsColumnRef.current;
         
-        // Text section: starts LEFT-CENTER, moves to final position
-        if (projectsText) {
-          gsap.fromTo(
-            projectsText,
-            {
-              x: "-42vw",      // Position text on LEFT side of center
-              y: "5vh",        // Slight vertical offset for visual balance
-              scale: 0.95,
-              opacity: 1,
+        // Right column: starts centered, moves to right after buffer
+        gsap.fromTo(
+          projectsContent,
+          {
+            x: "-30vw",      // Shift toward center
+            scale: 0.96,
+            opacity: 1,
+          },
+          {
+            x: 0,
+            scale: 1,
+            opacity: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: projectsSectionRef.current,
+              start: "top -8%",
+              end: "+=25%",
+              scrub: 1.5,
+              invalidateOnRefresh: true,
             },
-            {
-              x: 0,
-              y: 0,
-              scale: 1,
-              opacity: 1,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: projectsSectionRef.current,
-                start: "top -8%",
-                end: "+=25%",
-                scrub: 1.5,
-                invalidateOnRefresh: true,
-              },
-            }
-          );
-        }
-
-        // Cards grid: starts RIGHT-CENTER, moves to final position below text
-        if (projectsGrid) {
-          gsap.fromTo(
-            projectsGrid,
-            {
-              x: "-15vw",      // Position cards on RIGHT side of center (less offset than text)
-              y: "-20vh",      // Move up to be horizontally aligned with text
-              scale: 0.92,
-              opacity: 1,
-            },
-            {
-              x: 0,
-              y: 0,
-              scale: 1,
-              opacity: 1,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: projectsSectionRef.current,
-                start: "top -8%",
-                end: "+=25%",
-                scrub: 1.5,
-                invalidateOnRefresh: true,
-              },
-            }
-          );
-        }
+          }
+        );
 
         // Left column (stacking cards): fades in and moves to position
         if (projectsCards) {
@@ -648,7 +613,7 @@ export default function Home() {
             projectsCards,
             {
               x: "15vw",
-              scale: 0.95,
+              scale: 0.96,
               opacity: 0,
             },
             {
@@ -926,28 +891,25 @@ export default function Home() {
               <div 
                 ref={projectsContentRef}
                 className="flex flex-1 flex-col gap-6 md:max-w-[65ch] md:flex-[0.48] lg:flex-[0.45] will-change-transform">
-                {/* Text Section - Animated separately */}
-                <div ref={projectsTextRef} className="flex flex-col gap-4 will-change-transform">
-                  {/* Section Label */}
-                  <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
-                    Projects
-                  </p>
+                {/* Section Label */}
+                <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
+                  Projects
+                </p>
 
-                  {/* Headline */}
-                  <h2 className="text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
-                    Signature projects that blend craft with measurable outcomes.
-                  </h2>
+                {/* Headline */}
+                <h2 className="text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
+                  Signature projects that blend craft with measurable outcomes.
+                </h2>
 
-                  {/* Body Paragraph */}
-                  <p className="text-left max-w-[60ch] text-base leading-relaxed text-neutral-300 md:text-lg">
-                    Each engagement is grounded in research, elevated design systems,
-                    and performance-driven engineering. I partner with teams that
-                    want their digital presence to feel quietly iconic.
-                  </p>
-                </div>
+                {/* Body Paragraph */}
+                <p className="text-left max-w-[60ch] text-base leading-relaxed text-neutral-300 md:text-lg -mt-2">
+                  Each engagement is grounded in research, elevated design systems,
+                  and performance-driven engineering. I partner with teams that
+                  want their digital presence to feel quietly iconic.
+                </p>
 
-                {/* Projects Grid - Animated separately */}
-                <div ref={projectsGridRef} className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4 will-change-transform">
+                {/* Projects Grid */}
+                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4">
                   {[
                     {
                       name: "Employee Management System",
