@@ -340,6 +340,10 @@ export default function Home() {
   const animatedHeadlineContainerRef = useRef<HTMLDivElement | null>(null);
   const mainWrapperRef = useRef<HTMLDivElement | null>(null);
   const projectsSectionRef = useRef<HTMLElement | null>(null);
+  const projectsContentRef = useRef<HTMLDivElement | null>(null);
+  const projectsCardsColumnRef = useRef<HTMLDivElement | null>(null);
+  const projectsTextRef = useRef<HTMLDivElement | null>(null);
+  const projectsGridRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -575,6 +579,94 @@ export default function Home() {
           },
         });
       }
+
+      // ===== PROJECTS SECTION HORIZONTAL CENTERED LAYOUT ANIMATION =====
+      // Initially: Text (left-center) + Cards (right-center) arranged HORIZONTALLY
+      // On scroll: Both move to final right-column vertical stack position
+      if (!prefersReducedMotion && projectsSectionRef.current) {
+        const projectsText = projectsTextRef.current;
+        const projectsGrid = projectsGridRef.current;
+        const projectsCards = projectsCardsColumnRef.current;
+        
+        // Text section: starts LEFT-CENTER, moves to final position
+        if (projectsText) {
+          gsap.fromTo(
+            projectsText,
+            {
+              x: "-42vw",      // Position text on LEFT side of center
+              y: "5vh",        // Slight vertical offset for visual balance
+              scale: 0.95,
+              opacity: 1,
+            },
+            {
+              x: 0,
+              y: 0,
+              scale: 1,
+              opacity: 1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: projectsSectionRef.current,
+                start: "top -8%",
+                end: "+=25%",
+                scrub: 1.5,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+
+        // Cards grid: starts RIGHT-CENTER, moves to final position below text
+        if (projectsGrid) {
+          gsap.fromTo(
+            projectsGrid,
+            {
+              x: "-15vw",      // Position cards on RIGHT side of center (less offset than text)
+              y: "-20vh",      // Move up to be horizontally aligned with text
+              scale: 0.92,
+              opacity: 1,
+            },
+            {
+              x: 0,
+              y: 0,
+              scale: 1,
+              opacity: 1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: projectsSectionRef.current,
+                start: "top -8%",
+                end: "+=25%",
+                scrub: 1.5,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+
+        // Left column (stacking cards): fades in and moves to position
+        if (projectsCards) {
+          gsap.fromTo(
+            projectsCards,
+            {
+              x: "15vw",
+              scale: 0.95,
+              opacity: 0,
+            },
+            {
+              x: 0,
+              scale: 1,
+              opacity: 1,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: projectsSectionRef.current,
+                start: "top -8%",
+                end: "+=25%",
+                scrub: 1.5,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
+        }
+      }
     }, root);
 
     // ===== LENIS SMOOTH SCROLL SETUP WITH GSAP =====
@@ -715,7 +807,7 @@ export default function Home() {
         <section
           id="home"
           ref={heroRef}
-          className="hero-section relative min-h-[180vh] sm:min-h-[200vh] overflow-hidden px-4 sm:px-6 py-12 sm:py-20"
+          className="hero-section relative min-h-[180vh] sm:min-h-[200vh] overflow-hidden px-4 sm:px-6 pt-0 pb-12 sm:pb-20 -mt-12 sm:-mt-16"
         >
           <div
             ref={heroImageRef}
@@ -724,7 +816,7 @@ export default function Home() {
           >
             <div className="absolute inset-0 overflow-hidden">
               <div 
-                className="absolute inset-0 bg-[url('/images/hero.jpg')] bg-cover bg-center bg-no-repeat"
+                className="absolute inset-0 bg-[url('/images/hero.jpg')] bg-cover bg-top bg-no-repeat"
                 style={{
                   imageRendering: "auto",
                   backfaceVisibility: "hidden",
@@ -736,7 +828,7 @@ export default function Home() {
           </div>
 
           {/* Main content - positioned at bottom-left on mobile (within first viewport), above center on desktop */}
-          <div className="hero-content absolute sm:relative z-10 left-4 right-4 sm:left-0 sm:right-0 top-[75vh] xs:top-[78vh] sm:top-0 flex w-auto sm:w-full max-w-6xl flex-col items-start gap-5 xs:gap-6 sm:gap-8 md:gap-10 text-left sm:pt-[45vh] md:pt-[52vh] sm:pl-2 md:pl-4 lg:pl-0 sm:pr-0">
+          <div className="hero-content absolute sm:relative z-10 left-4 right-4 sm:left-0 sm:right-0 top-[75vh] xs:top-[78vh] sm:top-0 flex w-auto sm:w-full max-w-6xl flex-col items-start gap-5 xs:gap-6 sm:gap-8 md:gap-10 text-left sm:pt-[55vh] md:pt-[64vh] sm:pl-2 md:pl-4 lg:pl-0 sm:pr-0">
             <p
               ref={eyebrowRef}
               className="text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-[0.25em] xs:tracking-[0.3em] sm:tracking-[0.5em] text-neutral-400"
@@ -823,31 +915,39 @@ export default function Home() {
           <div className="sticky top-0 h-screen overflow-hidden">
             <div className="relative flex w-full h-full flex-col gap-12 py-24 pl-4 pr-4 md:flex-row md:items-center md:justify-between md:gap-16 lg:gap-20 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
               {/* Left Column - Stacking project cards (scroll‑animated) */}
-              <div className="hidden md:flex md:flex-[0.85] lg:flex-[0.9] md:items-center md:justify-center">
+              <div 
+                ref={projectsCardsColumnRef}
+                className="hidden md:flex md:flex-[0.85] lg:flex-[0.9] md:items-center md:justify-center will-change-transform"
+              >
                 <ProjectCardsLeft sectionRef={projectsSectionRef} />
               </div>
 
               {/* Right Column - Text Content */}
-              <div className="flex flex-1 flex-col gap-6 md:max-w-[65ch] md:flex-[0.48] lg:flex-[0.45]">
-                {/* Section Label */}
-                <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
-                  Projects
-                </p>
+              <div 
+                ref={projectsContentRef}
+                className="flex flex-1 flex-col gap-6 md:max-w-[65ch] md:flex-[0.48] lg:flex-[0.45] will-change-transform">
+                {/* Text Section - Animated separately */}
+                <div ref={projectsTextRef} className="flex flex-col gap-4 will-change-transform">
+                  {/* Section Label */}
+                  <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
+                    Projects
+                  </p>
 
-                {/* Headline */}
-                <h2 className="text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
-                  Signature projects that blend craft with measurable outcomes.
-                </h2>
+                  {/* Headline */}
+                  <h2 className="text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
+                    Signature projects that blend craft with measurable outcomes.
+                  </h2>
 
-                {/* Body Paragraph */}
-                <p className="text-left max-w-[60ch] text-base leading-relaxed text-neutral-300 md:text-lg -mt-2">
-                  Each engagement is grounded in research, elevated design systems,
-                  and performance-driven engineering. I partner with teams that
-                  want their digital presence to feel quietly iconic.
-                </p>
+                  {/* Body Paragraph */}
+                  <p className="text-left max-w-[60ch] text-base leading-relaxed text-neutral-300 md:text-lg">
+                    Each engagement is grounded in research, elevated design systems,
+                    and performance-driven engineering. I partner with teams that
+                    want their digital presence to feel quietly iconic.
+                  </p>
+                </div>
 
-                {/* Projects Grid */}
-                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4">
+                {/* Projects Grid - Animated separately */}
+                <div ref={projectsGridRef} className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4 will-change-transform">
                   {[
                     {
                       name: "Employee Management System",
