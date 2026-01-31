@@ -383,7 +383,11 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Request failed: ${response.status}`);
+        const message =
+          errorData.error ??
+          (typeof errorData.detail === 'string' ? errorData.detail : null) ??
+          `Request failed: ${response.status}`;
+        throw new Error(message);
       }
 
       if (!response.body) {

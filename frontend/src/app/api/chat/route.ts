@@ -125,7 +125,8 @@ async function proxyToPythonService(
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `Python service error: ${response.status}`);
+    const message = errorData.detail ?? errorData.error ?? `Python service error: ${response.status}`;
+    throw new Error(typeof message === 'string' ? message : JSON.stringify(message));
   }
   
   return response;
