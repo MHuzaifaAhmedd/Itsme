@@ -1,0 +1,28 @@
+# NEXI AI Chatbot - Python Service Dependencies
+
+# FastAPI framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+
+# Environment configuration
+python-dotenv>=1.0.0
+
+# HTTP client for OpenAI/Groq API calls
+httpx>=0.28.0
+
+# Data validation
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+
+# Server-Sent Events support
+sse-starlette>=2.2.0
+
+# Async support
+anyio>=4.0.0
+
+# Phase 2: Vector embeddings and semantic search
+openai>=1.0.0
+pinecone>=8.0.0
+
+# Phase 4: Error tracking and monitoring
+sentry-sdk[fastapi]>=2.0.0

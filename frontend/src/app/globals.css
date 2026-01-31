@@ -256,3 +256,34 @@ html, body {
 .chat-streaming-text {
   animation: text-fade-in 0.1s ease-out;
 }
+
+/* =============================================================================
+   NEXI Chat Scroll Container
+   ============================================================================= */
+
+/* Ensure chat messages container scrolls properly */
+#nexi-chat-drawer [role="log"] {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for chat container */
+#nexi-chat-drawer [role="log"]::-webkit-scrollbar {
+  width: 6px;
+}
+
+#nexi-chat-drawer [role="log"]::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+#nexi-chat-drawer [role="log"]::-webkit-scrollbar-thumb {
+  background: rgba(82, 82, 82, 0.5);
+  border-radius: 3px;
+}
+
+#nexi-chat-drawer [role="log"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 82, 82, 0.7);
+}

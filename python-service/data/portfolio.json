@@ -1,0 +1,192 @@
+{
+  "owner": {
+    "name": "Portfolio Owner",
+    "title": "Full-Stack Developer & System Architect",
+    "bio": "I'm a full-stack developer specializing in building enterprise-grade web applications. I focus on creating scalable, secure, and performant systems using modern technologies like Next.js, React, Node.js, and MongoDB. I have experience architecting complex systems with real-time capabilities, multi-tenant architectures, and GDPR-compliant data management.",
+    "location": "Available for remote work worldwide"
+  },
+  "projects": [
+    {
+      "name": "Employee Management System (EMS)",
+      "slug": "employee-management-system",
+      "type": "Enterprise HR Platform",
+      "description": "A comprehensive enterprise-grade HR platform that achieved 95% API performance improvement, 85%+ cache hit rate, and automated workforce management for thousands of employees with real-time tracking, data-driven performance evaluation, and GDPR compliance.",
+      "techStack": [
+        "Next.js 16",
+        "React 19",
+        "React Native",
+        "TypeScript",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "Redis",
+        "Socket.io",
+        "AWS S3",
+        "Firebase Cloud Messaging",
+        "Docker",
+        "Tailwind CSS"
+      ],
+      "highlights": [
+        "95% improvement in API response times (2-3s to 50-200ms)",
+        "85%+ cache hit rate with Redis",
+        "60% reduction in database queries",
+        "Real-time WebSocket updates across all connected clients",
+        "Micro-frontend architecture with 3 portals (Employee, Admin, SuperAdmin)",
+        "React Native mobile app",
+        "ZKTeco biometric device integration",
+        "GDPR compliance with automated data retention"
+      ],
+      "features": [
+        "Multi-role authentication with JWT, IP geofencing, and device management",
+        "Attendance management with biometric integration",
+        "Four-metric performance evaluation system",
+        "Leave management with conflict detection",
+        "Task assignment and verification workflow",
+        "Real-time notifications via WebSocket and FCM",
+        "Document management with S3 storage",
+        "Activity tracking with anomaly detection"
+      ],
+      "year": "2024-2026",
+      "role": "Full-Stack Developer / System Architect"
+    },
+    {
+      "name": "WhatsApp Funnel Lead Management",
+      "slug": "whatsapp-funnel-lead-management-system",
+      "type": "Multi-Channel CRM Platform",
+      "description": "A multi-channel lead management platform that consolidates WhatsApp, Facebook Lead Ads, Walk-in QR codes, and Webhook leads into a unified conversation system with visual flow automation, real-time Socket.IO updates, and configurable round-robin team assignment algorithms.",
+      "techStack": [
+        "Next.js 15",
+        "React 19",
+        "Redux Toolkit",
+        "Socket.IO",
+        "React Flow",
+        "Express",
+        "TypeScript",
+        "MongoDB",
+        "Firebase FCM",
+        "WhatsApp Cloud API",
+        "Facebook Graph API",
+        "AWS S3",
+        "Tailwind CSS"
+      ],
+      "highlights": [
+        "5 lead sources consolidated: WhatsApp, Facebook Lead Ads, Walk-in QR, Webhooks, Manual Entry",
+        "Visual flow builder with React Flow for no-code automation",
+        "Real-time Socket.IO with room-based message routing",
+        "Configurable round-robin and biased round-robin team assignment",
+        "7 concurrent background jobs for system health",
+        "Role-based access control with 3-tier permissions"
+      ],
+      "features": [
+        "Multi-channel lead ingestion and consolidation",
+        "Visual drag-and-drop flow builder",
+        "Real-time conversation management",
+        "Team assignment algorithms",
+        "Follow-up scheduling system",
+        "Facebook OAuth and Lead Ads integration",
+        "Large payload handling (100MB CSV imports)"
+      ],
+      "year": "2024-2025",
+      "role": "Full-Stack Developer / System Architect"
+    },
+    {
+      "name": "Clothie E-commerce (Naba Hussam)",
+      "slug": "naba-hussam",
+      "type": "Custom E-commerce Platform",
+      "description": "A custom e-commerce platform for a Pakistani fashion brand supporting both ready-to-wear and made-to-order products with local payment methods (COD, Bank Transfer), guest checkout with automatic account linking, and comprehensive admin management.",
+      "techStack": [
+        "React 18",
+        "Vite",
+        "React Router v6",
+        "Node.js",
+        "Express",
+        "MongoDB Atlas",
+        "Mongoose",
+        "AWS S3",
+        "JWT Authentication",
+        "Docker",
+        "Nginx",
+        "Tailwind CSS"
+      ],
+      "highlights": [
+        "Dual product type support (Ready-to-Wear + Made-to-Order)",
+        "Local payment methods: COD and Bank Transfer",
+        "Guest checkout with automatic account linking",
+        "Dynamic category management",
+        "GA4-compatible e-commerce analytics",
+        "Live at nabahussam.com"
+      ],
+      "features": [
+        "Shopping cart with size-specific quantities",
+        "COD management with delivery tracking",
+        "Product add-ons system",
+        "Admin dashboard for product and order management",
+        "S3 image management with aspect ratio validation"
+      ],
+      "year": "2024-2025",
+      "role": "Full-Stack Developer",
+      "liveUrl": "https://nabahussam.com"
+    }
+  ],
+  "skills": {
+    "frontend": [
+      "React",
+      "Next.js",
+      "React Native",
+      "TypeScript",
+      "JavaScript",
+      "Tailwind CSS",
+      "Redux Toolkit",
+      "TanStack Query",
+      "GSAP",
+      "Framer Motion",
+      "React Flow"
+    ],
+    "backend": [
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Mongoose",
+      "Redis",
+      "Socket.IO",
+      "REST APIs",
+      "JWT Authentication",
+      "Bull Queue"
+    ],
+    "cloud": [
+      "AWS S3",
+      "Firebase (FCM)",
+      "Vercel",
+      "Docker",
+      "Nginx"
+    ],
+    "integrations": [
+      "WhatsApp Cloud API",
+      "Facebook Graph API",
+      "ZKTeco Biometric Devices",
+      "Google Analytics 4"
+    ],
+    "practices": [
+      "System Architecture",
+      "API Design",
+      "Real-time Systems",
+      "Performance Optimization",
+      "Security Best Practices",
+      "GDPR Compliance"
+    ]
+  },
+  "contact": {
+    "email": "contact@example.com",
+    "github": "https://github.com/yourusername",
+    "linkedin": "https://linkedin.com/in/yourusername",
+    "cta": "I'm available for freelance projects and full-time opportunities. Let's build something great together!"
+  },
+  "quickFacts": [
+    "Specialized in enterprise-grade web applications",
+    "Experience with real-time systems using WebSockets",
+    "Built multi-tenant SaaS platforms",
+    "Strong focus on performance optimization",
+    "GDPR-compliant system design",
+    "Mobile development with React Native"
+  ]
+}

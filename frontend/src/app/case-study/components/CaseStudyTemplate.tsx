@@ -77,6 +77,8 @@ export default function CaseStudyTemplate({ data }: CaseStudyTemplateProps) {
           onComplete: () => {
             // Refresh ScrollTrigger after content is visible
             ScrollTrigger.refresh();
+            // Dispatch heroLoaded event for ChatWidget
+            window.dispatchEvent(new CustomEvent("heroLoaded"));
           }
         }
       );

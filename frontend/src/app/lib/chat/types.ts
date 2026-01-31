@@ -7,6 +7,7 @@
 // =============================================================================
 
 export type MessageRole = 'user' | 'assistant' | 'system';
+export type FeedbackType = 'positive' | 'negative' | null;
 
 export interface ChatMessage {
   id: string;
@@ -14,6 +15,7 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   isStreaming?: boolean;
+  feedback?: FeedbackType;
 }
 
 export interface StreamingMessage {
@@ -158,7 +160,8 @@ export type ChatAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_STREAMING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'CLEAR_MESSAGES' };
+  | { type: 'CLEAR_MESSAGES' }
+  | { type: 'SET_FEEDBACK'; payload: { id: string; feedback: FeedbackType } };
 
 // =============================================================================
 // Quick Reply Types
@@ -184,4 +187,28 @@ export interface ValidationResult {
   valid: boolean;
   error?: string;
   sanitizedContent?: string;
+}
+
+// =============================================================================
+// Analytics Types (Phase 4)
+// =============================================================================
+
+export interface ChatAnalyticsEvent {
+  event: 'chat_opened' | 'message_sent' | 'response_received' | 'feedback_given' | 'quick_reply_clicked' | 'chat_cleared';
+  timestamp: number;
+  sessionId?: string;
+  data?: {
+    messageId?: string;
+    messageLength?: number;
+    responseTime?: number;
+    feedbackType?: FeedbackType;
+    quickReply?: string;
+  };
+}
+
+export interface FeedbackPayload {
+  messageId: string;
+  feedback: FeedbackType;
+  messageContent: string;
+  conversationContext?: string;
 }

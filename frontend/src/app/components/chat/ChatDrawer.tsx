@@ -1,12 +1,102 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useReducer } from "react";
+import { useEffect, useRef, useCallback, useReducer, useState } from "react";
 import gsap from "gsap";
 import ChatMessage from "./ChatMessage";
-import ChatInput from "./ChatInput";
+import ChatInput, { ChatInputHandle } from "./ChatInput";
 import TypingIndicator from "./TypingIndicator";
 import QuickReplies from "./QuickReplies";
-import type { ChatMessage as ChatMessageType, ChatState, ChatAction } from "@/app/lib/chat/types";
+import type { ChatMessage as ChatMessageType, ChatState, ChatAction, FeedbackType } from "@/app/lib/chat/types";
+
+// =============================================================================
+// Swipe Gesture Hook
+// =============================================================================
+
+interface SwipeState {
+  startY: number;
+  currentY: number;
+  isDragging: boolean;
+}
+
+function useSwipeToClose(
+  elementRef: React.RefObject<HTMLDivElement | null>,
+  onClose: () => void,
+  isEnabled: boolean
+) {
+  const [swipeState, setSwipeState] = useState<SwipeState>({
+    startY: 0,
+    currentY: 0,
+    isDragging: false,
+  });
+  
+  const SWIPE_THRESHOLD = 100; // pixels to trigger close
+  const DRAG_RESISTANCE = 0.5; // resistance factor
+
+  useEffect(() => {
+    if (!isEnabled || !elementRef.current) return;
+    
+    const element = elementRef.current;
+    
+    const handleTouchStart = (e: TouchEvent) => {
+      // Only start swipe from top 60px (header area)
+      const touch = e.touches[0];
+      const rect = element.getBoundingClientRect();
+      const relativeY = touch.clientY - rect.top;
+      
+      if (relativeY <= 60) {
+        setSwipeState({
+          startY: touch.clientY,
+          currentY: touch.clientY,
+          isDragging: true,
+        });
+      }
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!swipeState.isDragging) return;
+      
+      const touch = e.touches[0];
+      const deltaY = touch.clientY - swipeState.startY;
+      
+      // Only allow downward swipe
+      if (deltaY > 0) {
+        const dragAmount = deltaY * DRAG_RESISTANCE;
+        gsap.set(element, { y: dragAmount });
+        setSwipeState(prev => ({ ...prev, currentY: touch.clientY }));
+      }
+    };
+    
+    const handleTouchEnd = () => {
+      if (!swipeState.isDragging) return;
+      
+      const deltaY = swipeState.currentY - swipeState.startY;
+      
+      if (deltaY > SWIPE_THRESHOLD) {
+        // Close the drawer
+        onClose();
+      } else {
+        // Snap back to original position
+        gsap.to(element, { y: 0, duration: 0.3, ease: "power2.out" });
+      }
+      
+      setSwipeState({ startY: 0, currentY: 0, isDragging: false });
+    };
+    
+    element.addEventListener("touchstart", handleTouchStart, { passive: true });
+    element.addEventListener("touchmove", handleTouchMove, { passive: true });
+    element.addEventListener("touchend", handleTouchEnd);
+    element.addEventListener("touchcancel", handleTouchEnd);
+    
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [elementRef, onClose, isEnabled, swipeState.isDragging, swipeState.startY, swipeState.currentY]);
+  
+  return swipeState.isDragging;
+}
 
 // =============================================================================
 // State Reducer
@@ -54,6 +144,15 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, error: action.payload };
     case "CLEAR_MESSAGES":
       return { ...state, messages: [] };
+    case "SET_FEEDBACK":
+      return {
+        ...state,
+        messages: state.messages.map((msg) =>
+          msg.id === action.payload.id
+            ? { ...msg, feedback: action.payload.feedback }
+            : msg
+        ),
+      };
     default:
       return state;
   }
@@ -72,8 +171,82 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const drawerRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<ChatInputHandle>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // Check if mobile (for swipe gesture)
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  
+  // Enable swipe-to-close on mobile
+  useSwipeToClose(drawerRef, onClose, isOpen && isMobile);
+
+  // =============================================================================
+  // Keyboard Shortcuts
+  // =============================================================================
+  
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape key to close
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // =============================================================================
+  // Focus Management
+  // =============================================================================
+  
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      // Small delay to ensure drawer animation has started
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+  
+  // Focus trap - keep focus within drawer when open
+  useEffect(() => {
+    if (!isOpen || !drawerRef.current) return;
+    
+    const drawer = drawerRef.current;
+    const focusableElements = drawer.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+    
+    drawer.addEventListener("keydown", handleTabKey);
+    return () => drawer.removeEventListener("keydown", handleTabKey);
+  }, [isOpen]);
 
   // =============================================================================
   // Animations
@@ -88,7 +261,7 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
 
     if (isOpen) {
       // Show drawer
-      gsap.set(drawerRef.current, { display: "flex" });
+      gsap.set(drawerRef.current, { display: "flex", y: 0 });
       gsap.set(backdropRef.current, { display: "block" });
 
       if (prefersReducedMotion) {
@@ -135,8 +308,13 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
 
   // Auto-scroll to bottom
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current && state.messages.length > 0) {
+      const container = messagesContainerRef.current;
+      // Scroll to bottom smoothly
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [state.messages, state.isStreaming]);
 
@@ -289,6 +467,31 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
     dispatch({ type: "SET_ERROR", payload: null });
   }, []);
 
+  // Handle feedback (thumbs up/down)
+  const handleFeedback = useCallback(async (messageId: string, feedback: FeedbackType) => {
+    dispatch({ type: "SET_FEEDBACK", payload: { id: messageId, feedback } });
+    
+    // Find the message to get its content
+    const message = state.messages.find(m => m.id === messageId);
+    if (!message) return;
+    
+    // Send feedback to analytics endpoint (fire and forget)
+    try {
+      await fetch("/api/chat/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messageId,
+          feedback,
+          messageContent: message.content,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (err) {
+      console.debug("Failed to send feedback:", err);
+    }
+  }, [state.messages]);
+
   // =============================================================================
   // Render
   // =============================================================================
@@ -309,50 +512,75 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
         id="nexi-chat-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Chat with NEXI"
-        className="fixed bottom-0 right-0 z-70 hidden h-full w-full flex-col bg-neutral-900/95 backdrop-blur-md md:bottom-24 md:right-6 md:h-[600px] md:w-[400px] md:rounded-3xl md:border md:border-neutral-800 md:shadow-2xl"
+        aria-labelledby="chat-title"
+        aria-describedby="chat-description"
+        className="fixed bottom-0 right-0 z-70 hidden h-full w-full flex-col overflow-hidden bg-neutral-900/95 backdrop-blur-md md:bottom-24 md:right-6 md:h-[600px] md:w-[400px] md:rounded-3xl md:border md:border-neutral-800 md:shadow-2xl"
       >
+        {/* Hidden description for screen readers */}
+        <p id="chat-description" className="sr-only">
+          Chat with NEXI, the AI Portfolio Assistant. Ask about projects, skills, or how to get in touch.
+          Press Escape to close. On mobile, swipe down from the header to close.
+        </p>
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
-              <span className="text-sm font-bold text-white">N</span>
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-neutral-100">NEXI</h2>
-              <p className="text-xs text-neutral-400">AI Portfolio Assistant</p>
-            </div>
+        <div className="shrink-0 border-b border-neutral-800">
+          {/* Swipe indicator - visible on mobile only */}
+          <div className="flex justify-center py-2 md:hidden">
+            <div className="h-1 w-10 rounded-full bg-neutral-600" aria-hidden="true" />
           </div>
-          <div className="flex items-center gap-2">
-            {state.messages.length > 0 && (
+          
+          <div className="flex items-center justify-between px-4 py-3 md:py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600">
+                <span className="text-sm font-bold text-white" aria-hidden="true">N</span>
+              </div>
+              <div>
+                <h2 id="chat-title" className="text-sm font-semibold text-neutral-100">NEXI</h2>
+                <p className="text-xs text-neutral-400">AI Portfolio Assistant</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {state.messages.length > 0 && (
+                <button
+                  onClick={handleClearChat}
+                  className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-900"
+                  aria-label="Clear chat history"
+                  title="Clear chat (start fresh)"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              )}
               <button
-                onClick={handleClearChat}
-                className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-200"
-                aria-label="Clear chat"
+                onClick={onClose}
+                className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-900"
+                aria-label="Close chat (or press Escape)"
+                title="Close chat (Esc)"
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-            )}
-            <button
-              onClick={onClose}
-              className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-800 hover:text-neutral-200 md:hidden"
-              aria-label="Close chat"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            </div>
           </div>
         </div>
 
         {/* Messages */}
         <div
-          className="flex-1 overflow-y-auto px-4 py-4"
+          ref={messagesContainerRef}
+          className="min-h-0 flex-1 px-4 py-4"
+          style={{
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            overscrollBehavior: 'contain',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#525252 transparent',
+          }}
           role="log"
           aria-live="polite"
           aria-label="Chat messages"
+          onWheel={(e) => e.stopPropagation()}
         >
           {state.messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
@@ -370,7 +598,11 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
           ) : (
             <>
               {state.messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
+                <ChatMessage 
+                  key={message.id} 
+                  message={message} 
+                  onFeedback={handleFeedback}
+                />
               ))}
               {state.isLoading && <TypingIndicator />}
               <div ref={messagesEndRef} />
@@ -380,13 +612,14 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
 
         {/* Error Banner */}
         {state.error && (
-          <div className="mx-4 mb-2 rounded-lg bg-red-900/50 px-3 py-2 text-sm text-red-200">
+          <div className="mx-4 mb-2 shrink-0 rounded-lg bg-red-900/50 px-3 py-2 text-sm text-red-200">
             {state.error}
           </div>
         )}
 
         {/* Input */}
         <ChatInput
+          ref={inputRef}
           onSend={sendMessage}
           disabled={state.isLoading || state.isStreaming}
         />

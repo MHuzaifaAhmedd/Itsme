@@ -76,6 +76,8 @@ export default function EMSCaseStudyTemplate({ data }: EMSCaseStudyTemplateProps
           ease: "power2.out",
           onComplete: () => {
             ScrollTrigger.refresh();
+            // Dispatch heroLoaded event for ChatWidget
+            window.dispatchEvent(new CustomEvent("heroLoaded"));
           }
         }
       );

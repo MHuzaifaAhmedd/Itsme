@@ -83,6 +83,8 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
           ease: "power2.out",
           onComplete: () => {
             ScrollTrigger.refresh();
+            // Dispatch heroLoaded event for ChatWidget
+            window.dispatchEvent(new CustomEvent("heroLoaded"));
           }
         }
       );

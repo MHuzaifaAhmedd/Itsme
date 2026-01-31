@@ -430,6 +430,8 @@ export default function Home() {
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
         }
+        // Dispatch heroLoaded immediately since loader is skipped
+        window.dispatchEvent(new CustomEvent("heroLoaded"));
       } else {
         // Initial states
         gsap.set(heroRef.current, { autoAlpha: 0 });
@@ -523,6 +525,11 @@ export default function Home() {
               duration: prefersReducedMotion ? 0.2 : 0.8,
               stagger: prefersReducedMotion ? 0 : 0.08,
               ease: "power3.out",
+              onComplete: () => {
+                // Dispatch custom event when hero section is fully loaded
+                // This signals the ChatWidget to start its entrance animation
+                window.dispatchEvent(new CustomEvent("heroLoaded"));
+              },
             },
             "-=0.6",
           );
@@ -992,7 +999,7 @@ export default function Home() {
             </p>
             <div className="flex items-center gap-4 text-sm text-neutral-500">
               <a
-                href="https://github.com"
+                href="https://github.com/MHuzaifaAhmedd"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition duration-200 hover:text-neutral-300"
@@ -1010,7 +1017,7 @@ export default function Home() {
               </a>
               <span className="h-1 w-1 rounded-full bg-neutral-700" />
               <a
-                href="mailto:hello@studio.com"
+                href="mailto:ahmedhuzaifa451@gmail.com"
                 className="transition duration-200 hover:text-neutral-300"
               >
                 Email

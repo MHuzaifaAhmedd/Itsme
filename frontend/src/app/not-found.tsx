@@ -18,6 +18,7 @@ export default function NotFound() {
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: -1000, y: -1000, radius: 250 });
   const animationFrameRef = useRef<number | null>(null);
+  const animateFnRef = useRef<(() => void) | null>(null);
 
   // Grid configuration
   const gap = 35;
@@ -70,59 +71,65 @@ export default function NotFound() {
     particle.y += particle.vy;
   }, [ease, friction]);
 
-  const animate = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  // Animation loop - using effect to avoid circular dependency
+  useEffect(() => {
+    const animate = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const particles = particlesRef.current;
-    const mouse = mouseRef.current;
-    const cols = Math.ceil(canvas.width / gap) + 1;
+      const particles = particlesRef.current;
+      const mouse = mouseRef.current;
+      const cols = Math.ceil(canvas.width / gap) + 1;
 
-    for (let i = 0; i < particles.length; i++) {
-      const particle = particles[i];
-      updateParticle(particle);
+      for (let i = 0; i < particles.length; i++) {
+        const particle = particles[i];
+        updateParticle(particle);
 
-      // Draw particle
-      ctx.fillStyle = `rgba(255, 255, 255, ${particle.opacity})`;
-      ctx.beginPath();
-      ctx.fillRect(particle.x, particle.y, 1.2, 1.2);
-
-      // Calculate distance to mouse for line color
-      const dx = mouse.x - particle.x;
-      const dy = mouse.y - particle.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < mouse.radius * 1.5) {
-        ctx.strokeStyle = `rgba(66, 133, 244, ${0.15 * (1 - dist / (mouse.radius * 1.5))})`;
-      } else {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-      }
-
-      // Draw horizontal line to next particle
-      if ((i + 1) % cols !== 0 && i + 1 < particles.length) {
+        // Draw particle
+        ctx.fillStyle = `rgba(255, 255, 255, ${particle.opacity})`;
         ctx.beginPath();
-        ctx.lineWidth = 0.5;
-        ctx.moveTo(particle.x, particle.y);
-        ctx.lineTo(particles[i + 1].x, particles[i + 1].y);
-        ctx.stroke();
+        ctx.fillRect(particle.x, particle.y, 1.2, 1.2);
+
+        // Calculate distance to mouse for line color
+        const dx = mouse.x - particle.x;
+        const dy = mouse.y - particle.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < mouse.radius * 1.5) {
+          ctx.strokeStyle = `rgba(66, 133, 244, ${0.15 * (1 - dist / (mouse.radius * 1.5))})`;
+        } else {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+        }
+
+        // Draw horizontal line to next particle
+        if ((i + 1) % cols !== 0 && i + 1 < particles.length) {
+          ctx.beginPath();
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(particle.x, particle.y);
+          ctx.lineTo(particles[i + 1].x, particles[i + 1].y);
+          ctx.stroke();
+        }
+
+        // Draw vertical line to particle below
+        if (i + cols < particles.length) {
+          ctx.beginPath();
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(particle.x, particle.y);
+          ctx.lineTo(particles[i + cols].x, particles[i + cols].y);
+          ctx.stroke();
+        }
       }
 
-      // Draw vertical line to particle below
-      if (i + cols < particles.length) {
-        ctx.beginPath();
-        ctx.lineWidth = 0.5;
-        ctx.moveTo(particle.x, particle.y);
-        ctx.lineTo(particles[i + cols].x, particles[i + cols].y);
-        ctx.stroke();
-      }
-    }
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+    // Store reference
+    animateFnRef.current = animate;
   }, [gap, updateParticle]);
 
   useEffect(() => {
@@ -155,7 +162,11 @@ export default function NotFound() {
 
     // Initialize
     handleResize();
-    animate();
+    
+    // Start animation using ref
+    if (animateFnRef.current) {
+      animateFnRef.current();
+    }
 
     // Add event listeners
     window.addEventListener('resize', handleResize);
@@ -172,7 +183,7 @@ export default function NotFound() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [animate, initParticles]);
+  }, [initParticles]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#0a0a0a]">

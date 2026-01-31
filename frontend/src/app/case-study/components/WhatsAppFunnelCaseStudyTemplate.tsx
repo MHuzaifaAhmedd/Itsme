@@ -87,6 +87,8 @@ export default function WhatsAppFunnelCaseStudyTemplate({ data }: WhatsAppFunnel
           ease: "power2.out",
           onComplete: () => {
             ScrollTrigger.refresh();
+            // Dispatch heroLoaded event for ChatWidget
+            window.dispatchEvent(new CustomEvent("heroLoaded"));
           }
         }
       );

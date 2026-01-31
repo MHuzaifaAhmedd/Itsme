@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, KeyboardEvent } from "react";
+import { useState, useRef, useCallback, useEffect, KeyboardEvent, forwardRef, useImperativeHandle } from "react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   placeholder?: string;
+}
+
+export interface ChatInputHandle {
+  focus: () => void;
 }
 
 const MIN_HEIGHT = 44;
@@ -14,14 +18,24 @@ const MAX_HEIGHT = 120;
 /**
  * ChatInput - Auto-resizing textarea with send button
  */
-export default function ChatInput({
-  onSend,
-  disabled = false,
-  placeholder = "Ask me anything...",
-}: ChatInputProps) {
+const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function ChatInput(
+  {
+    onSend,
+    disabled = false,
+    placeholder = "Ask me anything...",
+  },
+  ref
+) {
   const [value, setValue] = useState("");
   const [showScrollbar, setShowScrollbar] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Expose focus method to parent
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      textareaRef.current?.focus();
+    },
+  }));
 
   // Auto-resize textarea
   const adjustHeight = useCallback(() => {
@@ -73,7 +87,7 @@ export default function ChatInput({
   const canSend = value.trim().length > 0 && !disabled && !isOverLimit;
 
   return (
-    <div className="border-t border-neutral-800 px-4 py-3">
+    <div className="shrink-0 border-t border-neutral-800 px-4 py-3">
       <div className="flex items-center gap-3">
         {/* Textarea */}
         <div className="relative flex-1">
@@ -91,7 +105,8 @@ export default function ChatInput({
                 : "border-neutral-700"
             } ${showScrollbar ? "overflow-y-auto" : "overflow-hidden"}`}
             style={{ minHeight: "44px", maxHeight: `${MAX_HEIGHT}px` }}
-            aria-label="Message input"
+            aria-label="Type your message to NEXI. Press Enter to send, Shift+Enter for new line."
+            aria-invalid={isOverLimit}
           />
 
           {/* Character count (shown when approaching limit) */}
@@ -154,9 +169,11 @@ export default function ChatInput({
       </div>
 
       {/* Helper text */}
-      <p className="mt-2 text-center text-[10px] text-neutral-500">
+      <p className="mt-2 text-center text-[10px] text-neutral-500" aria-hidden="true">
         Press Enter to send, Shift+Enter for new line
       </p>
     </div>
   );
-}
+});
+
+export default ChatInput;

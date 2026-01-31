@@ -29,11 +29,13 @@ export default function ParticleNIcon({ size = 56, className = "" }: ParticleNIc
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<Particle[]>([]);
-  const mouseRef = useRef({ x: -1000, y: -1000, radius: 20 });
+  // Larger interaction radius for better effect
+  const mouseRef = useRef({ x: -1000, y: -1000, radius: size * 0.4 });
   const animationFrameRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
+  const animateFnRef = useRef<(() => void) | null>(null);
 
-  // Create a particle
+  // Create a particle - larger and more visible
   const createParticle = useCallback((x: number, y: number, color: string): Particle => ({
     originX: x,
     originY: y,
@@ -41,7 +43,7 @@ export default function ParticleNIcon({ size = 56, className = "" }: ParticleNIc
     y,
     vx: 0,
     vy: 0,
-    size: size > 50 ? 1.8 : 1.4, // Adjust particle size based on container size
+    size: size >= 64 ? 2.2 : size > 50 ? 1.8 : 1.4, // Larger particles for bigger icons
     color,
     ease: 0.1,
     friction: 0.9,
@@ -71,8 +73,8 @@ export default function ParticleNIcon({ size = 56, className = "" }: ParticleNIc
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Sample pixels and create particles
-    const step = size > 50 ? 2.2 : 1.8; // Adjust density based on size
+    // Sample pixels and create particles - denser for larger sizes
+    const step = size >= 64 ? 2.8 : size > 50 ? 2.2 : 1.8;
     const leftBound = size * 0.22;
     const rightBound = size * 0.78;
 
@@ -98,53 +100,58 @@ export default function ParticleNIcon({ size = 56, className = "" }: ParticleNIc
     }
   }, [size, createParticle]);
 
-  // Animation loop
-  const animate = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  // Animation loop - using ref pattern to avoid circular dependency
+  useEffect(() => {
+    const animate = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = "screen";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = "screen";
 
-    const mouse = mouseRef.current;
-    const currentTime = Date.now();
+      const mouse = mouseRef.current;
+      const currentTime = Date.now();
 
-    particlesRef.current.forEach((p) => {
-      // Mouse interaction
-      const dx = mouse.x - p.x;
-      const dy = mouse.y - p.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      particlesRef.current.forEach((p) => {
+        // Mouse interaction
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < mouse.radius) {
-        const force = (mouse.radius - dist) / mouse.radius;
-        const angle = Math.atan2(dy, dx);
-        p.vx -= Math.cos(angle) * force * 4;
-        p.vy -= Math.sin(angle) * force * 4;
-      }
+        if (dist < mouse.radius) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          const angle = Math.atan2(dy, dx);
+          p.vx -= Math.cos(angle) * force * 5;
+          p.vy -= Math.sin(angle) * force * 5;
+        }
 
-      // Return to origin with easing
-      p.vx += (p.originX - p.x) * p.ease;
-      p.vy += (p.originY - p.y) * p.ease;
-      p.vx *= p.friction;
-      p.vy *= p.friction;
-      p.x += p.vx;
-      p.y += p.vy;
+        // Return to origin with easing
+        p.vx += (p.originX - p.x) * p.ease;
+        p.vy += (p.originY - p.y) * p.ease;
+        p.vx *= p.friction;
+        p.vy *= p.friction;
+        p.x += p.vx;
+        p.y += p.vy;
 
-      // Flicker effect
-      p.flicker = Math.sin((currentTime - startTimeRef.current) * 0.008 + p.originX) * 0.15 + 0.85;
+        // Flicker effect
+        p.flicker = Math.sin((currentTime - startTimeRef.current) * 0.008 + p.originX) * 0.15 + 0.85;
 
-      // Draw particle
-      ctx.globalAlpha = p.flicker;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-    });
+        // Draw particle
+        ctx.globalAlpha = p.flicker;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    // Store reference for external access
+    animateFnRef.current = animate;
   }, []);
 
   // Handle mouse move
@@ -167,14 +174,18 @@ export default function ParticleNIcon({ size = 56, className = "" }: ParticleNIc
   useEffect(() => {
     initParticles();
     startTimeRef.current = Date.now();
-    animate();
+    
+    // Start animation using the ref
+    if (animateFnRef.current) {
+      animateFnRef.current();
+    }
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [initParticles, animate]);
+  }, [initParticles]);
 
   // Handle resize
   useEffect(() => {
@@ -194,20 +205,10 @@ export default function ParticleNIcon({ size = 56, className = "" }: ParticleNIc
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Subtle glow background */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-        style={{
-          width: size * 0.7,
-          height: size * 0.7,
-          background: "radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%)",
-        }}
-      />
       <canvas
         ref={canvasRef}
         width={size}
         height={size}
-        className="relative z-10"
         style={{ width: size, height: size }}
       />
     </div>
