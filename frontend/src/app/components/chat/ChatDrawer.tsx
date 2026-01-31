@@ -175,7 +175,7 @@ export default function ChatDrawer({ isOpen, onClose }: ChatDrawerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<ChatInputHandle>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-  
+
   // Check if mobile (for swipe gesture)
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   

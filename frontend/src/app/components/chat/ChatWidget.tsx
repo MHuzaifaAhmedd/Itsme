@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import gsap from "gsap";
 import ChatDrawer from "./ChatDrawer";
 import ParticleNIcon from "./ParticleNIcon";
+import { playNexiVoiceGreetingIfFirstTime } from "./nexiVoiceGreeting";
 
 // Client-side mount detection using useSyncExternalStore (avoids setState in effect)
 const emptySubscribe = () => () => {};
@@ -118,7 +119,13 @@ export default function ChatWidget() {
   }, [isOpen]);
 
   const handleToggle = useCallback(() => {
-    setIsOpen((prev) => !prev);
+    setIsOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        playNexiVoiceGreetingIfFirstTime();
+      }
+      return next;
+    });
   }, []);
 
   const handleClose = useCallback(() => {
