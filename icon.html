@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Nexus-N | Red Blue White</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050505; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        
+        #avatar-container {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .glow-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="avatar-container">
+        <div class="glow-bg"></div>
+        <canvas id="nCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('nCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const container = document.getElementById('avatar-container');
+
+        let particles = [];
+        const mouse = { x: -1000, y: -1000, radius: 55 };
+
+        class Particle {
+            constructor(x, y, color) {
+                this.originX = x;
+                this.originY = y;
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.size = 2.2;
+                this.color = color;
+                this.ease = 0.1;
+                this.friction = 0.9;
+                this.flicker = Math.random() * 0.3 + 0.7;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.flicker;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < mouse.radius) {
+                    let force = (mouse.radius - dist) / mouse.radius;
+                    let angle = Math.atan2(dy, dx);
+                    this.vx -= Math.cos(angle) * force * 5;
+                    this.vy -= Math.sin(angle) * force * 5;
+                }
+
+                this.vx += (this.originX - this.x) * this.ease;
+                this.vy += (this.originY - this.y) * this.ease;
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.x += this.vx;
+                this.y += this.vy;
+
+                this.flicker = Math.sin(Date.now() * 0.008 + this.originX) * 0.15 + 0.85;
+            }
+        }
+
+        function init() {
+            canvas.width = 200;
+            canvas.height = 200;
+            particles = [];
+
+            // Render a high-quality N
+            ctx.fillStyle = 'white';
+            ctx.font = '900 140px "Arial Black", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('N', canvas.width / 2, canvas.height / 2);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const step = 2.8; 
+            for (let y = 0; y < canvas.height; y += step) {
+                for (let x = 0; x < canvas.width; x += step) {
+                    const index = (Math.floor(y) * 4 * canvas.width) + (Math.floor(x) * 4) + 3;
+                    if (imageData.data[index] > 128) {
+                        
+                        let color;
+                        // Map x-position to find the stems and diagonal
+                        // Values adjusted to match the Arial Black 'N' proportions
+                        const relativeX = (x - 45) / 110; 
+
+                        if (relativeX < 0.28) {
+                            color = '#EF4444'; // Red (Left Stem |)
+                        } else if (relativeX > 0.72) {
+                            color = '#FFFFFF'; // White (Right Stem |) - REPLACED YELLOW
+                        } else {
+                            color = '#3B82F6'; // Blue (Diagonal \)
+                        }
+
+                        particles.push(new Particle(x, y, color));
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'screen'; 
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        container.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            mouse.y = (e.clientY - rect.top) * (canvas.height / rect.height);
+        });
+
+        container.addEventListener('mouseleave', () => {
+            mouse.x = -1000;
+            mouse.y = -1000;
+        });
+
+        document.fonts.ready.then(init);
+        animate();
+        window.addEventListener('resize', init);
+    </script>
+</body>
+</html>

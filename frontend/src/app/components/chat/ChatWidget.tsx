@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from "
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import ChatDrawer from "./ChatDrawer";
+import ParticleNIcon from "./ParticleNIcon";
 
 // Client-side mount detection using useSyncExternalStore (avoids setState in effect)
 const emptySubscribe = () => () => {};
@@ -11,36 +12,35 @@ const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
 /**
- * ChatWidget - Floating chat bubble that opens the chat drawer
+ * ChatWidget - Floating particle N icon that opens the chat drawer
  */
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [hasNewMessage, setHasNewMessage] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const iconRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iconRef = useRef<HTMLDivElement>(null);
   const closeIconRef = useRef<SVGSVGElement>(null);
 
-  // Mount check for portal (using useSyncExternalStore to avoid setState in effect)
+  // Mount check (using useSyncExternalStore to avoid setState in effect)
   const isMounted = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
   // Entrance animation
   useEffect(() => {
-    if (!buttonRef.current || !isMounted) return;
+    if (!containerRef.current || !isMounted) return;
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
     if (prefersReducedMotion) {
-      gsap.set(buttonRef.current, { opacity: 1, scale: 1 });
+      gsap.set(containerRef.current, { opacity: 1, scale: 1 });
       return;
     }
 
     // Initial state
-    gsap.set(buttonRef.current, { opacity: 0, scale: 0.8 });
+    gsap.set(containerRef.current, { opacity: 0, scale: 0.8 });
 
     // Entrance animation with slight delay
-    gsap.to(buttonRef.current, {
+    gsap.to(containerRef.current, {
       opacity: 1,
       scale: 1,
       duration: 0.4,
@@ -96,8 +96,7 @@ export default function ChatWidget() {
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
-    if (hasNewMessage) setHasNewMessage(false);
-  }, [hasNewMessage]);
+  }, []);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -119,36 +118,28 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Particle Icon Button */}
       <button
-        ref={buttonRef}
+        ref={containerRef as React.RefObject<HTMLButtonElement>}
         onClick={handleToggle}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-950 md:h-16 md:w-16"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 border border-neutral-800 shadow-lg shadow-black/50 transition-all hover:border-neutral-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-950 md:h-16 md:w-16"
         aria-label={isOpen ? "Close chat" : "Open chat with NEXI"}
         aria-expanded={isOpen}
         aria-controls="nexi-chat-drawer"
       >
-        {/* Chat Icon */}
-        <svg
+        {/* Particle N Icon */}
+        <div
           ref={iconRef}
-          className="absolute h-6 w-6 md:h-7 md:w-7"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
+          className="absolute flex items-center justify-center"
           aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-          />
-        </svg>
+          <ParticleNIcon size={48} />
+        </div>
 
         {/* Close Icon */}
         <svg
           ref={closeIconRef}
-          className="absolute h-6 w-6 opacity-0 md:h-7 md:w-7"
+          className="absolute h-6 w-6 opacity-0 md:h-7 md:w-7 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -161,13 +152,6 @@ export default function ChatWidget() {
             d="M6 18L18 6M6 6l12 12"
           />
         </svg>
-
-        {/* New Message Indicator */}
-        {hasNewMessage && !isOpen && (
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold">
-            1
-          </span>
-        )}
       </button>
 
       {/* Chat Drawer Portal */}
