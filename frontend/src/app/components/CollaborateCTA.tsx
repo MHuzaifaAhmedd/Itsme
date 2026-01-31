@@ -408,7 +408,7 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
         >
           {/* Primary Button - Solid */}
           <a
-            href="mailto:hello@studio.com"
+            href="mailto:ahmedhuzaifa451@gmail.com"
             className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-neutral-50 px-6 text-xs font-medium uppercase tracking-[0.2em] text-neutral-950 transition-all duration-250 ease-out hover:scale-[1.03] hover:shadow-[0_8px_30px_rgba(255,255,255,0.12)] sm:h-13 sm:px-8 sm:text-sm"
           >
             <span className="relative z-10">Start a project</span>

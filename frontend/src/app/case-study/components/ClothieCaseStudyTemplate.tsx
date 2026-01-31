@@ -256,7 +256,7 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
             </p>
             <div className="flex items-center gap-4 text-sm text-neutral-500">
               <a
-                href="https://github.com"
+                href="https://github.com/MHuzaifaAhmedd/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition duration-200 hover:text-neutral-300"
@@ -265,7 +265,7 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
               </a>
               <span className="h-1 w-1 rounded-full bg-neutral-700" />
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/huzaifa-ahmed-38755b1b7/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition duration-200 hover:text-neutral-300"
@@ -274,7 +274,7 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
               </a>
               <span className="h-1 w-1 rounded-full bg-neutral-700" />
               <a
-                href="mailto:hello@studio.com"
+                href="mailto:ahmedhuzaifa451@gmail.com"
                 className="transition duration-200 hover:text-neutral-300"
               >
                 Email

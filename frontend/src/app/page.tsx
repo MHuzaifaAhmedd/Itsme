@@ -1008,7 +1008,7 @@ export default function Home() {
               </a>
               <span className="h-1 w-1 rounded-full bg-neutral-700" />
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/huzaifa-ahmed-38755b1b7/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="transition duration-200 hover:text-neutral-300"

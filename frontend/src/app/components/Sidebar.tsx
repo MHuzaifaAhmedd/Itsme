@@ -321,7 +321,7 @@ export default function Sidebar({ contentRef }: SidebarProps) {
               </div>
               <div className="flex gap-3">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/MHuzaifaAhmedd/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900/50 text-neutral-400 transition-all hover:border-neutral-700 hover:bg-neutral-800 hover:text-neutral-200"
@@ -332,7 +332,7 @@ export default function Sidebar({ contentRef }: SidebarProps) {
                   </svg>
                 </a>
                 <a
-                  href="https://linkedin.com"
+                  href="https://www.linkedin.com/in/huzaifa-ahmed-38755b1b7/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900/50 text-neutral-400 transition-all hover:border-neutral-700 hover:bg-neutral-800 hover:text-neutral-200"
@@ -343,7 +343,7 @@ export default function Sidebar({ contentRef }: SidebarProps) {
                   </svg>
                 </a>
                 <a
-                  href="mailto:hello@studio.com"
+                  href="mailto:ahmedhuzaifa451@gmail.com"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900/50 text-neutral-400 transition-all hover:border-neutral-700 hover:bg-neutral-800 hover:text-neutral-200"
                   aria-label="Email"
                 >
