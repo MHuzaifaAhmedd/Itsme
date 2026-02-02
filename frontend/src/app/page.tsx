@@ -805,7 +805,7 @@ export default function Home() {
               ref={eyebrowRef}
               className="text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-[0.25em] xs:tracking-[0.3em] sm:tracking-[0.5em] text-neutral-400"
             >
-              Product designer &amp; engineer
+              Software Engineer &amp; Full Stack Developer
             </p>
             <h1
               ref={headlineRef}
@@ -995,7 +995,7 @@ export default function Home() {
         >
           <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 text-center">
             <p className="text-sm text-neutral-500">
-              © 2024 Portfolio Studio. All rights reserved.
+              © {new Date().getFullYear()} Muhammad Huzaifa Ahmed. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-sm text-neutral-500">
               <a

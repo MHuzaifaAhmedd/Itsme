@@ -16,3 +16,10 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# Deployment (keep out of repo to avoid committing secrets)
+DEPLOYMENT-Backend.md
+DEPLOYMENT-Frontend.md
+DEPLOYMENT-Portfolio.md
+DOMAIN-SETUP.md
+deployment/

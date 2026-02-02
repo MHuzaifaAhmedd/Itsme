@@ -1,0 +1,41 @@
+# Virtual environment
+venv
+.venv
+env
+.env
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Env files
+.env
+.env.*
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Documentation
+*.md
+
+# Data (if large)
+# data/
+
+# Logs
+*.log

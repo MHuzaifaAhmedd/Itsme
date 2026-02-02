@@ -1,9 +1,9 @@
 {
   "owner": {
-    "name": "Portfolio Owner",
-    "title": "Full-Stack Developer & System Architect",
-    "bio": "I'm a full-stack developer specializing in building enterprise-grade web applications. I focus on creating scalable, secure, and performant systems using modern technologies like Next.js, React, Node.js, and MongoDB. I have experience architecting complex systems with real-time capabilities, multi-tenant architectures, and GDPR-compliant data management.",
-    "location": "Available for remote work worldwide"
+    "name": "Muhammad Huzaifa Ahmed",
+    "title": "Software Engineer | Full Stack Developer",
+    "bio": "Full-Stack Developer with 1.5+ years of experience building scalable, production-grade applications using MERN, Next.js, Django, and AWS, with a strong focus on clean architecture, secure APIs, microservices, and high-performance SaaS systems.",
+    "location": "Karachi, Pakistan (Open to Remote)"
   },
   "projects": [
     {

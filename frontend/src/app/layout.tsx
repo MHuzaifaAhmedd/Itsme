@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio Website",
-  description: "My personal portfolio website",
+  title: "Muhammad Huzaifa Ahmed - Full Stack Developer",
+  description: "Portfolio of Muhammad Huzaifa Ahmed — Software Engineer & Full Stack Developer. MERN, Next.js, Django, AWS. Karachi, Pakistan. Open to remote.",
 };
 
 export default function RootLayout({
