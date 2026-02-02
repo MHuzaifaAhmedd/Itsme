@@ -1,0 +1,247 @@
+{
+  "projectMeta": {
+    "name": "Sharaf ul Quran",
+    "domain": "Islamic education platform - connecting students with Quran teachers (Qaris) for online learning",
+    "purpose": "Full-stack platform for Quran teaching: student/Qari registration, onboarding, one-time and monthly booking, course enrollment with subscription payments, meeting scheduling (Google Meet), recording (Fireflies.ai), resource sharing, and admin oversight",
+    "year": "",
+    "role": "",
+    "techStack": [
+      "React 18",
+      "Vite 5",
+      "React Router 7",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Redux Toolkit (Admin frontend)",
+      "TanStack React Query (Admin frontend)",
+      "ECharts (Admin frontend)",
+      "Node.js",
+      "Express 4",
+      "PostgreSQL",
+      "Stripe",
+      "Google OAuth2 / Calendar API",
+      "Facebook OAuth",
+      "Fireflies.ai",
+      "Socket.io",
+      "Nodemailer",
+      "WhatsApp Cloud API",
+      "Docker",
+      "Nginx"
+    ]
+  },
+
+  "problemStatement": {
+    "context": "Platform for Quran education requiring coordination between students, Qaris, and admins; payment handling; session scheduling with meeting links; and access control to learning resources.",
+    "userPainPoints": [
+      "Students need to find Qaris, book sessions, pay, and access resources",
+      "Qaris need onboarding approval, availability setup, earnings tracking, resource uploads",
+      "Admins need to approve onboarding, manage enrollments, assign slots, view stats"
+    ],
+    "existingSolutionsLimitations": []
+  },
+
+  "goalsAndMetrics": {
+    "goals": [],
+    "successMetrics": []
+  },
+
+  "userFlow": [
+    { "step": "Landing", "description": "User visits public landing page" },
+    { "step": "Register", "description": "User registers as student or Qari with email/password or OAuth" },
+    { "step": "Onboarding", "description": "Qari submits onboarding form; Student submits onboarding form with guardian info" },
+    { "step": "Review", "description": "Admin reviews onboarding; user sees under-review or approved/rejected" },
+    { "step": "Booking (one-time)", "description": "Student selects Qari, slot; pays via Stripe; receives Meet link and notifications" },
+    { "step": "Monthly enrollment", "description": "Student selects Qari, package (5/6 days), slot; pays first month; sessions generated" },
+    { "step": "Course enrollment", "description": "Student enrolls in course; admin approves and assigns slot; student pays monthly" },
+    { "step": "Portal", "description": "Student accesses portal (overview, Quran, resources); Qari accesses Qari dashboard (overview, appointments, availability, earnings, resources)" },
+    { "step": "Resources", "description": "Qari uploads lessons/PDFs/videos; Student accesses resources for Qaris with paid bookings" }
+  ],
+
+  "systemArchitecture": {
+    "frontend": [
+      "Main Frontend (React, Vite) - Student and Qari portals",
+      "Admin Frontend (React, Vite, Redux, React Query) - Admin dashboard"
+    ],
+    "backend": [
+      "Main Backend (Node/Express) - Auth, calendar, payment, resources, courses, monthly booking",
+      "Admin Backend (Node/Express) - Admin auth, Qari/student management, stats, courses"
+    ],
+    "services": [
+      "Stripe (payments, webhooks)",
+      "Google Calendar API (Meet links)",
+      "Fireflies.ai (recording, transcription)",
+      "Gmail SMTP (Nodemailer)",
+      "WhatsApp Cloud API",
+      "Socket.io (real-time)"
+    ],
+    "databases": [
+      "PostgreSQL (Neon in production)"
+    ],
+    "externalIntegrations": [
+      "Stripe webhooks (payment_intent.succeeded, payment_intent.payment_failed, charge.refunded)",
+      "Fireflies webhook",
+      "Google OAuth2 callback",
+      "Facebook OAuth callback"
+    ]
+  },
+
+  "dataFlow": [
+    { "from": "Frontend", "to": "Backend", "data": "Auth credentials, booking payload, enrollment payload", "trigger": "User login, book slot, enroll" },
+    { "from": "Backend", "to": "Stripe", "data": "PaymentIntent creation, customer creation", "trigger": "Booking payment, course payment" },
+    { "from": "Stripe", "to": "Backend", "data": "Webhook event (payment_intent.succeeded, etc.)", "trigger": "Payment completion" },
+    { "from": "Backend", "to": "PostgreSQL", "data": "User, booking, enrollment, payment records", "trigger": "All write operations" },
+    { "from": "Backend", "to": "Google Calendar API", "data": "Event creation request", "trigger": "Booking confirmed, session notification" },
+    { "from": "Backend", "to": "SMTP", "data": "Email (booking confirmation, payment, notification)", "trigger": "Booking, payment, cron" },
+    { "from": "Backend", "to": "WhatsApp", "data": "Template message", "trigger": "Booking confirmation, payment confirmation" },
+    { "from": "Fireflies", "to": "Backend", "data": "Webhook event", "trigger": "Recording/transcript ready" },
+    { "from": "Backend", "to": "Frontend", "data": "Socket event (booking update)", "trigger": "Booking created/updated/cancelled" }
+  ],
+
+  "coreFeatures": [
+    {
+      "name": "Authentication",
+      "whatItDoes": "Email/password and OAuth (Google, Facebook) registration and login; JWT in httpOnly cookie; role-based access",
+      "implementationLocation": "Backend/src/controllers/authController.js, authRoutes.js, middlewares/authMiddleware.js; Frontend/src/hooks/useAuth.js",
+      "implementationSummary": "bcrypt for passwords; JWT with userId, role; cookie + Bearer fallback; profile fetch for cookie auth"
+    },
+    {
+      "name": "Qari Onboarding",
+      "whatItDoes": "Qaris submit personal, educational, availability data; admin approves or rejects",
+      "implementationLocation": "Backend/src/routes/onboardingRoutes.js, OnboardingModel.js; Frontend/src/components/Onboarding/; Admin-backend adminOnboardingRoutes",
+      "implementationSummary": "qari_onboarding table; availability_data JSONB; certificate upload; status: pending/submitted/approved/rejected"
+    },
+    {
+      "name": "Student Onboarding",
+      "whatItDoes": "Students submit personal, guardian, level data; admin approves or rejects",
+      "implementationLocation": "Backend/src/routes/studentOnboardingRoutes.js, StudentOnboardingModel.js; Admin-backend adminStudentOnboardingRoutes",
+      "implementationSummary": "student_onboarding table; guardian_cnic, student_level; CNIC validation"
+    },
+    {
+      "name": "One-Time Booking",
+      "whatItDoes": "Students book single sessions; Stripe payment; Google Meet link; email and WhatsApp notifications",
+      "implementationLocation": "Backend app.js (Stripe webhook), calendarRoutes, paymentRoutes; utils/googleMeet.js, emailService.js, whatsappService.js",
+      "implementationSummary": "payment_intents; calendar_bookings; createGoogleCalendarEventWithMeet; Stripe webhook updates status and sends notifications"
+    },
+    {
+      "name": "Monthly Enrollment",
+      "whatItDoes": "Recurring monthly plans (5 or 6 days/week); Qari availability; session generation",
+      "implementationLocation": "Backend/monthlyBookingRoutes, monthlyAvailabilityService, monthlySessionGenerator; Frontend QariAvailability, BookingManager",
+      "implementationSummary": "qari_monthly_availability, monthly_slots, monthly_enrollments, monthly_sessions; package-based enrollment"
+    },
+    {
+      "name": "Course Enrollment",
+      "whatItDoes": "Multi-month courses; admin approval and slot assignment; monthly Stripe payments; course_sessions",
+      "implementationLocation": "Backend courseRoutes, courseController, courseWebhookService, enrollmentStateMachine; Frontend CourseEnrollmentReview, CoursePayment",
+      "implementationSummary": "courses, course_enrollments, course_payments, course_sessions; state machine (pending_approval→approved_unpaid→active→completed); idempotent webhooks"
+    },
+    {
+      "name": "Resource Management",
+      "whatItDoes": "Qaris upload lessons, PDFs, session videos; students access only with paid booking",
+      "implementationLocation": "Backend resourceRoutes, resourcesController, resourceAccessMiddleware; Frontend Resources, StudentResources",
+      "implementationSummary": "qari_resources; resource_type: lesson/pdf/session_video; middleware checks booking for students"
+    },
+    {
+      "name": "Meeting Recordings",
+      "whatItDoes": "Fireflies.ai records and transcribes meetings; webhook and polling for status",
+      "implementationLocation": "Backend firefliesRoutes, firefliesService, firefliesWebhookHandlers, firefliesPolling job",
+      "implementationSummary": "meeting_recordings; Fireflies webhook; polling for transcript/audio/video URLs"
+    },
+    {
+      "name": "Admin Panel",
+      "whatItDoes": "Overview, Qari/student management, appointments, transactions, course enrollments, settings",
+      "implementationLocation": "Admin-frontend App.jsx, AdminSidebar, AdminPanel, AdminQari, AdminStudents, etc.; Admin-backend routes",
+      "implementationSummary": "Redux auth; admin-only routes; stats with 30s cache; certificate serving; admin users in users table (role=admin)"
+    },
+    {
+      "name": "Session Notifications",
+      "whatItDoes": "Cron job sends email 1 hour before monthly and course sessions; creates Meet link if missing",
+      "implementationLocation": "Backend/jobs/monthlySessionNotificationJob.js",
+      "implementationSummary": "node-cron every 5 minutes; finds sessions in 55-65 min window; creates Meet, sends emails"
+    }
+  ],
+
+  "technicalChallenges": [
+    {
+      "challenge": "Stripe webhook requires raw body for signature verification",
+      "whyItWasHard": "express.json() parses body and breaks signature verification",
+      "solution": "Fireflies and Stripe webhook routes registered before express.json(); use express.raw() for those routes"
+    },
+    {
+      "challenge": "Course webhook idempotency and concurrent processing",
+      "whyItWasHard": "Stripe can retry; multiple workers could process same event",
+      "solution": "webhook_events table; claimForProcessing atomic lock; mark processed/failed with retry count"
+    },
+    {
+      "challenge": "Resource access control for students",
+      "whyItWasHard": "Students should only access resources for Qaris they have paid bookings with",
+      "solution": "resourceAccessMiddleware extracts qariId from path; queries calendar_bookings for student; denies if no paid booking"
+    },
+    {
+      "challenge": "Admin tokens on main backend",
+      "whyItWasHard": "Admin and student/qari share auth tables but different backends",
+      "solution": "Main backend explicitly rejects admin tokens; returns 403 and clears cookie"
+    },
+    {
+      "challenge": "Gmail OAuth token expiry",
+      "whyItWasHard": "Google Meet creation uses OAuth; access token expires",
+      "solution": "GOOGLE_REFRESH_TOKEN in env; oAuth2Client.setCredentials with refresh_token; token refresh on use"
+    }
+  ],
+
+  "performanceAndSecurity": {
+    "performanceOptimizations": [
+      "Admin stats in-memory cache with 30s-2min TTL",
+      "PostgreSQL indexes on bookings, enrollments, payments, sessions, availability",
+      "Connection pooling (pg)",
+      "File streaming for certificates and resources",
+      "Rate limiting (express-rate-limit)"
+    ],
+    "securityConsiderations": [
+      "JWT in httpOnly cookie",
+      "bcrypt password hashing",
+      "express-validator on auth inputs",
+      "Resource access middleware for file serving",
+      "CORS with allowed origins",
+      "Parameterized SQL (pg)",
+      "Helmet in admin backend"
+    ],
+    "errorHandling": [
+      "PostgreSQL 23505 (unique), 23503 (FK) in errorHandler",
+      "Stripe webhook signature verification",
+      "Fireflies webhook verification",
+      "401/403 for auth failures",
+      "Course webhook returns 200 on processing error to avoid Stripe retry storms"
+    ]
+  },
+
+  "visualAndUXDecisions": {
+    "uiPatternsObserved": [
+      "Modal-based login/register",
+      "Sidebar navigation for portal and admin",
+      "Skeleton loaders during auth check",
+      "Toast for success/error messages",
+      "Role-based redirects (Qari → /qari/overview, Student → /portal)",
+      "Page skeleton instead of full-page loader when reloading authenticated pages"
+    ],
+    "interactionLogic": [
+      "OAuth callback cleans URL and fetches profile",
+      "Legacy route redirects (/wari→/qari, /qari/quran-resources→/qari/resources)",
+      "Onboarding status determines redirect (submitted→under-review, approved→dashboard)"
+    ]
+  },
+
+  "outcomeAndImpact": {
+    "actualResults": [],
+    "limitations": [
+      "No automated tests",
+      "Helmet disabled in main backend",
+      "Admin stats cache is in-memory (lost on restart)",
+      "Calendly integration may be partial/legacy",
+      "ML/AI not implemented",
+      "Credentials in deployment docs (should use secrets)"
+    ]
+  },
+
+  "learnings": [],
+
+  "futureImprovements": []
+}

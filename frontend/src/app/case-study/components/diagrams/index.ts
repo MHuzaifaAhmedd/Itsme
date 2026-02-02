@@ -16,3 +16,9 @@ export { default as WhatsAppFunnelDiagramLoader } from './WhatsAppFunnelDiagramL
 export { default as WhatsAppFunnelDiagramWithExplanation } from './WhatsAppFunnelDiagramWithExplanation';
 export { default as WhatsAppFunnelCaseStudyDiagram } from './WhatsAppFunnelCaseStudyDiagram';
 export { whatsappFunnelDiagramExplanations } from './whatsappfunnelExplanations';
+
+// Sharaf ul Quran exports
+export { default as SharafulQuranDiagramLoader } from './SharafulQuranDiagramLoader';
+export { default as SharafulQuranDiagramWithExplanation } from './SharafulQuranDiagramWithExplanation';
+export { default as SharafulQuranCaseStudyDiagram } from './SharafulQuranCaseStudyDiagram';
+export { sharafulQuranDiagramExplanations } from './sharafulQuranExplanations';

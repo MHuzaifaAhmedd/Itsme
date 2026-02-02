@@ -1,0 +1,188 @@
+{
+  "version": "1.0.0",
+  "projectName": "Sharaf ul Quran",
+  "diagrams": [
+    {
+      "id": "system-architecture",
+      "title": "System Architecture Diagram",
+      "description": "High-level topology: main and admin frontends, main and admin backends, PostgreSQL, and external services (Stripe, Google, Fireflies, SMTP, WhatsApp, Socket.io).",
+      "nodes": [
+        { "id": "main-frontend", "label": "Main Frontend", "type": "frontend", "group": "frontend", "metadata": { "tech": "React 18, Vite 5, React Router 7", "portals": "Student + Qari" } },
+        { "id": "admin-frontend", "label": "Admin Frontend", "type": "frontend", "group": "frontend", "metadata": { "tech": "React, Vite, Redux, React Query, ECharts" } },
+        { "id": "main-backend", "label": "Main Backend", "type": "backend", "group": "backend", "metadata": { "tech": "Node.js, Express 4", "responsibilities": "Auth, calendar, payment, resources, courses, monthly booking" } },
+        { "id": "admin-backend", "label": "Admin Backend", "type": "backend", "group": "backend", "metadata": { "tech": "Node.js, Express 4", "responsibilities": "Admin auth, Qari/student management, stats, courses" } },
+        { "id": "postgresql", "label": "PostgreSQL", "type": "db", "group": "data", "metadata": { "hosting": "Neon in production" } },
+        { "id": "stripe", "label": "Stripe", "type": "external", "group": "external", "metadata": { "purpose": "Payments, webhooks" } },
+        { "id": "google-calendar", "label": "Google Calendar API", "type": "external", "group": "external", "metadata": { "purpose": "Meet links" } },
+        { "id": "fireflies", "label": "Fireflies.ai", "type": "external", "group": "external", "metadata": { "purpose": "Recording, transcription, webhook" } },
+        { "id": "smtp", "label": "Gmail SMTP (Nodemailer)", "type": "external", "group": "external", "metadata": { "purpose": "Email notifications" } },
+        { "id": "whatsapp", "label": "WhatsApp Cloud API", "type": "external", "group": "external", "metadata": { "purpose": "Booking/payment notifications" } },
+        { "id": "socket-io", "label": "Socket.io", "type": "service", "group": "backend", "metadata": { "purpose": "Real-time booking/availability updates" } },
+        { "id": "google-oauth", "label": "Google OAuth2", "type": "external", "group": "external", "metadata": { "purpose": "Auth, Calendar" } },
+        { "id": "facebook-oauth", "label": "Facebook OAuth", "type": "external", "group": "external", "metadata": { "purpose": "Social login" } }
+      ],
+      "edges": [
+        { "source": "main-frontend", "target": "main-backend", "label": "HTTP (cookie/Bearer)" },
+        { "source": "admin-frontend", "target": "admin-backend", "label": "HTTP (cookie/Bearer)" },
+        { "source": "main-backend", "target": "postgresql", "label": "Read/Write" },
+        { "source": "admin-backend", "target": "postgresql", "label": "Read/Write" },
+        { "source": "main-backend", "target": "stripe", "label": "PaymentIntent, customer" },
+        { "source": "stripe", "target": "main-backend", "label": "Webhook (payment_intent.*, charge.refunded)" },
+        { "source": "main-backend", "target": "google-calendar", "label": "Create event (Meet)" },
+        { "source": "main-backend", "target": "smtp", "label": "Email" },
+        { "source": "main-backend", "target": "whatsapp", "label": "Template message" },
+        { "source": "fireflies", "target": "main-backend", "label": "Webhook (recording/transcript)" },
+        { "source": "main-backend", "target": "socket-io", "label": "Emit" },
+        { "source": "socket-io", "target": "main-frontend", "label": "Booking/availability events" },
+        { "source": "main-frontend", "target": "google-oauth", "label": "OAuth redirect" },
+        { "source": "google-oauth", "target": "main-backend", "label": "Callback" },
+        { "source": "main-frontend", "target": "facebook-oauth", "label": "OAuth redirect" },
+        { "source": "facebook-oauth", "target": "main-backend", "label": "Callback" }
+      ]
+    },
+    {
+      "id": "authentication-flow",
+      "title": "Authentication Flow Diagram",
+      "description": "Auth path: register/login (email or OAuth), token issuance, profile fetch, role-based redirect; main backend rejects admin tokens.",
+      "nodes": [
+        { "id": "user", "label": "User", "type": "frontend", "group": "client" },
+        { "id": "main-fe-auth", "label": "Main Frontend", "type": "frontend", "group": "frontend" },
+        { "id": "main-be-auth", "label": "Main Backend", "type": "backend", "group": "backend" },
+        { "id": "admin-fe-auth", "label": "Admin Frontend", "type": "frontend", "group": "frontend" },
+        { "id": "admin-be-auth", "label": "Admin Backend", "type": "backend", "group": "backend" },
+        { "id": "db-auth", "label": "PostgreSQL (users)", "type": "db", "group": "data" },
+        { "id": "google-oauth-auth", "label": "Google OAuth", "type": "external", "group": "external" },
+        { "id": "facebook-oauth-auth", "label": "Facebook OAuth", "type": "external", "group": "external" }
+      ],
+      "edges": [
+        { "source": "user", "target": "main-fe-auth", "label": "Register/Login" },
+        { "source": "main-fe-auth", "target": "main-be-auth", "label": "Credentials or OAuth callback" },
+        { "source": "main-fe-auth", "target": "google-oauth-auth", "label": "OAuth redirect" },
+        { "source": "main-fe-auth", "target": "facebook-oauth-auth", "label": "OAuth redirect" },
+        { "source": "google-oauth-auth", "target": "main-be-auth", "label": "Callback" },
+        { "source": "facebook-oauth-auth", "target": "main-be-auth", "label": "Callback" },
+        { "source": "main-be-auth", "target": "db-auth", "label": "Create/verify user" },
+        { "source": "main-be-auth", "target": "main-fe-auth", "label": "JWT cookie + profile" },
+        { "source": "main-fe-auth", "target": "main-fe-auth", "label": "Redirect by role (Qari/Student)" },
+        { "source": "user", "target": "admin-fe-auth", "label": "Admin login" },
+        { "source": "admin-fe-auth", "target": "admin-be-auth", "label": "Credentials" },
+        { "source": "admin-be-auth", "target": "db-auth", "label": "Verify admin user" },
+        { "source": "admin-be-auth", "target": "admin-fe-auth", "label": "JWT cookie" },
+        { "source": "main-be-auth", "target": "main-fe-auth", "label": "403 + clear cookie if admin token" }
+      ]
+    },
+    {
+      "id": "core-feature-lifecycle-booking",
+      "title": "Core Feature Lifecycle — One-Time Booking",
+      "description": "Flow from slot selection to payment intent, webhook confirmation, Meet link creation, and notifications.",
+      "nodes": [
+        { "id": "student", "label": "Student", "type": "frontend", "group": "client" },
+        { "id": "fe-booking", "label": "Main Frontend", "type": "frontend", "group": "frontend" },
+        { "id": "be-calendar", "label": "Calendar/Payment Routes", "type": "backend", "group": "backend" },
+        { "id": "stripe-booking", "label": "Stripe", "type": "external", "group": "external" },
+        { "id": "be-webhook", "label": "Stripe Webhook Handler", "type": "backend", "group": "backend" },
+        { "id": "be-meet", "label": "Google Meet Service", "type": "backend", "group": "backend" },
+        { "id": "be-email-wa", "label": "Email + WhatsApp", "type": "backend", "group": "backend" },
+        { "id": "db-booking", "label": "PostgreSQL (calendar_bookings)", "type": "db", "group": "data" }
+      ],
+      "edges": [
+        { "source": "student", "target": "fe-booking", "label": "Select Qari & slot" },
+        { "source": "fe-booking", "target": "be-calendar", "label": "Booking payload" },
+        { "source": "be-calendar", "target": "stripe-booking", "label": "Create PaymentIntent" },
+        { "source": "be-calendar", "target": "db-booking", "label": "Create booking record" },
+        { "source": "stripe-booking", "target": "be-webhook", "label": "payment_intent.succeeded" },
+        { "source": "be-webhook", "target": "db-booking", "label": "Update status" },
+        { "source": "be-webhook", "target": "be-meet", "label": "Create Meet link" },
+        { "source": "be-webhook", "target": "be-email-wa", "label": "Send confirmation" },
+        { "source": "be-meet", "target": "db-booking", "label": "Store meeting_link" }
+      ]
+    },
+    {
+      "id": "core-feature-lifecycle-course",
+      "title": "Core Feature Lifecycle — Course Enrollment",
+      "description": "Course enrollment: submit → admin approval → payment → idempotent webhook → state machine → sessions.",
+      "nodes": [
+        { "id": "student-course", "label": "Student", "type": "frontend", "group": "client" },
+        { "id": "fe-course", "label": "Main Frontend", "type": "frontend", "group": "frontend" },
+        { "id": "be-course", "label": "Course Routes / Controller", "type": "backend", "group": "backend" },
+        { "id": "admin-course", "label": "Admin Backend", "type": "backend", "group": "backend" },
+        { "id": "stripe-course", "label": "Stripe", "type": "external", "group": "external" },
+        { "id": "be-webhook-course", "label": "Course Webhook Service", "type": "backend", "group": "backend" },
+        { "id": "state-machine", "label": "Enrollment State Machine", "type": "backend", "group": "backend" },
+        { "id": "db-course", "label": "PostgreSQL (course_*, webhook_events)", "type": "db", "group": "data" }
+      ],
+      "edges": [
+        { "source": "student-course", "target": "fe-course", "label": "Enroll" },
+        { "source": "fe-course", "target": "be-course", "label": "Enrollment payload" },
+        { "source": "be-course", "target": "db-course", "label": "pending_approval" },
+        { "source": "admin-course", "target": "db-course", "label": "Approve, assign slot" },
+        { "source": "db-course", "target": "state-machine", "label": "approved_unpaid" },
+        { "source": "fe-course", "target": "be-course", "label": "Payment" },
+        { "source": "be-course", "target": "stripe-course", "label": "PaymentIntent" },
+        { "source": "stripe-course", "target": "be-webhook-course", "label": "Webhook" },
+        { "source": "be-webhook-course", "target": "db-course", "label": "claimForProcessing, idempotency" },
+        { "source": "be-webhook-course", "target": "state-machine", "label": "Transition to active" },
+        { "source": "state-machine", "target": "db-course", "label": "course_sessions, status" }
+      ]
+    },
+    {
+      "id": "data-processing-flow",
+      "title": "Data Processing Flow Diagram",
+      "description": "Data movement: Frontend ↔ Backend ↔ PostgreSQL; Backend ↔ Stripe, Google, SMTP, WhatsApp; Fireflies → Backend; Backend → Frontend via Socket.",
+      "nodes": [
+        { "id": "fe-dp", "label": "Frontend", "type": "frontend", "group": "frontend" },
+        { "id": "be-dp", "label": "Main Backend", "type": "backend", "group": "backend" },
+        { "id": "db-dp", "label": "PostgreSQL", "type": "db", "group": "data" },
+        { "id": "stripe-dp", "label": "Stripe", "type": "external", "group": "external" },
+        { "id": "google-dp", "label": "Google Calendar API", "type": "external", "group": "external" },
+        { "id": "smtp-dp", "label": "SMTP", "type": "external", "group": "external" },
+        { "id": "wa-dp", "label": "WhatsApp", "type": "external", "group": "external" },
+        { "id": "fireflies-dp", "label": "Fireflies", "type": "external", "group": "external" },
+        { "id": "socket-dp", "label": "Socket.io", "type": "service", "group": "backend" }
+      ],
+      "edges": [
+        { "source": "fe-dp", "target": "be-dp", "label": "Auth, booking, enrollment payload" },
+        { "source": "be-dp", "target": "db-dp", "label": "User, booking, enrollment, payment records" },
+        { "source": "be-dp", "target": "stripe-dp", "label": "PaymentIntent, customer" },
+        { "source": "stripe-dp", "target": "be-dp", "label": "Webhook event" },
+        { "source": "be-dp", "target": "google-dp", "label": "Event creation (Meet)" },
+        { "source": "be-dp", "target": "smtp-dp", "label": "Email" },
+        { "source": "be-dp", "target": "wa-dp", "label": "Template message" },
+        { "source": "fireflies-dp", "target": "be-dp", "label": "Webhook (recording/transcript)" },
+        { "source": "be-dp", "target": "socket-dp", "label": "Booking update event" },
+        { "source": "socket-dp", "target": "fe-dp", "label": "Real-time event" }
+      ]
+    },
+    {
+      "id": "performance-decision-flow",
+      "title": "Performance / Calculation / Decision Flow Diagram",
+      "description": "Admin stats cache (hit/miss, TTL), rate limiting, resource access middleware, file streaming; cron trigger for session notifications.",
+      "nodes": [
+        { "id": "request", "label": "Incoming Request", "type": "frontend", "group": "entry" },
+        { "id": "rate-limit", "label": "Rate Limiter", "type": "backend", "group": "backend" },
+        { "id": "cache-check", "label": "Admin Stats Cache", "type": "cache", "group": "backend" },
+        { "id": "db-query", "label": "PostgreSQL Query", "type": "db", "group": "data" },
+        { "id": "resource-middleware", "label": "Resource Access Middleware", "type": "backend", "group": "backend" },
+        { "id": "booking-check", "label": "Paid Booking Check", "type": "db", "group": "data" },
+        { "id": "file-stream", "label": "File Stream (uploads)", "type": "backend", "group": "backend" },
+        { "id": "cron", "label": "Cron (node-cron)", "type": "backend", "group": "backend" },
+        { "id": "session-notification", "label": "Session Notification Job", "type": "backend", "group": "backend" },
+        { "id": "meet-create", "label": "Create Meet if missing", "type": "external", "group": "external" }
+      ],
+      "edges": [
+        { "source": "request", "target": "rate-limit", "label": "All requests" },
+        { "source": "rate-limit", "target": "cache-check", "label": "Admin stats request" },
+        { "source": "cache-check", "target": "db-query", "label": "Cache miss (30s / 2min TTL)" },
+        { "source": "cache-check", "target": "request", "label": "Cache hit" },
+        { "source": "db-query", "target": "cache-check", "label": "Set cache" },
+        { "source": "rate-limit", "target": "resource-middleware", "label": "Resource GET" },
+        { "source": "resource-middleware", "target": "booking-check", "label": "Qari + student" },
+        { "source": "booking-check", "target": "file-stream", "label": "Allow" },
+        { "source": "booking-check", "target": "request", "label": "Deny (403)" },
+        { "source": "cron", "target": "session-notification", "label": "Every 5 min" },
+        { "source": "session-notification", "target": "db-query", "label": "Sessions in 55–65 min" },
+        { "source": "session-notification", "target": "meet-create", "label": "If Meet missing" }
+      ]
+    }
+  ]
+}

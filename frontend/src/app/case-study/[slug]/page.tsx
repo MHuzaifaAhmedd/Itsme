@@ -7,6 +7,7 @@ import CaseStudyTemplate from "../components/CaseStudyTemplate";
 import EMSCaseStudyTemplate from "../components/EMSCaseStudyTemplate";
 import ClothieCaseStudyTemplate from "../components/ClothieCaseStudyTemplate";
 import WhatsAppFunnelCaseStudyTemplate from "../components/WhatsAppFunnelCaseStudyTemplate";
+import SharafulQuranCaseStudyTemplate from "../components/SharafulQuranCaseStudyTemplate";
 
 /**
  * Dynamic Case Study Page
@@ -20,6 +21,7 @@ import WhatsAppFunnelCaseStudyTemplate from "../components/WhatsAppFunnelCaseStu
  * - EMS: Employee Management System
  * - Naba Hussam: Clothie E-commerce Platform
  * - WhatsApp Funnel: Lead Management System
+ * - Sharaf ul Quran: Quranic Platform
  */
 export default function CaseStudyPage() {
   const params = useParams();
@@ -62,6 +64,11 @@ export default function CaseStudyPage() {
   // Use WhatsApp Funnel-specific template for whatsapp-funnel-lead-management-system
   if (slug === 'whatsapp-funnel-lead-management-system') {
     return <WhatsAppFunnelCaseStudyTemplate data={project} />;
+  }
+
+  // Use Sharaf ul Quran-specific template for sharaf-ul-quran
+  if (slug === 'sharaf-ul-quran') {
+    return <SharafulQuranCaseStudyTemplate data={project} />;
   }
 
   return <CaseStudyTemplate data={project} />;
