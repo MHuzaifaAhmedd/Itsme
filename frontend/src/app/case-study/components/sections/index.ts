@@ -5,6 +5,7 @@
  */
 
 export { default as CaseStudyHero } from './CaseStudyHero';
+export { default as CaseStudySummary } from './CaseStudySummary';
 export { default as ProblemStatement } from './ProblemStatement';
 export { default as GoalsMetrics } from './GoalsMetrics';
 export { default as UserFlowDiagram } from './UserFlowDiagram';

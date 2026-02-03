@@ -42,6 +42,23 @@ export const caseStudies: Record<string, CaseStudyData> = {
       },
       heroImage: '/images/p2.jpg',
     },
+    summary: {
+      overview: 'The Employee Management System (EMS) is an enterprise-grade HR platform built to solve workforce management at scale. This case study documents the architecture, technical decisions, and outcomes of a system that achieved 95% API performance improvement, 85%+ cache hit rate, and automated management for thousands of employees.',
+      sections: [
+        {
+          title: 'The Problem',
+          content: 'Organizations struggled with manual HR processes: error-prone attendance tracking, leave management through emails, subjective performance evaluation, scattered documents, and no real-time communication. Existing solutions were costly, inflexible, and lacked biometric integration.',
+        },
+        {
+          title: 'The Solution',
+          content: 'A micro-frontend architecture with three Next.js portals (Employee, Admin, SuperAdmin) plus React Native mobile app, all connected to a centralized Express backend. Key innovations include Redis caching, WebSocket real-time updates, ZKTeco biometric integration, IP geofencing, and GDPR-compliant data retention.',
+        },
+        {
+          title: 'Key Outcomes',
+          content: '95% improvement in API response times (2-3s → 50-200ms), 85%+ cache hit rate, 60% reduction in database queries, 30-40% storage cost reduction, and 95%+ anomaly detection accuracy. The system supports 4 user roles with granular permissions and delivers real-time updates within milliseconds.',
+        },
+      ],
+    },
     problem: {
       context: 'Organizations were facing significant challenges in managing their workforce efficiently. Traditional HR processes relied heavily on manual paperwork, spreadsheets, and disconnected systems, creating operational inefficiencies and security vulnerabilities. Manual attendance tracking was error-prone, leave management through emails made balance tracking difficult, performance evaluation was subjective, and employee documents were scattered across physical files and multiple systems.',
       painPoints: [
@@ -460,6 +477,23 @@ export const caseStudies: Record<string, CaseStudyData> = {
       ctas: {},
       heroImage: '/images/p1.jpg',
     },
+    summary: {
+      overview: 'Sharaf ul Quran is a full-stack Islamic education platform connecting students with Quran teachers (Qaris). This case study covers the architecture for one-time and monthly booking, course enrollment with Stripe, Google Meet integration, Fireflies.ai recording, and comprehensive admin oversight.',
+      sections: [
+        {
+          title: 'The Challenge',
+          content: 'The platform needed to coordinate students, Qaris, and admins across registration, payment handling, session scheduling with meeting links, and access control to learning resources. Students needed to find Qaris, book sessions, and pay; Qaris needed onboarding, availability setup, and earnings tracking; admins needed approval workflows and enrollment management.',
+        },
+        {
+          title: 'The Approach',
+          content: 'Dual backends (main + admin) with shared PostgreSQL and role-separated auth. Webhook-driven Stripe payment confirmation, idempotent course payment handling, and an enrollment state machine (pending_approval → approved_unpaid → active → completed). Session notification cron, in-memory admin stats cache with TTL, and resource gating based on paid bookings.',
+        },
+        {
+          title: 'Key Deliverables',
+          content: 'Student/Qari registration with admin approval, one-time and monthly booking with Google Meet, course enrollment with slot assignment, Fireflies.ai meeting recordings, and a comprehensive admin panel for oversight and analytics.',
+        },
+      ],
+    },
     problem: {
       context:
         'Platform for Quran education requiring coordination between students, Qaris, and admins; payment handling; session scheduling with meeting links; and access control to learning resources.',
@@ -711,6 +745,23 @@ export const caseStudies: Record<string, CaseStudyData> = {
       year: '2024-2025',
       ctas: {},
       heroImage: '/images/p3.jpg',
+    },
+    summary: {
+      overview: 'WhatsApp Funnel is a multi-channel lead management platform that consolidates WhatsApp, Facebook Lead Ads, Walk-in QR codes, and Webhook leads into a unified conversation system. This case study documents the visual flow automation, real-time Socket.IO updates, and configurable round-robin team assignment algorithms.',
+      sections: [
+        {
+          title: 'The Problem',
+          content: 'Businesses face fragmented lead sources—WhatsApp inbound, Facebook Lead Ads, walk-in captures, webhooks—each requiring different ingestion patterns. Existing solutions force single-channel workflows, lack intelligent assignment algorithms, provide no visual automation, and offer poor real-time visibility into conversation status.',
+        },
+        {
+          title: 'The Solution',
+          content: 'A unified platform with multi-channel lead ingestion, configurable round-robin and biased round-robin assignment algorithms, visual flow automation using React Flow (no code deployment), real-time updates via Socket.IO and FCM, and role-based access control at the conversation level. Supports multiple businesses, team members, and WhatsApp numbers.',
+        },
+        {
+          title: 'Key Outcomes',
+          content: 'Single interface for all lead sources, automated fair workload distribution, visual flow builder for non-developers, real-time conversation status across web and mobile, and large-scale CSV imports (up to 100MB) with background job processing.',
+        },
+      ],
     },
     problem: {
       context: 'Businesses operating at scale face a critical operational challenge: managing high-volume customer conversations across multiple acquisition channels while maintaining fair workload distribution among team members and ensuring no lead falls through the cracks. The WhatsApp Business ecosystem presents unique constraints with real-time handling requirements and strict platform API limitations.',
@@ -1092,6 +1143,23 @@ export const caseStudies: Record<string, CaseStudyData> = {
         live: 'https://nabahussam.com',
       },
       heroImage: '/images/p4.jpg',
+    },
+    summary: {
+      overview: 'Clothie (Naba Hussam) is a custom e-commerce platform for a Pakistani fashion brand supporting both ready-to-wear and made-to-order products. This case study covers local payment methods (COD, Bank Transfer), guest checkout with automatic account linking, and comprehensive admin management.',
+      sections: [
+        {
+          title: 'The Challenge',
+          content: 'The brand needed to sell through two distinct models: ready-to-wear with immediate fulfillment, and made-to-order with custom sizing and deposit-based payment plans. Local payment preferences (COD, Bank Transfer) were essential for the Pakistani market. Guest checkout with automatic order linking was required for reduced friction.',
+        },
+        {
+          title: 'The Approach',
+          content: 'Complete e-commerce platform with distinct checkout flows for RTW and MTO products. COD and Bank Transfer payment methods, dynamic category/subcategory management, guest checkout with automatic order linking when accounts are created, AWS S3 for image storage, and comprehensive admin panel for products, orders, and settings.',
+        },
+        {
+          title: 'Key Deliverables',
+          content: 'Dual product types (RTW/MTO) with appropriate workflows, local payment methods, size charts for custom orders, regional shipping (within/outside Karachi), product add-ons support, and GA4-compatible e-commerce analytics.',
+        },
+      ],
     },
     problem: {
       context: 'A Pakistani fashion brand (Naba Hussam) required a custom e-commerce platform to sell women\'s clothing through two distinct business models: ready-to-wear (RTW) products with immediate fulfillment, and made-to-order (MTO) products with custom sizing and deposit-based payment plans. The platform needed to accommodate local payment preferences—specifically Cash on Delivery and Bank Transfer—while supporting guest checkout for reduced friction and automatic account linking for order history preservation.',

@@ -10,6 +10,7 @@ import { getNextCaseStudy } from "../data/caseStudies";
 
 // Import all section components
 import CaseStudyHero from "./sections/CaseStudyHero";
+import CaseStudySummary from "./sections/CaseStudySummary";
 import ProblemStatement from "./sections/ProblemStatement";
 import GoalsMetrics from "./sections/GoalsMetrics";
 import UserFlowDiagram from "./sections/UserFlowDiagram";
@@ -45,12 +46,15 @@ interface CaseStudyTemplateProps {
 export default function CaseStudyTemplate({ data }: CaseStudyTemplateProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const fullContentRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const nextProject = getNextCaseStudy(data.slug);
   
   // State for intro animation
   const [showIntro, setShowIntro] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
+  // If summary exists, hide full case study until user clicks "View whole case study"
+  const [showFullCaseStudy, setShowFullCaseStudy] = useState(!data.summary);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -147,6 +151,32 @@ export default function CaseStudyTemplate({ data }: CaseStudyTemplateProps) {
     router.push("/#projects");
   };
 
+  const handleViewFullCaseStudy = useCallback(() => {
+    setShowFullCaseStudy(true);
+    // Animate full content in and scroll to it
+    requestAnimationFrame(() => {
+      if (fullContentRef.current) {
+        gsap.fromTo(
+          fullContentRef.current,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            onComplete: () => {
+              fullContentRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+              ScrollTrigger.refresh();
+            },
+          }
+        );
+      }
+    });
+  }, []);
+
   return (
     <div ref={rootRef} className="min-h-screen bg-neutral-950 text-white">
       {/* Premium Intro Animation */}
@@ -186,12 +216,28 @@ export default function CaseStudyTemplate({ data }: CaseStudyTemplateProps) {
           </button>
         </div>
 
-        {/* All 14 Sections */}
+        {/* Main Content Flow: Hero → Summary (if exists) → Full Case Study */}
         <main className="relative">
         {/* 1. Hero Section */}
         <CaseStudyHero data={data.hero} />
 
-        {/* 2. Problem Statement */}
+        {/* 2. Summary Section (1-2 pages) - shown when summary exists */}
+        {data.summary && !showFullCaseStudy && (
+          <CaseStudySummary
+            data={data.summary}
+            onViewFullCaseStudy={handleViewFullCaseStudy}
+          />
+        )}
+
+        {/* 3-16. Full Case Study Sections - shown when no summary or user clicked "View whole" */}
+        <div
+          ref={fullContentRef}
+          style={{
+            display: showFullCaseStudy ? "block" : "none",
+            opacity: data.summary ? 0 : 1,
+          }}
+        >
+        {/* Problem Statement */}
         <ProblemStatement data={data.problem} />
 
         {/* 3. Goals & Metrics */}
@@ -229,6 +275,7 @@ export default function CaseStudyTemplate({ data }: CaseStudyTemplateProps) {
 
         {/* 14. Next Project Navigation */}
         <NextProjectNav nextProject={nextProject} />
+        </div>
       </main>
 
         {/* Footer */}

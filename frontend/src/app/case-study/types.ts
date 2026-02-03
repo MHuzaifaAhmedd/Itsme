@@ -131,6 +131,20 @@ export interface FutureImprovementsData {
 }
 
 /**
+ * Case Study Summary - Condensed 1-2 page overview
+ * Shown before full case study with "View whole case study" CTA
+ */
+export interface CaseStudySummarySection {
+  title: string;
+  content: string;
+}
+
+export interface CaseStudySummaryData {
+  overview: string; // Opening paragraph
+  sections: CaseStudySummarySection[]; // Organized summary sections
+}
+
+/**
  * Complete Case Study Data Structure
  * 
  * All 14 mandatory sections included
@@ -139,6 +153,7 @@ export interface FutureImprovementsData {
 export interface CaseStudyData {
   slug: string;
   hero: CaseStudyHeroData;
+  summary?: CaseStudySummaryData; // Optional: shown before full case study
   problem: ProblemStatementData;
   goalsMetrics: GoalsMetricsData;
   userFlow: UserFlowData;

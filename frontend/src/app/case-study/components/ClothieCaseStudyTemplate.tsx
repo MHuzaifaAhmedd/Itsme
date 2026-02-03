@@ -10,6 +10,7 @@ import { getNextCaseStudy } from "../data/caseStudies";
 
 // Import standard section components
 import CaseStudyHero from "./sections/CaseStudyHero";
+import CaseStudySummary from "./sections/CaseStudySummary";
 import ProblemStatement from "./sections/ProblemStatement";
 import GoalsMetrics from "./sections/GoalsMetrics";
 import UserFlowDiagram from "./sections/UserFlowDiagram";
@@ -57,11 +58,13 @@ interface ClothieCaseStudyTemplateProps {
 export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTemplateProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const fullContentRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const nextProject = getNextCaseStudy(data.slug);
   
   const [showIntro, setShowIntro] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
+  const [showFullCaseStudy, setShowFullCaseStudy] = useState(!data.summary);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -149,6 +152,31 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
     router.push("/#projects");
   };
 
+  const handleViewFullCaseStudy = useCallback(() => {
+    setShowFullCaseStudy(true);
+    requestAnimationFrame(() => {
+      if (fullContentRef.current) {
+        gsap.fromTo(
+          fullContentRef.current,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            onComplete: () => {
+              fullContentRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+              ScrollTrigger.refresh();
+            },
+          }
+        );
+      }
+    });
+  }, []);
+
   return (
     <div ref={rootRef} className="min-h-screen bg-neutral-950 text-white">
       {showIntro && (
@@ -190,7 +218,23 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
           {/* 1. Hero Section */}
           <CaseStudyHero data={data.hero} />
 
-          {/* 2. Problem Statement */}
+          {/* 2. Summary Section (if exists) */}
+          {data.summary && !showFullCaseStudy && (
+            <CaseStudySummary
+              data={data.summary}
+              onViewFullCaseStudy={handleViewFullCaseStudy}
+            />
+          )}
+
+          {/* 3+. Full Case Study Sections */}
+          <div
+            ref={fullContentRef}
+            style={{
+              display: showFullCaseStudy ? "block" : "none",
+              opacity: data.summary ? 0 : 1,
+            }}
+          >
+          {/* Problem Statement */}
           <ProblemStatement data={data.problem} />
 
           {/* 3. Goals & Metrics */}
@@ -246,6 +290,7 @@ export default function ClothieCaseStudyTemplate({ data }: ClothieCaseStudyTempl
 
           {/* 19. Next Project Navigation */}
           <NextProjectNav nextProject={nextProject} />
+          </div>
         </main>
 
         {/* Footer */}
