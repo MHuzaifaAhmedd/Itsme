@@ -342,6 +342,8 @@ export default function Home() {
   const projectsSectionRef = useRef<HTMLElement | null>(null);
   const projectsContentRef = useRef<HTMLDivElement | null>(null);
   const projectsCardsColumnRef = useRef<HTMLDivElement | null>(null);
+  const projectsCardsBlockRef = useRef<HTMLDivElement | null>(null);
+  const projectsCardsScrollHintRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -585,59 +587,27 @@ export default function Home() {
         });
       }
 
-      // ===== PROJECTS SECTION CENTER-TO-RIGHT SCROLL ANIMATION =====
-      // Content starts centered when section pins, moves to right on scroll
-      if (!prefersReducedMotion && projectsContentRef.current && projectsSectionRef.current) {
-        const projectsContent = projectsContentRef.current;
-        const projectsCards = projectsCardsColumnRef.current;
-        
-        // Right column: starts centered, moves to right after buffer
+      // Projects: keep scroll hint visible until user has scrolled further and first card animates, then fade out
+      if (
+        !prefersReducedMotion &&
+        projectsCardsBlockRef.current &&
+        projectsCardsScrollHintRef.current
+      ) {
         gsap.fromTo(
-          projectsContent,
+          projectsCardsScrollHintRef.current,
+          { opacity: 1 },
           {
-            x: "-30vw",      // Shift toward center
-            scale: 0.96,
-            opacity: 1,
-          },
-          {
-            x: 0,
-            scale: 1,
-            opacity: 1,
-            ease: "power3.out",
+            opacity: 0,
+            ease: "power2.out",
             scrollTrigger: {
-              trigger: projectsSectionRef.current,
-              start: "top -8%",
-              end: "+=25%",
-              scrub: 1.5,
+              trigger: projectsCardsBlockRef.current,
+              start: "top bottom",
+              end: "top -50%",
+              scrub: 1,
               invalidateOnRefresh: true,
             },
           }
         );
-
-        // Left column (stacking cards): fades in and moves to position
-        if (projectsCards) {
-          gsap.fromTo(
-            projectsCards,
-            {
-              x: "15vw",
-              scale: 0.96,
-              opacity: 0,
-            },
-            {
-              x: 0,
-              scale: 1,
-              opacity: 1,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: projectsSectionRef.current,
-                start: "top -8%",
-                end: "+=25%",
-                scrub: 1.5,
-                invalidateOnRefresh: true,
-              },
-            }
-          );
-        }
       }
     }, root);
 
@@ -879,88 +849,113 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Projects Section - Desktop (unchanged) */}
+          {/* Projects Section - Desktop: content first (fully visible), then cards animation on scroll */}
           <section
             ref={projectsSectionRef}
-            className="relative z-10 min-h-[300vh] border-t border-neutral-900 bg-neutral-950 hidden md:block"
+            className="relative z-10 border-t border-neutral-900 bg-neutral-950 hidden md:block"
           >
-          <div className="sticky top-0 h-screen overflow-hidden">
-            <div className="relative flex w-full h-full flex-col gap-12 py-24 pl-4 pr-4 md:flex-row md:items-center md:justify-between md:gap-16 lg:gap-20 md:pl-6 md:pr-6 lg:pl-12 lg:pr-12">
-              {/* Left Column - Stacking project cards (scroll‑animated) */}
-              <div 
-                ref={projectsCardsColumnRef}
-                className="hidden md:flex md:flex-[0.85] lg:flex-[0.9] md:items-center md:justify-center will-change-transform"
-              >
-                <ProjectCardsLeft sectionRef={projectsSectionRef} />
-              </div>
-
-              {/* Right Column - Text Content */}
-              <div 
-                ref={projectsContentRef}
-                className="flex flex-1 flex-col gap-6 md:max-w-[65ch] md:flex-[0.48] lg:flex-[0.45] will-change-transform">
-                {/* Section Label */}
-                <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
-                  Projects
-                </p>
-
-                {/* Headline */}
-                <h2 className="text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
-                  Signature projects that blend craft with measurable outcomes.
-                </h2>
-
-                {/* Body Paragraph */}
-                <p className="text-left max-w-[60ch] text-base leading-relaxed text-neutral-300 md:text-lg -mt-2">
-                  Each engagement is grounded in research, elevated design systems,
-                  and performance-driven engineering. I partner with teams that
-                  want their digital presence to feel quietly iconic.
-                </p>
-
-                {/* Projects Grid */}
-                <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 mt-4">
-                  {[
-                    {
-                      name: "Employee Management System",
-                      description: "Comprehensive system for managing employee data, attendance, and organizational workflows.",
-                    },
-                    {
-                      name: "Sharaf ul Quran",
-                      description: "Digital platform for Quranic learning and spiritual guidance.",
-                    },
-                    {
-                      name: "Whatsapp funnel (Lead Management system)",
-                      description: "Automated lead generation and management system integrated with WhatsApp messaging.",
-                    },
-                    {
-                      name: "Naba Hussam",
-                      description: "Ecommerce platform specializing in women's clothing with elegant design and seamless shopping experience.",
-                    },
-                  ].map((item) => (
-                    <div
-                      key={item.name}
-                      className="rounded-3xl border border-neutral-900 bg-neutral-900/40 p-6 text-neutral-300 flex flex-col"
+            {/* Part A: Project description + case study grid — horizontally aligned, all visible in viewport */}
+            <div
+              ref={projectsContentRef}
+              className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6 md:py-20 lg:px-12 lg:py-24"
+            >
+              <p className="text-xs uppercase tracking-[0.5em] text-neutral-500 opacity-60 text-left">
+                Projects
+              </p>
+              <h2 className="mt-4 text-left text-4xl font-semibold leading-[1.1] text-neutral-100 md:text-5xl lg:text-6xl">
+                Signature projects that blend craft with measurable outcomes.
+              </h2>
+              <p className="mt-4 max-w-[60ch] text-left text-base leading-relaxed text-neutral-300 md:text-lg">
+                Each engagement is grounded in research, elevated design systems,
+                and performance-driven engineering. I partner with teams that
+                want their digital presence to feel quietly iconic.
+              </p>
+              <div className="mt-10 grid w-full max-w-full grid-cols-1 gap-6 min-w-0 lg:grid-cols-2">
+                {[
+                  {
+                    name: "Employee Management System",
+                    description: "Comprehensive system for managing employee data, attendance, and organizational workflows.",
+                  },
+                  {
+                    name: "Sharaf ul Quran",
+                    description: "Digital platform for Quranic learning and spiritual guidance.",
+                  },
+                  {
+                    name: "Whatsapp funnel (Lead Management system)",
+                    description: "Automated lead generation and management system integrated with WhatsApp messaging.",
+                  },
+                  {
+                    name: "Naba Hussam",
+                    description: "Ecommerce platform specializing in women's clothing with elegant design and seamless shopping experience.",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.name}
+                    className="min-w-0 overflow-hidden rounded-3xl border border-neutral-900 bg-neutral-900/40 p-6 text-neutral-300 flex flex-col"
+                  >
+                    <p className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+                      Case study
+                    </p>
+                    <h3 className="mt-3 min-w-0 text-base font-medium text-neutral-100 wrap-break-word">
+                      {item.name}
+                    </h3>
+                    <p className="mt-2 min-w-0 flex-1 text-xs text-neutral-400 wrap-break-word">
+                      {item.description}
+                    </p>
+                    <Link
+                      href={`/case-study/${createSlug(item.name)}`}
+                      className="mt-4 w-fit px-4 py-2 text-xs font-medium text-neutral-100 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-neutral-600 rounded-lg transition-colors"
                     >
-                      <p className="text-xs uppercase tracking-[0.2em] text-neutral-500">
-                        Case study
-                      </p>
-                      <h3 className="mt-3 text-base font-medium text-neutral-100">
-                        {item.name}
-                      </h3>
-                      <p className="mt-2 text-xs text-neutral-400 flex-1">
-                        {item.description}
-                      </p>
-                      <Link
-                        href={`/case-study/${createSlug(item.name)}`}
-                        className="mt-4 w-fit px-4 py-2 text-xs font-medium text-neutral-100 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-neutral-600 rounded-lg transition-colors"
-                      >
-                        View
-                      </Link>
+                      View
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Part B: Animated project cards — appears below on scroll, cards animation runs here */}
+            <div
+              ref={projectsCardsBlockRef}
+              className="relative min-h-[280vh] w-full"
+            >
+              <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
+                {/* Scroll floating hint: visible in empty viewport before cards, fades out on scroll */}
+                <div
+                  ref={projectsCardsScrollHintRef}
+                  className="scroll-hint-float absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <div className="flex flex-col items-center gap-5 rounded-2xl border border-neutral-700/50 bg-neutral-950/90 px-10 py-8 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+                    {/* Scroll-down line + glowing track */}
+                    <div className="relative flex flex-col items-center">
+                      <div className="h-16 w-px bg-neutral-600" aria-hidden="true" />
+                      <div
+                        className="absolute top-0 h-16 w-px bg-linear-to-b from-neutral-100 via-neutral-300 to-transparent animate-scroll-hint-line"
+                        style={{ transformOrigin: "top" }}
+                        aria-hidden="true"
+                      />
+                      <div
+                        className="absolute -bottom-0.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-neutral-300 bg-neutral-200 shadow-[0_0_16px_rgba(229,229,229,0.5)] animate-scroll-hint-bounce"
+                        aria-hidden="true"
+                      />
                     </div>
-                  ))}
+                    <p className="text-base font-medium uppercase tracking-[0.35em] text-neutral-100">
+                      Scroll down
+                    </p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 -mt-1">
+                      for the cards
+                    </p>
+                  </div>
+                </div>
+                <div
+                  ref={projectsCardsColumnRef}
+                  className="relative z-0 flex h-full w-full items-center justify-center will-change-transform"
+                >
+                  <ProjectCardsLeft sectionRef={projectsCardsBlockRef} />
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </div>
 
         <section

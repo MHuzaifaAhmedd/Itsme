@@ -112,13 +112,19 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
     particleArrayRef.current = [];
 
     const text = "MAKE IT REAL";
-    // Responsive font size: smaller on mobile, original on desktop
-    const isMobile = window.innerWidth < 640; // sm breakpoint
-    const fontSize = isMobile 
-      ? Math.min(canvas.width / 8, 120) // Smaller on mobile
-      : Math.min(canvas.width / 5, 220); // Original desktop size
-    ctx.fillStyle = 'white';
+    const padding = 48; // horizontal padding so text never clips
+    const maxTextWidth = canvas.width - padding * 2;
+    const isMobile = window.innerWidth < 640;
+    let fontSize = isMobile
+      ? Math.min(canvas.width / 8, 120)
+      : Math.min(canvas.width / 5, 220);
     ctx.font = `900 ${fontSize}px Arial, system-ui, sans-serif`;
+    let textWidth = ctx.measureText(text).width;
+    if (textWidth > maxTextWidth) {
+      fontSize = Math.floor((fontSize * maxTextWidth) / textWidth);
+      ctx.font = `900 ${fontSize}px Arial, system-ui, sans-serif`;
+    }
+    ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
@@ -159,13 +165,19 @@ export default function CollaborateCTA({ className = "" }: CollaborateCTAProps) 
       canvas.height = rect.height;
       
       const text = "MAKE IT REAL";
-      // Responsive font size: smaller on mobile, original on desktop
-      const isMobile = window.innerWidth < 640; // sm breakpoint
-      const fontSize = isMobile 
-        ? Math.min(canvas.width / 8, 120) // Smaller on mobile
-        : Math.min(canvas.width / 5, 220); // Original desktop size
-      ctx.fillStyle = 'rgba(26, 91, 199, 0.15)';
+      const padding = 48;
+      const maxTextWidth = canvas.width - padding * 2;
+      const isMobile = window.innerWidth < 640;
+      let fontSize = isMobile
+        ? Math.min(canvas.width / 8, 120)
+        : Math.min(canvas.width / 5, 220);
       ctx.font = `900 ${fontSize}px Arial, system-ui, sans-serif`;
+      let textWidth = ctx.measureText(text).width;
+      if (textWidth > maxTextWidth) {
+        fontSize = Math.floor((fontSize * maxTextWidth) / textWidth);
+        ctx.font = `900 ${fontSize}px Arial, system-ui, sans-serif`;
+      }
+      ctx.fillStyle = 'rgba(26, 91, 199, 0.15)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, canvas.width / 2, canvas.height / 2);

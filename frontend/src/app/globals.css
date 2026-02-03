@@ -348,3 +348,64 @@ html, body {
     transform: scale(1.05);
   }
 }
+
+/* =============================================================================
+   Projects cards section – "Scroll down" hint animation (before first card)
+   ============================================================================= */
+
+@keyframes scroll-hint-line {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scroll-hint-bounce {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-50%, 14px);
+    opacity: 1;
+  }
+}
+
+.animate-scroll-hint-line {
+  animation: scroll-hint-line 2s ease-in-out infinite;
+}
+
+.animate-scroll-hint-bounce {
+  animation: scroll-hint-bounce 1.6s ease-in-out infinite;
+}
+
+/* Gentle floating motion for the whole scroll hint in empty viewport */
+.scroll-hint-float {
+  animation: scroll-hint-float 3s ease-in-out infinite;
+}
+
+@keyframes scroll-hint-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-hint-line,
+  .animate-scroll-hint-bounce {
+    animation: none;
+  }
+  .scroll-hint-float {
+    animation: none;
+  }
+}
