@@ -30,6 +30,11 @@ const QUICK_REPLIES: QuickReply[] = [
     text: "Tell me about the EMS project",
     category: "projects",
   },
+  {
+    id: "sharaf-ul-quran",
+    text: "Tell me about Sharaf ul Quran",
+    category: "projects",
+  },
 ];
 
 export default function QuickReplies({ onSelect }: QuickRepliesProps) {

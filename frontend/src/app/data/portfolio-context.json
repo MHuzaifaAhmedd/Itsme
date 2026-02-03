@@ -126,6 +126,55 @@
       "year": "2024-2025",
       "role": "Full-Stack Developer",
       "liveUrl": "https://nabahussam.com"
+    },
+    {
+      "name": "Sharaf ul Quran",
+      "slug": "sharaf-ul-quran",
+      "type": "Islamic Education Platform",
+      "description": "Full-stack Islamic education platform connecting students (talib) with Quran teachers (Qaris) for online learning: one-time and monthly session booking, course enrollment (Noorani Qaida, Quran Recitation, Memorization) with Stripe payments, Google Meet scheduling, Fireflies.ai recording and transcription, resource sharing gated by paid bookings, and admin oversight with dual backends (main + admin) sharing PostgreSQL.",
+      "techStack": [
+        "React 18",
+        "Vite 5",
+        "React Router 7",
+        "Tailwind CSS",
+        "Framer Motion",
+        "Redux Toolkit",
+        "TanStack React Query",
+        "ECharts",
+        "Node.js",
+        "Express 4",
+        "PostgreSQL",
+        "Stripe",
+        "Google OAuth2 / Calendar API",
+        "Facebook OAuth",
+        "Fireflies.ai",
+        "Socket.io",
+        "Nodemailer",
+        "WhatsApp Cloud API",
+        "Docker",
+        "Nginx"
+      ],
+      "highlights": [
+        "Dual frontends (Student/Qari portal + Admin dashboard) and dual Express backends sharing one PostgreSQL",
+        "One-time and monthly session booking with Stripe and Google Meet links",
+        "Course enrollment with admin slot assignment and idempotent Stripe webhook handling",
+        "Enrollment state machine: pending_approval → approved_unpaid → active → completed",
+        "Resource access gated by paid booking via resourceAccessMiddleware",
+        "Fireflies.ai integration for meeting recording and transcription",
+        "Cookie-based JWT with role separation (main backend rejects admin tokens)",
+        "Session notification cron and in-memory admin stats cache"
+      ],
+      "features": [
+        "Email/password and OAuth (Google, Facebook) auth with JWT in httpOnly cookie",
+        "Qari and Student onboarding with admin approval workflow",
+        "One-time booking with Stripe PaymentIntent, Google Meet, email and WhatsApp notifications",
+        "Monthly plans (5/6 days) and multi-month course enrollment with Stripe",
+        "Qari resource uploads (lessons, PDFs, videos); student access only with paid booking for that Qari",
+        "Fireflies.ai webhook and polling for meeting recordings and transcripts",
+        "Admin panel with stats (ECharts), Qari/student management, and session notification cron"
+      ],
+      "year": "2024-2025",
+      "role": "Full-Stack Developer / System Architect"
     }
   ],
   "skills": {
