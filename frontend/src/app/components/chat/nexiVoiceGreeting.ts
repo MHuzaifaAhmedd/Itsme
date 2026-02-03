@@ -6,7 +6,6 @@
 // Spelled so TTS says "NEX" as one word and "I" as "eye" (not letter-by-letter N-E-X-I)
 const GREETING_TEXT =
   "Hi, I'm NEX eye — a real-time AI bot here to entertain and help you.";
-const STORAGE_KEY = "nexi_voice_greeted";
 const VOICE_SETTINGS = {
   rate: 0.92, // slightly slower, but a touch more lively
   pitch: 1.15, // a bit higher for a sweeter tone
@@ -68,20 +67,10 @@ export function playNexiVoiceGreetingIfFirstTime(): void {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) {
     return;
   }
-  // Prevent double-queueing (React Strict Mode can invoke updater functions twice in dev).
+  // Prevent double-queueing within the same page load (e.g. open → close → open).
+  // After a full reload, greetingTriggeredThisSession is reset, so greeting plays again.
   if (greetingTriggeredThisSession) return;
-  try {
-    if (localStorage.getItem(STORAGE_KEY) === "true") return;
-  } catch {
-    return;
-  }
   greetingTriggeredThisSession = true;
-  // Best-effort: mark greeted immediately to avoid duplicates even if onstart is delayed.
-  try {
-    localStorage.setItem(STORAGE_KEY, "true");
-  } catch {
-    // ignore
-  }
 
   const utterance = new SpeechSynthesisUtterance(GREETING_TEXT);
   utterance.rate = VOICE_SETTINGS.rate;
@@ -115,16 +104,12 @@ export function playNexiVoiceGreetingIfFirstTime(): void {
 
   utterance.onerror = (event) => {
     console.error("Speech synthesis error:", event);
-    try {
-      localStorage.setItem(STORAGE_KEY, "true");
-    } catch {
-      // ignore
-    }
   };
 
   try {
+    // Cancel any pending/playing speech so we never queue a duplicate greeting.
+    window.speechSynthesis.cancel();
     // Call speak() immediately so it runs in the same user gesture.
-    // Do not wait for voiceschanged — that runs async and loses the gesture.
     window.speechSynthesis.resume?.();
     window.speechSynthesis.speak(utterance);
   } catch {
