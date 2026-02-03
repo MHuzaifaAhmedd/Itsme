@@ -800,7 +800,7 @@ export default function Home() {
           </div>
 
           {/* Main content - positioned at bottom-left on mobile (within first viewport), above center on desktop */}
-          <div className="hero-content absolute sm:relative z-10 left-4 right-4 sm:left-0 sm:right-0 top-[75vh] xs:top-[78vh] sm:top-0 flex w-auto sm:w-full max-w-6xl flex-col items-start gap-5 xs:gap-6 sm:gap-8 md:gap-10 text-left sm:pt-[55vh] md:pt-[64vh] sm:pl-2 md:pl-4 lg:pl-0 sm:pr-0">
+          <div className="hero-content absolute sm:relative z-10 left-4 right-4 sm:left-0 sm:right-0 top-[73vh] xs:top-[78vh] sm:top-0 flex w-auto sm:w-full max-w-6xl flex-col items-start gap-5 xs:gap-6 sm:gap-8 md:gap-10 text-left sm:pt-[55vh] md:pt-[64vh] sm:pl-2 md:pl-4 lg:pl-0 sm:pr-0">
             <p
               ref={eyebrowRef}
               className="text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-[0.25em] xs:tracking-[0.3em] sm:tracking-[0.5em] text-neutral-400"
