@@ -922,29 +922,38 @@ export default function Home() {
                 {/* Scroll floating hint: visible in empty viewport before cards, fades out on scroll */}
                 <div
                   ref={projectsCardsScrollHintRef}
-                  className="scroll-hint-float absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 pointer-events-none"
+                  className="scroll-hint-float absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none"
                   aria-hidden="true"
                 >
-                  <div className="flex flex-col items-center gap-5 rounded-2xl border border-neutral-700/50 bg-neutral-950/90 px-10 py-8 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
-                    {/* Scroll-down line + glowing track */}
-                    <div className="relative flex flex-col items-center">
-                      <div className="h-16 w-px bg-neutral-600" aria-hidden="true" />
+                  <div className="flex flex-col items-center gap-6">
+                    {/* Scroll cue: dot slides down the line (centered with same axis via left + margin) */}
+                    <div className="relative h-16 w-4 flex flex-col items-center">
+                      {/* Track + gradient line: centered with margin so axis is exact */}
                       <div
-                        className="absolute top-0 h-16 w-px bg-linear-to-b from-neutral-100 via-neutral-300 to-transparent animate-scroll-hint-line"
-                        style={{ transformOrigin: "top" }}
+                        className="absolute left-1/2 top-0 h-16 w-px -ml-px rounded-full bg-neutral-700/50"
                         aria-hidden="true"
+                        style={{ marginLeft: "-0.5px" }}
                       />
                       <div
-                        className="absolute -bottom-0.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border-2 border-neutral-300 bg-neutral-200 shadow-[0_0_16px_rgba(229,229,229,0.5)] animate-scroll-hint-bounce"
+                        className="absolute left-1/2 top-0 h-16 w-px rounded-full bg-linear-to-b from-neutral-300/80 via-neutral-400/60 to-transparent"
                         aria-hidden="true"
+                        style={{ marginLeft: "-0.5px" }}
+                      />
+                      {/* Dot: same center via left 50% + marginLeft -4px (half of 8px), animation only translateY */}
+                      <div
+                        className="scroll-hint-dot absolute top-0 left-1/2 h-2 w-2 rounded-full bg-neutral-200 shadow-[0_0_10px_rgba(255,255,255,0.35)]"
+                        aria-hidden="true"
+                        style={{ marginLeft: "-4px" }}
                       />
                     </div>
-                    <p className="text-base font-medium uppercase tracking-[0.35em] text-neutral-100">
-                      Scroll down
-                    </p>
-                    <p className="text-xs uppercase tracking-[0.25em] text-neutral-400 -mt-1">
-                      for the cards
-                    </p>
+                    <div className="flex flex-col items-center gap-0.5 scroll-hint-text">
+                      <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-neutral-300">
+                        Scroll down
+                      </p>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">
+                        for the cards
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <div

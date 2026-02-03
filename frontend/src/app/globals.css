@@ -350,59 +350,72 @@ html, body {
 }
 
 /* =============================================================================
-   Projects cards section – "Scroll down" hint animation (before first card)
+   Projects cards section – "Scroll down" hint (dot slides down line, then resets)
    ============================================================================= */
 
-@keyframes scroll-hint-line {
-  0%,
-  100% {
-    transform: scaleY(0.4);
-    opacity: 0.8;
+/* Dot travels top → bottom, fades out, reappears at top */
+@keyframes scroll-hint-dot-slide {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
   }
-  50% {
-    transform: scaleY(1);
+  55% {
+    transform: translateY(56px);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(56px);
+    opacity: 0;
+  }
+  75% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  85% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
     opacity: 1;
   }
 }
 
-@keyframes scroll-hint-bounce {
-  0%,
-  100% {
-    transform: translate(-50%, 0);
-    opacity: 0.85;
-  }
-  50% {
-    transform: translate(-50%, 14px);
+.scroll-hint-dot {
+  animation: scroll-hint-dot-slide 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Subtle pulse on text */
+@keyframes scroll-hint-text-pulse {
+  0%, 100% {
     opacity: 1;
   }
+  50% {
+    opacity: 0.75;
+  }
 }
 
-.animate-scroll-hint-line {
-  animation: scroll-hint-line 2s ease-in-out infinite;
+.scroll-hint-text {
+  animation: scroll-hint-text-pulse 2.4s ease-in-out infinite;
 }
 
-.animate-scroll-hint-bounce {
-  animation: scroll-hint-bounce 1.6s ease-in-out infinite;
-}
-
-/* Gentle floating motion for the whole scroll hint in empty viewport */
+/* Gentle float for the whole block */
 .scroll-hint-float {
-  animation: scroll-hint-float 3s ease-in-out infinite;
+  animation: scroll-hint-float 4s ease-in-out infinite;
 }
 
 @keyframes scroll-hint-float {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-4px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-scroll-hint-line,
-  .animate-scroll-hint-bounce {
+  .scroll-hint-dot,
+  .scroll-hint-text {
     animation: none;
   }
   .scroll-hint-float {
